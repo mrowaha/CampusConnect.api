@@ -6,7 +6,7 @@
 ## Contributors
 1. <a href="https://github.com/Atherrrrr">Maher Ather Ilyas</a>
 2. <a href="https://github.com/MehshidAtiq">Mehshid Atiq</a>
-3. <a href="https://github.com/gahme">Ghulam Ahmad</a>
+3. <a href="https://github.com/TheGhulam">Ghulam Ahmed</a>
 4. <a href="https://github.com/Quikker">İsmail Özgenç</a> 
 5. <a href="https://github.com/mrowaha">Muhammad Rowaha</a>
 
