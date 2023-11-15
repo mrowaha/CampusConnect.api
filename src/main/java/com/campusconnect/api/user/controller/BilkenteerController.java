@@ -4,14 +4,18 @@ import com.campusconnect.api.user.dto.BilkenteerCreationDto;
 import com.campusconnect.api.user.dto.BilkenteerLoginDto;
 import com.campusconnect.api.user.entity.Bilkenteer;
 import com.campusconnect.api.user.service.BilkenteerService;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/bilkenteer")
 @RequiredArgsConstructor
+@Controller
 public class BilkenteerController {
 
     private final BilkenteerService bilkenteerService;
@@ -32,6 +36,12 @@ public class BilkenteerController {
 
     @GetMapping(value = "/protected")
     public  ResponseEntity<?> protectedRoute() {
-        return new ResponseEntity("Good", HttpStatus.OK);
+        return new ResponseEntity(new ProtectedDto("Authorized"), HttpStatus.OK);
     }
+}
+
+@Data
+@AllArgsConstructor
+class ProtectedDto {
+    String success;
 }

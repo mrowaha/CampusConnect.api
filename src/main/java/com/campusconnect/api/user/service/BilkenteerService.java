@@ -31,8 +31,6 @@ public class BilkenteerService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtilities jwtUtilities;
 
-
-
     public ResponseEntity<?> register(BilkenteerCreationDto creationDto) {
         if(bilkenteerRepository.existsByEmail(creationDto.getEmail())) {
             return  new ResponseEntity<>(new ErrorDto("email is already taken"), HttpStatus.SEE_OTHER); }
@@ -72,5 +70,4 @@ public class BilkenteerService {
         String token = jwtUtilities.generateToken(bilkenteer.getUsername(), "BILKENTEER");
         return new ResponseEntity<>(new BearerToken(token, "Bearer "), HttpStatus.OK);
     }
-
 }
