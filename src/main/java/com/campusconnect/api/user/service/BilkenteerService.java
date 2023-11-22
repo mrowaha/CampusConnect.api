@@ -9,6 +9,7 @@ import com.campusconnect.api.user.entity.Bilkenteer;
 import com.campusconnect.api.user.enums.Role;
 import com.campusconnect.api.user.repository.BilkenteerRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +56,7 @@ public class BilkenteerService {
         }
     }
 
-    public ResponseEntity<?> authenticate(BilkenteerLoginDto loginDto) {
+    public ResponseEntity<?> authenticate(@Valid BilkenteerLoginDto loginDto) {
         Bilkenteer bilkenteer = bilkenteerRepository.findByEmail(loginDto.getEmail());
         if (bilkenteer == null) {
             return new ResponseEntity<>(new ErrorDto("User not found!"), HttpStatus.NOT_FOUND);
