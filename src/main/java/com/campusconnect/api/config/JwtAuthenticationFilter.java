@@ -15,7 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
 
 
@@ -49,8 +48,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UserDetails userDetails = null;
                 if (role.equals("BILKENTEER")) {
                     userDetails = bilkenteerDetailsService.loadUserByUsername(email);
-                } else {
+                } else if (role.equals("MODERATOR")) {
                     userDetails = moderatorDetailsService.loadUserByUsername(email);
+                } else {
+                    filterChain.doFilter(request,response);
+                    return;
                 }
 
                 if (userDetails != null) {
