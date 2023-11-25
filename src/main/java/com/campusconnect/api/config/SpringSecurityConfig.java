@@ -1,6 +1,7 @@
 package com.campusconnect.api.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,13 +14,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 
 @Configuration
 @EnableWebSecurity
+@EnableConfigurationProperties(RoledJwtProperties.class)
 @RequiredArgsConstructor
 public class SpringSecurityConfig {
 
@@ -34,8 +33,8 @@ public class SpringSecurityConfig {
             .and()
             .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers(new String[]{"/bilkenteer/register", "/bilkenteer/login"}).permitAll()
-                .requestMatchers("/bilkenteer/protected").authenticated();
+                .requestMatchers(new String[]{"/bilkenteer/register", "/bilkenteer/login", "/moderator/register", "/moderator/login"}).permitAll()
+                .requestMatchers(new String[]{"/bilkenteer/protected", "/moderator/protected"}).authenticated();
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return  http.build();
@@ -49,16 +48,4 @@ public class SpringSecurityConfig {
     public PasswordEncoder passwordEncoder()
     { return new BCryptPasswordEncoder(); }
 
-//    @Bean
-//    public CorsFilter corsFilter() {
-//        UrlBasedCorsConfigurationSource source =
-//                new UrlBasedCorsConfigurationSource();
-//        CorsConfiguration config = new CorsConfiguration();
-////        config.setAllowCredentials(true);
-//        config.addAllowedOrigin("*");
-//        config.addAllowedHeader("*");
-//        config.addAllowedMethod("*");
-//        source.registerCorsConfiguration("/**", config);
-//        return new CorsFilter(source);
-//    }
 }

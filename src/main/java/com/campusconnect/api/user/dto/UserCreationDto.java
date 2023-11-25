@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BilkenteerCreationDto {
+public class UserCreationDto {
 
     @NotBlank(message = "first name field cannot be blank")
     @NotNull(message = "first name cannot be null")

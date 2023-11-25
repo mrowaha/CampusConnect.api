@@ -2,10 +2,8 @@ package com.campusconnect.api.user.controller;
 
 import com.campusconnect.api.user.dto.UserCreationDto;
 import com.campusconnect.api.user.dto.UserLoginDto;
-import com.campusconnect.api.user.service.BilkenteerService;
+import com.campusconnect.api.user.service.ModeratorService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,35 +11,29 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/bilkenteer")
+@RequestMapping("/moderator")
 @RequiredArgsConstructor
 @Controller
-public class BilkenteerController {
+public class ModeratorController {
 
-    private final BilkenteerService bilkenteerService;
+    private  final ModeratorService moderatorService;
 
     @PostMapping(value = "/register", consumes = "application/json")
     public ResponseEntity<?> registerBilkenteer(
-           @Valid @RequestBody UserCreationDto bilkenteerCreationInfo
+            @Valid @RequestBody UserCreationDto moderatorCreationInfo
     ) {
-        return bilkenteerService.register(bilkenteerCreationInfo);
+        return moderatorService.register(moderatorCreationInfo);
     }
 
     @PostMapping(value = "/login", consumes = "application/json")
     public ResponseEntity<?> loginBilkenteer(
-            @Valid @RequestBody UserLoginDto bilkenteerLoginDto
+            @Valid @RequestBody UserLoginDto moderatorLoginInfo
     ) {
-        return bilkenteerService.authenticate(bilkenteerLoginDto);
+        return moderatorService.authenticate(moderatorLoginInfo);
     }
 
     @GetMapping(value = "/protected")
     public  ResponseEntity<?> protectedRoute() {
         return new ResponseEntity(new ProtectedDto("Authorized"), HttpStatus.OK);
     }
-}
-
-@Data
-@AllArgsConstructor
-class ProtectedDto {
-    String success;
 }

@@ -1,22 +1,19 @@
 package com.campusconnect.api.user.service;
 
 import com.campusconnect.api.common.dto.BearerToken;
-import com.campusconnect.api.common.dto.ErrorDto;
 import com.campusconnect.api.config.JwtUtilities;
-import com.campusconnect.api.user.dto.BilkenteerCreationDto;
-import com.campusconnect.api.user.dto.BilkenteerLoginDto;
+import com.campusconnect.api.user.exceptions.InvalidPasswordException;
+import com.campusconnect.api.user.exceptions.UserAlreadyTakenException;
+import com.campusconnect.api.user.exceptions.UserNotFoundException;
+import com.campusconnect.api.user.dto.UserCreationDto;
+import com.campusconnect.api.user.dto.UserLoginDto;
 import com.campusconnect.api.user.entity.Bilkenteer;
 import com.campusconnect.api.user.enums.Role;
 import com.campusconnect.api.user.repository.BilkenteerRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,14 +24,14 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class BilkenteerService {
 
-    private final AuthenticationManager authenticationManager;
     private final BilkenteerRepository bilkenteerRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtilities jwtUtilities;
 
-    public ResponseEntity<?> register(BilkenteerCreationDto creationDto) {
+    public ResponseEntity<?> register(UserCreationDto creationDto) {
         if(bilkenteerRepository.existsByEmail(creationDto.getEmail())) {
-            return  new ResponseEntity<>(new ErrorDto("email is already taken"), HttpStatus.SEE_OTHER); }
+            throw new UserAlreadyTakenException();
+        }
         else {
             Bilkenteer bilkenteer = Bilkenteer.builder()
                     .firstName(creationDto.getFirstName())
@@ -56,18 +53,17 @@ public class BilkenteerService {
         }
     }
 
-    public ResponseEntity<?> authenticate(@Valid BilkenteerLoginDto loginDto) {
+    public ResponseEntity<?> authenticate(UserLoginDto loginDto) throws UserNotFoundException {
         Bilkenteer bilkenteer = bilkenteerRepository.findByEmail(loginDto.getEmail());
+
         if (bilkenteer == null) {
-            return new ResponseEntity<>(new ErrorDto("User not found!"), HttpStatus.NOT_FOUND);
+            throw new UserNotFoundException();
         }
-        Authentication authentication= authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginDto.getEmail(),
-                        loginDto.getPassword()
-                )
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        if (!passwordEncoder.matches(loginDto.getPassword(), bilkenteer.getPassword())) {
+            throw new InvalidPasswordException();
+        }
+
         String token = jwtUtilities.generateToken(bilkenteer.getUsername(), "BILKENTEER");
         return new ResponseEntity<>(new BearerToken(token, "Bearer "), HttpStatus.OK);
     }
