@@ -33,7 +33,7 @@ public class SpringSecurityConfig {
             .and()
             .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers(new String[]{"/bilkenteer/register", "/bilkenteer/login", "/moderator/register", "/moderator/login"}).permitAll()
+                .requestMatchers(new String[]{"/auth/**"}).permitAll()
                 .requestMatchers(new String[]{"/bilkenteer/protected", "/moderator/protected"}).authenticated();
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
