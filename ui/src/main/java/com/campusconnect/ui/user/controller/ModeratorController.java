@@ -13,12 +13,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 @RequestMapping("/moderator")
 public class ModeratorController {
 
-    private final RequestMappingHandlerMapping handlerMapping;
-    @Autowired
-    public ModeratorController(RequestMappingHandlerMapping handlerMapping) {
-        this.handlerMapping = handlerMapping;
-    }
-
     @GetMapping(value = "/protected")
     public ResponseEntity<?> protectedModeratorRoute() {
         return new ResponseEntity(new ProtectedDto("Authorized"), HttpStatus.OK);
