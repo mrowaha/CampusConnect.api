@@ -14,10 +14,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 public class ModeratorController {
 
     @GetMapping(value = "/protected")
-    public ResponseEntity<?> protectedModeratorRoute() {
-        return new ResponseEntity(new ProtectedDto("Authorized"), HttpStatus.OK);
+    public ResponseEntity<ProtectedDto> protectedModeratorRoute() {
+        return new ResponseEntity<>(new ProtectedDto("Authorized"), HttpStatus.OK);
     }
-
-
 
 }

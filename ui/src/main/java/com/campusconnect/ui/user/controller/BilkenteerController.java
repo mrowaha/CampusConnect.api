@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class BilkenteerController {
 
     @GetMapping(value = "/protected")
-    public ResponseEntity<?> protectedBilkenteerRoute() {
-        return new ResponseEntity(new ProtectedDto("Authorized"), HttpStatus.OK);
+    public ResponseEntity<ProtectedDto> protectedBilkenteerRoute() {
+        return new ResponseEntity<>(new ProtectedDto("Authorized"), HttpStatus.OK);
     }
 
 }

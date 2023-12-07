@@ -37,7 +37,7 @@ public class ModeratorService implements UserDetailsService {
         );
     }
 
-    public ResponseEntity<?> register(UserCreationDto creationDto) {
+    public BearerToken register(UserCreationDto creationDto) throws UserAlreadyTakenException {
         if(moderatorRepository.existsByEmail(creationDto.getEmail())) {
             throw new UserAlreadyTakenException();
         }
@@ -52,11 +52,11 @@ public class ModeratorService implements UserDetailsService {
                             .build();
             moderatorRepository.save(moderator);
             String token = jwtUtilities.generateToken(creationDto.getEmail(), Role.MODERATOR);
-            return new ResponseEntity<>(new BearerToken(token , "Bearer "), HttpStatus.OK);
+            return new BearerToken(token , "Bearer ");
         }
     }
 
-    public ResponseEntity<?> authenticate(UserLoginDto loginDto)
+    public BearerToken authenticate(UserLoginDto loginDto)
             throws UserNotFoundException, InvalidPasswordException
     {
         Moderator moderator = moderatorRepository.findByEmail(loginDto.getEmail())
@@ -67,7 +67,7 @@ public class ModeratorService implements UserDetailsService {
         }
 
         String token = jwtUtilities.generateToken(moderator.getUsername(), Role.MODERATOR);
-        return new ResponseEntity<>(new BearerToken(token, "Bearer "), HttpStatus.OK);
+        return new BearerToken(token, "Bearer ");
     }
 
 

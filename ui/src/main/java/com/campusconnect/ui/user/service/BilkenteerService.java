@@ -33,10 +33,11 @@ public class BilkenteerService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return bilkenteerRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        return bilkenteerRepository.findByEmail(email).orElseThrow(() ->
+                new UsernameNotFoundException("User not found"));
     }
 
-    public ResponseEntity<?> register(UserCreationDto creationDto) throws UserAlreadyTakenException {
+    public BearerToken register(UserCreationDto creationDto) throws UserAlreadyTakenException {
         if(bilkenteerRepository.existsByEmail(creationDto.getEmail())) {
             throw new UserAlreadyTakenException();
         }
@@ -56,12 +57,11 @@ public class BilkenteerService implements UserDetailsService {
                     .build();
             bilkenteerRepository.save(bilkenteer);
             String token = jwtUtilities.generateToken(creationDto.getEmail(), Role.BILKENTEER);
-            return new ResponseEntity<>(new BearerToken(token , "Bearer "),HttpStatus.OK);
-
+            return new BearerToken(token , "Bearer ");
         }
     }
 
-    public ResponseEntity<?> authenticate(UserLoginDto loginDto)
+    public BearerToken authenticate(UserLoginDto loginDto)
             throws UserNotFoundException,InvalidPasswordException
     {
         Bilkenteer bilkenteer = bilkenteerRepository.findByEmail(loginDto.getEmail())
@@ -71,6 +71,6 @@ public class BilkenteerService implements UserDetailsService {
         }
 
         String token = jwtUtilities.generateToken(bilkenteer.getUsername(), Role.BILKENTEER);
-        return new ResponseEntity<>(new BearerToken(token, "Bearer "), HttpStatus.OK);
+        return new BearerToken(token, "Bearer ");
     }
 }
