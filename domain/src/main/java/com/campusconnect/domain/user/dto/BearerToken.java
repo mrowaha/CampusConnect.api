@@ -1,4 +1,4 @@
-package com.campusconnect.ui.common.dto;
+package com.campusconnect.domain.user.dto;
 
 import lombok.Data;
 

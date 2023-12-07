@@ -1,7 +1,9 @@
 package com.campusconnect.ui.config;
 
-import com.campusconnect.ui.common.exceptions.InvalidRoleException;
+import com.campusconnect.domain.user.enums.Role;
+
 import io.jsonwebtoken.*;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +37,20 @@ public class JwtUtilities{
         return extractClaim(token, Claims::getSubject);
     }
 
-    public String extractRole(String token) {
+    public Role extractRole(String token)
+    throws ServletException
+    {
         final Claims claims = extractAllClaims(token);
         if (claims == null) {
-            return null;
+            throw new ServletException("jwt role extraction failed");
         }
-        return (String)claims.get("role");
+
+        try {
+            return Role.valueOf((String)claims.get("role"));
+        } catch (IllegalArgumentException e) {
+            throw new ServletException("invalid jwt role");
+        }
+
     }
 
     public Claims extractAllClaims(String token) {
@@ -49,9 +59,9 @@ public class JwtUtilities{
             claims = Jwts.parser().setSigningKey(secrets.getBilkenteerSecret()).parseClaimsJws(token).getBody();
         } catch (SignatureException e) {
             claims = Jwts.parser().setSigningKey(secrets.getModeratorSecret()).parseClaimsJws(token).getBody();
-        } finally {
-            return claims;
         }
+
+        return  claims;
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -68,28 +78,33 @@ public class JwtUtilities{
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String email , String role) {
-        if (role.equals("BILKENTEER")) {
-            return Jwts.builder().setSubject(email).claim("role",role).setIssuedAt(new Date(System.currentTimeMillis()))
-                    .setExpiration(Date.from(Instant.now().plus(jwtExpiration, ChronoUnit.MILLIS)))
-                    .signWith(SignatureAlgorithm.HS256, secrets.getBilkenteerSecret()).compact();
-        } else {
-            return Jwts.builder().setSubject(email).claim("role",role).setIssuedAt(new Date(System.currentTimeMillis()))
-                    .setExpiration(Date.from(Instant.now().plus(jwtExpiration, ChronoUnit.MILLIS)))
-                    .signWith(SignatureAlgorithm.HS256, secrets.getModeratorSecret()).compact();
-        }
+    public String generateToken(String email , Role role) {
+        return switch (role) {
+            case BILKENTEER ->
+                    Jwts.builder().setSubject(email).claim("role", role.toString()).setIssuedAt(new Date(System.currentTimeMillis()))
+                            .setExpiration(Date.from(Instant.now().plus(jwtExpiration, ChronoUnit.MILLIS)))
+                            .signWith(SignatureAlgorithm.HS256, secrets.getBilkenteerSecret()).compact();
+            case MODERATOR ->
+                    Jwts.builder().setSubject(email).claim("role", role.toString()).setIssuedAt(new Date(System.currentTimeMillis()))
+                            .setExpiration(Date.from(Instant.now().plus(jwtExpiration, ChronoUnit.MILLIS)))
+                            .signWith(SignatureAlgorithm.HS256, secrets.getModeratorSecret()).compact();
+        };
     }
 
-    public boolean validateToken(String token, String role) {
+    public boolean validateToken(String token, Role role) {
         try {
-            if (role.equals("BILKENTEER")) {
-                Jwts.parser().setSigningKey(secrets.getBilkenteerSecret()).parseClaimsJws(token);
-            } else if (role.equals("MODERATOR")) {
-                Jwts.parser().setSigningKey(secrets.getModeratorSecret()).parseClaimsJws(token);
-            } else {
-                throw new InvalidRoleException();
-            }
-            return true;
+            return switch (role) {
+                case BILKENTEER -> {
+                    System.out.println("validating Bilkenteer Role");
+                    Jwts.parser().setSigningKey(secrets.getBilkenteerSecret()).parseClaimsJws(token);
+                    yield true;
+                }
+                case MODERATOR -> {
+                    System.out.println("validating Moderator Role");
+                    Jwts.parser().setSigningKey(secrets.getModeratorSecret()).parseClaimsJws(token);
+                    yield false;
+                }
+            };
         } catch (SignatureException e) {
             log.info("Invalid JWT signature.");
             log.trace("Invalid JWT signature trace: {}", e);
@@ -105,8 +120,6 @@ public class JwtUtilities{
         } catch (IllegalArgumentException e) {
             log.info("JWT token compact of handler are invalid.");
             log.trace("JWT token compact of handler are invalid trace: {}", e);
-        } catch (InvalidRoleException e) {
-            log.info("JWT token has invalid role field, {}", role);
         }
         return false;
     }

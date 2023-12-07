@@ -1,6 +1,6 @@
 package com.campusconnect.ui.user.service;
 
-import com.campusconnect.ui.common.dto.BearerToken;
+import com.campusconnect.domain.user.dto.BearerToken;
 import com.campusconnect.ui.config.JwtUtilities;
 import com.campusconnect.domain.user.dto.UserLoginDto;
 import com.campusconnect.domain.user.dto.UserCreationDto;
@@ -14,6 +14,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +24,20 @@ import org.springframework.stereotype.Service;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class ModeratorService {
+public class ModeratorService implements UserDetailsService {
 
     private final ModeratorRepository moderatorRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtilities jwtUtilities;
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Moderator moderator = moderatorRepository.findByEmail((email));
+        if (moderator == null) {
+            throw new UsernameNotFoundException("User not found!");
+        }
+        return moderator;
+    }
 
     public ResponseEntity<?> register(UserCreationDto creationDto) {
         if(moderatorRepository.existsByEmail(creationDto.getEmail())) {
@@ -41,12 +53,14 @@ public class ModeratorService {
                             .isActive(true)
                             .build();
             moderatorRepository.save(moderator);
-            String token = jwtUtilities.generateToken(creationDto.getEmail(), "MODERATOR");
+            String token = jwtUtilities.generateToken(creationDto.getEmail(), Role.MODERATOR);
             return new ResponseEntity<>(new BearerToken(token , "Bearer "), HttpStatus.OK);
         }
     }
 
-    public ResponseEntity<?> authenticate(UserLoginDto loginDto) throws UserNotFoundException {
+    public ResponseEntity<?> authenticate(UserLoginDto loginDto)
+            throws UserNotFoundException, InvalidPasswordException
+    {
         Moderator moderator = moderatorRepository.findByEmail(loginDto.getEmail());
         if (moderator == null) {
             throw new UserNotFoundException();
@@ -56,7 +70,7 @@ public class ModeratorService {
             throw new InvalidPasswordException();
         }
 
-        String token = jwtUtilities.generateToken(moderator.getUsername(), "MODERATOR");
+        String token = jwtUtilities.generateToken(moderator.getUsername(), Role.MODERATOR);
         return new ResponseEntity<>(new BearerToken(token, "Bearer "), HttpStatus.OK);
     }
 
