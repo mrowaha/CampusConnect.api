@@ -8,7 +8,7 @@ Ensure that you have Java SDK version 17 installed on your machine. You can down
 
 ## 2. Update Local Database Details
 
-Navigate to the `ui/resources` directory and open the `application.properties` file. Update the database details to match your local setup.
+Navigate to the `ui/resources` directory and open the `application-local.properties` file. Update the database details to match your local setup.
 
 ```properties
 # ui/resources/application.properties
