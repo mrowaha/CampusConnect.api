@@ -33,11 +33,7 @@ public class BilkenteerService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Bilkenteer bilkenteer = bilkenteerRepository.findByEmail(email);
-        if (bilkenteer == null) {
-            throw new UsernameNotFoundException("User not found!");
-        }
-        return  bilkenteer;
+        return bilkenteerRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
     }
 
     public ResponseEntity<?> register(UserCreationDto creationDto) throws UserAlreadyTakenException {
@@ -68,12 +64,8 @@ public class BilkenteerService implements UserDetailsService {
     public ResponseEntity<?> authenticate(UserLoginDto loginDto)
             throws UserNotFoundException,InvalidPasswordException
     {
-        Bilkenteer bilkenteer = bilkenteerRepository.findByEmail(loginDto.getEmail());
-
-        if (bilkenteer == null) {
-            throw new UserNotFoundException();
-        }
-
+        Bilkenteer bilkenteer = bilkenteerRepository.findByEmail(loginDto.getEmail())
+                .orElseThrow(UserNotFoundException::new);
         if (!passwordEncoder.matches(loginDto.getPassword(), bilkenteer.getPassword())) {
             throw new InvalidPasswordException();
         }

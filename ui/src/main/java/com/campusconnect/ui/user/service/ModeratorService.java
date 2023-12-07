@@ -32,11 +32,9 @@ public class ModeratorService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Moderator moderator = moderatorRepository.findByEmail((email));
-        if (moderator == null) {
-            throw new UsernameNotFoundException("User not found!");
-        }
-        return moderator;
+        return moderatorRepository.findByEmail(email).orElseThrow(() ->
+                new UsernameNotFoundException("User not found")
+        );
     }
 
     public ResponseEntity<?> register(UserCreationDto creationDto) {
@@ -61,10 +59,8 @@ public class ModeratorService implements UserDetailsService {
     public ResponseEntity<?> authenticate(UserLoginDto loginDto)
             throws UserNotFoundException, InvalidPasswordException
     {
-        Moderator moderator = moderatorRepository.findByEmail(loginDto.getEmail());
-        if (moderator == null) {
-            throw new UserNotFoundException();
-        }
+        Moderator moderator = moderatorRepository.findByEmail(loginDto.getEmail())
+                .orElseThrow(UserNotFoundException::new);
 
         if (!passwordEncoder.matches(loginDto.getPassword(), moderator.getPassword())) {
             throw new InvalidPasswordException();
