@@ -1,6 +1,6 @@
 package com.campusconnect;
 
-import com.campusconnect.image.BucketValidationRunner;
+import com.campusconnect.s3.BucketValidationRunner;
 import com.campusconnect.ui.config.RoledJwtProperties;
 
 import lombok.RequiredArgsConstructor;

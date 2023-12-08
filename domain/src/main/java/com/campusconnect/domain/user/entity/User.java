@@ -51,4 +51,7 @@ public class User{
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(name = "profile_picture", nullable = true)
+    private String profilePicture;
+
 }
