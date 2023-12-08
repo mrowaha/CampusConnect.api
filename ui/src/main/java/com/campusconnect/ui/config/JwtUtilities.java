@@ -93,16 +93,15 @@ public class JwtUtilities{
 
     public boolean validateToken(String token, Role role) {
         try {
-            return switch (role) {
+            switch (role) {
                 case BILKENTEER -> {
                     Jwts.parser().setSigningKey(secrets.getBilkenteerSecret()).parseClaimsJws(token);
-                    yield true;
                 }
                 case MODERATOR -> {
                     Jwts.parser().setSigningKey(secrets.getModeratorSecret()).parseClaimsJws(token);
-                    yield false;
                 }
-            };
+            }
+            return true;
         } catch (SignatureException e) {
             log.info("Invalid JWT signature.");
             log.trace("Invalid JWT signature trace: {}", e);

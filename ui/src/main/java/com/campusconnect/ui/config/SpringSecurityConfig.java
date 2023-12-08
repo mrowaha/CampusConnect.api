@@ -40,6 +40,10 @@ public class SpringSecurityConfig {
                 "/bilkenteer/**"
         };
 
+        String[] sharedProtectedRoutes = new String[] {
+                "/s3/**"
+        };
+
         http
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -48,9 +52,12 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(new String[]{"/auth/**"}).permitAll()
                 .requestMatchers(moderatorProtectedRoutes).authenticated()
-                .requestMatchers(bilkenteerProtectedRoutes).authenticated();
+                .requestMatchers(bilkenteerProtectedRoutes).authenticated()
+                .requestMatchers(sharedProtectedRoutes).authenticated();
 
         jwtAuthenticationFilter.insertModeratorRoutes(moderatorProtectedRoutes);
+        jwtAuthenticationFilter.insertBilkenteerRoutes(bilkenteerProtectedRoutes);
+        jwtAuthenticationFilter.insertSharedRoutes(sharedProtectedRoutes);
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return  http.build();

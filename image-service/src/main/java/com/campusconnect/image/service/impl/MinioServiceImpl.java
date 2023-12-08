@@ -32,8 +32,9 @@ public class MinioServiceImpl implements MinioService {
     @Override
     public FileResponse putObject(MultipartFile multipartFile, String bucketName) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException, InvalidFileTypeException {
         // validate incoming image type
-        String fileType = imageTypeUtils.getImageType(multipartFile);
 
+        String fileType = imageTypeUtils.getImageType(multipartFile);
+        System.out.println("file type is " + fileType);
         byte[] filedata = multipartFile.getBytes();
         String fileName = multipartFile.getOriginalFilename();
         Long fileSize = multipartFile.getSize();

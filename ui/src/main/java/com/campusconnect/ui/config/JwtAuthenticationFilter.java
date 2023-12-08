@@ -33,7 +33,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final ModeratorService moderatorDetailsService;
 
 
-    private List<String> moderatorRoutes;
+    /**
+     * moderator routes are routes that can be validated
+     * on only JWT generated for moderator role
+     */
+    private final List<String> moderatorRoutes;
+
+    /**
+     * bilkenteer routes are routes that can be validated
+     * on only JWT generated for bilkenteer role
+     */
+    private final List<String> bilkenteerRoutes;
+
+    /**
+     * shared routes are routes that can be validated
+     * on either of the web token roles
+     */
+    private final List<String> sharedRoutes;
 
     @Autowired
     public JwtAuthenticationFilter(
@@ -45,10 +61,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.bilkenteerDetailsService = bilkenteerService;
         this.moderatorDetailsService = moderatorService;
         this.moderatorRoutes = new ArrayList<>();
+        this.bilkenteerRoutes = new ArrayList<>();
+        this.sharedRoutes = new ArrayList<>();
     }
 
     public void insertModeratorRoutes(String[] routes) {
+
         moderatorRoutes.addAll(Arrays.asList(routes));
+    }
+
+    public void insertBilkenteerRoutes(String[] routes) {
+        bilkenteerRoutes.addAll(Arrays.asList(routes));
+    }
+
+
+    public void insertSharedRoutes(String[] routes) {
+        sharedRoutes.addAll(Arrays.asList(routes));
     }
 
     @Override
@@ -58,6 +86,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         AntPathMatcher pathMatcher = new AntPathMatcher();
+        System.out.println(request.getServletPath());
+        boolean isSharedRoute = sharedRoutes.stream().anyMatch(
+                route -> pathMatcher.match(route, request.getServletPath())
+        );
+        System.out.println("is shared " + isSharedRoute);
+
         boolean isModeratorRoute = moderatorRoutes.stream().anyMatch(
                 route -> pathMatcher.match(route, request.getServletPath())
         );
@@ -67,13 +101,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token != null) {
             // extract role first
             Role userRole = jwtUtilities.extractRole(token);
-            if ((userRole == Role.BILKENTEER && isModeratorRoute) ||
-                    (userRole == Role.MODERATOR && !isModeratorRoute)
-            ) {
-              throw new ServletException("unauthorized role access");
+            System.out.println(userRole);
+            if (!isSharedRoute) {
+                if ((userRole == Role.BILKENTEER && isModeratorRoute) ||
+                        (userRole == Role.MODERATOR && !isModeratorRoute)
+                ) {
+                    throw new ServletException("unauthorized role access");
+                }
             }
 
             boolean valid = jwtUtilities.validateToken(token, userRole);
+            System.out.println("is valid " + valid);
             if (valid) {
                 String email = jwtUtilities.extractUsername(token);
                 UserDetails userDetails = switch (userRole) {
