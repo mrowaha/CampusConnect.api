@@ -12,8 +12,6 @@ import com.campusconnect.ui.user.exceptions.UserNotFoundException;
 import com.campusconnect.domain.user.repository.ModeratorRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -69,6 +67,4 @@ public class ModeratorService implements UserDetailsService {
         String token = jwtUtilities.generateToken(moderator.getUsername(), Role.MODERATOR);
         return new BearerToken(token, "Bearer ");
     }
-
-
 }

@@ -95,12 +95,10 @@ public class JwtUtilities{
         try {
             return switch (role) {
                 case BILKENTEER -> {
-                    System.out.println("validating Bilkenteer Role");
                     Jwts.parser().setSigningKey(secrets.getBilkenteerSecret()).parseClaimsJws(token);
                     yield true;
                 }
                 case MODERATOR -> {
-                    System.out.println("validating Moderator Role");
                     Jwts.parser().setSigningKey(secrets.getModeratorSecret()).parseClaimsJws(token);
                     yield false;
                 }
