@@ -22,7 +22,7 @@
 		<module>ui</module>
 		<module>domain</module>
         <module>image-service</module>
-    </modules>
+	</modules>
 
 	<properties>
 		<java.version>17</java.version>
