@@ -32,11 +32,6 @@ public class S3Controller {
         this.jwtUtilities = jwtUtilities;
     }
 
-    @GetMapping
-    public ResponseEntity<ProtectedDto> sayhello() {
-        return new ResponseEntity<>(new ProtectedDto("hello"), HttpStatus.OK);
-    }
-
     @PostMapping(value = "/profile-picture")
     public ResponseEntity<FileResponse> uploadProfilePicture(
             @RequestPart(value = "file") MultipartFile imageFile,

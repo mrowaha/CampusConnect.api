@@ -19,6 +19,23 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableConfigurationProperties(RoledJwtProperties.class)
 public class SpringSecurityConfig {
 
+    private static String[] WHITE_LIST_URLS = {
+            "/auth/**",
+    };
+
+    private static String[] MODERATOR_URLS = {
+            "/moderator/**"
+    };
+
+    private static String[] BILKENTEER_URLS = {
+            "/bilkenteer/**"
+    };
+
+
+    private static String[] SHARED_URLS = {
+            "/s3/**"
+    };
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter ;
 
     @Autowired
@@ -31,6 +48,9 @@ public class SpringSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain (HttpSecurity http) throws Exception
     {
+        String[] permittedRoutes = new String[]{
+                "/auth/**"
+        };
 
         String[] moderatorProtectedRoutes = new String[]{
                 "/moderator/**"
@@ -50,7 +70,7 @@ public class SpringSecurityConfig {
             .and()
             .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers(new String[]{"/auth/**"}).permitAll()
+                .requestMatchers(permittedRoutes).permitAll()
                 .requestMatchers(moderatorProtectedRoutes).authenticated()
                 .requestMatchers(bilkenteerProtectedRoutes).authenticated()
                 .requestMatchers(sharedProtectedRoutes).authenticated();
