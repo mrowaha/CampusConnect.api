@@ -38,19 +38,19 @@ public class JwtUtilities{
     }
 
     public Role extractRole(String token)
-    throws ServletException
     {
         final Claims claims = extractAllClaims(token);
         if (claims == null) {
-            throw new ServletException("jwt role extraction failed");
+            log.error("failed to extract claims from JWT");
+            return null;
         }
 
         try {
             return Role.valueOf((String)claims.get("role"));
         } catch (IllegalArgumentException e) {
-            throw new ServletException("invalid jwt role");
+            log.error("failed to cast role string to enum");
+            return null;
         }
-
     }
 
     public Claims extractAllClaims(String token) {

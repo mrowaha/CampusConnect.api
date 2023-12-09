@@ -96,9 +96,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // any request not a moderator route must be validated as BILKENTEER
         String token = jwtUtilities.getToken(request);
 
+        System.out.println("validating token");
         if (token != null) {
             // extract role first
             Role userRole = jwtUtilities.extractRole(token);
+            if (userRole == null) {
+                throw new ServletException("failed to extract role claim from token");
+            }
             if (!isSharedRoute) {
                 if ((userRole == Role.BILKENTEER && isModeratorRoute) ||
                         (userRole == Role.MODERATOR && !isModeratorRoute)
