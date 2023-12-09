@@ -1,15 +1,17 @@
 package com.campusconnect.ui.user.service;
 
 import com.campusconnect.domain.user.dto.BearerToken;
+import com.campusconnect.domain.user.dto.BilkenteerLoginResponse;
 import com.campusconnect.ui.config.JwtUtilities;
 import com.campusconnect.ui.user.exceptions.InvalidPasswordException;
 import com.campusconnect.ui.user.exceptions.UserAlreadyTakenException;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
 import com.campusconnect.domain.user.dto.UserCreationDto;
-import com.campusconnect.domain.user.dto.UserLoginDto;
+import com.campusconnect.domain.user.dto.UserLoginRequestDto;
 import com.campusconnect.domain.user.entity.Bilkenteer;
 import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.domain.user.repository.BilkenteerRepository;
+import com.campusconnect.ui.user.exceptions.UserSuspendedException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -59,8 +61,8 @@ public class BilkenteerService implements UserDetailsService {
         }
     }
 
-    public BearerToken authenticate(UserLoginDto loginDto)
-            throws UserNotFoundException,InvalidPasswordException
+    public BilkenteerLoginResponse authenticate(UserLoginRequestDto loginDto)
+            throws UserNotFoundException,InvalidPasswordException, UserSuspendedException
     {
         Bilkenteer bilkenteer = bilkenteerRepository.findByEmail(loginDto.getEmail())
                 .orElseThrow(UserNotFoundException::new);
@@ -68,7 +70,20 @@ public class BilkenteerService implements UserDetailsService {
             throw new InvalidPasswordException();
         }
 
+        if (bilkenteer.getIsSuspended()) {
+            throw new UserSuspendedException();
+        }
+
         String token = jwtUtilities.generateToken(bilkenteer.getUsername(), Role.BILKENTEER);
-        return new BearerToken(token, "Bearer ");
+        BearerToken bearerToken = new BearerToken(token, "Bearer ");
+        return BilkenteerLoginResponse.builder()
+                .uuid(bilkenteer.getUserId())
+                .email(bilkenteer.getEmail())
+                .firstName(bilkenteer.getFirstName())
+                .lastName(bilkenteer.getLastName())
+                .role(bilkenteer.getRole())
+                .trustScore(bilkenteer.getTrustScore())
+                .token(bearerToken)
+                .build();
     }
 }

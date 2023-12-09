@@ -1,5 +1,6 @@
 package com.campusconnect.ui.config;
 
+import com.campusconnect.ui.common.controller.SecureController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -13,71 +14,74 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Configuration
 @EnableWebSecurity
 @EnableConfigurationProperties(RoledJwtProperties.class)
 public class SpringSecurityConfig {
 
-    private static String[] WHITE_LIST_URLS = {
-            "/auth/**",
-    };
+    private List<String> WHITE_LIST_URLS;
 
-    private static String[] MODERATOR_URLS = {
-            "/moderator/**"
-    };
+    private List<String> MODERATOR_URLS;
 
-    private static String[] BILKENTEER_URLS = {
-            "/bilkenteer/**"
-    };
+    private List<String> BILKENTEER_URLS;
 
-
-    private static String[] SHARED_URLS = {
-            "/s3/**"
-    };
-
+    private List<String> SHARED_URLS;
+    private final List<SecureController> secureControllerList;
     private final JwtAuthenticationFilter jwtAuthenticationFilter ;
 
     @Autowired
     public SpringSecurityConfig(
-            JwtAuthenticationFilter filter
+            JwtAuthenticationFilter filter,
+            List<SecureController> secureControllerList
     ) {
         this.jwtAuthenticationFilter = filter;
+        this.secureControllerList = secureControllerList;
+        this.MODERATOR_URLS = new ArrayList<>();
+        this.SHARED_URLS = new ArrayList<>();
+        this.BILKENTEER_URLS = new ArrayList<>();
+        this.WHITE_LIST_URLS = new ArrayList<>();
+        for (SecureController appController : this.secureControllerList) {
+            for (SecureController.Endpoint endpoint : appController.getEndpoints()) {
+                SecureController.SecurityScope scope = endpoint.getScope();
+                switch (scope) {
+                    case NONE -> this.WHITE_LIST_URLS.add(endpoint.getUrl());
+                    case BILKENTEER -> this.BILKENTEER_URLS.add(endpoint.getUrl());
+                    case MODERATOR -> this.MODERATOR_URLS.add(endpoint.getUrl());
+                    case SHARED -> this.SHARED_URLS.add(endpoint.getUrl());
+                }
+            }
+        }
     }
 
     @Bean
     public SecurityFilterChain filterChain (HttpSecurity http) throws Exception
     {
-        String[] permittedRoutes = new String[]{
-                "/auth/**"
-        };
-
-        String[] moderatorProtectedRoutes = new String[]{
-                "/moderator/**"
-        };
-
-        String[] bilkenteerProtectedRoutes = new String[] {
-                "/bilkenteer/**"
-        };
-
-        String[] sharedProtectedRoutes = new String[] {
-                "/s3/**"
-        };
-
         http
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers(permittedRoutes).permitAll()
-                .requestMatchers(moderatorProtectedRoutes).authenticated()
-                .requestMatchers(bilkenteerProtectedRoutes).authenticated()
-                .requestMatchers(sharedProtectedRoutes).authenticated();
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
 
-        jwtAuthenticationFilter.insertModeratorRoutes(moderatorProtectedRoutes);
-        jwtAuthenticationFilter.insertBilkenteerRoutes(bilkenteerProtectedRoutes);
-        jwtAuthenticationFilter.insertSharedRoutes(sharedProtectedRoutes);
+        for (SecureController appController : this.secureControllerList) {
+            for (SecureController.Endpoint endpoint : appController.getEndpoints()) {
+                if (endpoint.getScope() != SecureController.SecurityScope.NONE) {
+                    http.authorizeHttpRequests().
+                            requestMatchers(endpoint.getMethod(), endpoint.getUrl()).authenticated();
+                } else {
+                    http.authorizeHttpRequests()
+                            .requestMatchers(endpoint.getMethod(), endpoint.getUrl()).permitAll();
+                }
+            }
+        }
+
+        jwtAuthenticationFilter.insertModeratorRoutes(MODERATOR_URLS);
+        jwtAuthenticationFilter.insertBilkenteerRoutes(BILKENTEER_URLS);
+        jwtAuthenticationFilter.insertSharedRoutes(SHARED_URLS);
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return  http.build();

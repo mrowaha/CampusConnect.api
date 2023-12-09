@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserLoginDto {
+public class UserLoginRequestDto {
 
     @NotBlank(message = "email field cannot be blank")
     @NotNull(message = "email field cannot be null")
