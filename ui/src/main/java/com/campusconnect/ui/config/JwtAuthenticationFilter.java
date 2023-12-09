@@ -65,18 +65,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.sharedRoutes = new ArrayList<>();
     }
 
-    public void insertModeratorRoutes(String[] routes) {
-
-        moderatorRoutes.addAll(Arrays.asList(routes));
+    public void insertModeratorRoutes(List<String> routes) {
+        moderatorRoutes.addAll(routes);
     }
 
-    public void insertBilkenteerRoutes(String[] routes) {
-        bilkenteerRoutes.addAll(Arrays.asList(routes));
+    public void insertBilkenteerRoutes(List<String> routes) {
+
+        bilkenteerRoutes.addAll(routes);
     }
 
+    public void insertSharedRoutes(List<String> routes) {
 
-    public void insertSharedRoutes(String[] routes) {
-        sharedRoutes.addAll(Arrays.asList(routes));
+        sharedRoutes.addAll(routes);
     }
 
     @Override

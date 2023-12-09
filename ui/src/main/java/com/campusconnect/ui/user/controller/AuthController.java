@@ -1,18 +1,16 @@
 package com.campusconnect.ui.user.controller;
 
 
-import com.campusconnect.domain.user.dto.BearerToken;
-import com.campusconnect.domain.user.dto.UserCreationDto;
-import com.campusconnect.domain.user.dto.UserLoginDto;
+import com.campusconnect.domain.user.dto.*;
 
 import com.campusconnect.ui.common.controller.SecureController;
 import com.campusconnect.ui.user.exceptions.InvalidPasswordException;
 import com.campusconnect.ui.user.exceptions.UserAlreadyTakenException;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
+import com.campusconnect.ui.user.exceptions.UserSuspendedException;
 import com.campusconnect.ui.user.service.BilkenteerService;
 import com.campusconnect.ui.user.service.ModeratorService;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
@@ -21,14 +19,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController extends SecureController {
 
+    private static final String BASE_URL = "/auth";
     private static final String BILKENTEER_LOGIN = "/bilkenteer/login";
     private static final String MODERATOR_LOGIN = "/moderator/login";
     private static final String BILKENTEER_REGISTER = "/bilkenteer/register";
@@ -48,9 +45,9 @@ public class AuthController extends SecureController {
     }
 
     @PostMapping(value = AuthController.BILKENTEER_LOGIN, consumes = "application/json", produces = "application/json")
-    public ResponseEntity<BearerToken> loginBilkenteer(
-            @Valid @RequestBody UserLoginDto bilkenteerLoginDto
-    ) throws UserNotFoundException, InvalidPasswordException {
+    public ResponseEntity<BilkenteerLoginResponse> loginBilkenteer(
+            @Valid @RequestBody UserLoginRequestDto bilkenteerLoginDto
+    ) throws UserNotFoundException, InvalidPasswordException, UserSuspendedException {
         return new ResponseEntity<>(
                 bilkenteerService.authenticate(bilkenteerLoginDto),
                 HttpStatus.OK
@@ -58,7 +55,7 @@ public class AuthController extends SecureController {
     }
 
 
-    @PostMapping(value = AuthController.BILKENTEER_REGISTER, consumes = "application/json", produces = "application/json")
+    @PostMapping(value = AuthController.MODERATOR_REGISTER, consumes = "application/json", produces = "application/json")
     public ResponseEntity<BearerToken> registerModerator(
             @Valid @RequestBody UserCreationDto moderatorCreationInfo
     ) throws UserAlreadyTakenException {
@@ -68,9 +65,9 @@ public class AuthController extends SecureController {
     }
 
     @PostMapping(value = AuthController.MODERATOR_LOGIN, consumes = "application/json", produces = "application/json")
-    public ResponseEntity<BearerToken> loginModerator(
-            @Valid @RequestBody UserLoginDto moderatorLoginInfo
-    ) throws UsernameNotFoundException, InvalidPasswordException {
+    public ResponseEntity<UserLoginResponseDto> loginModerator(
+            @Valid @RequestBody UserLoginRequestDto moderatorLoginInfo
+    ) throws UsernameNotFoundException, InvalidPasswordException, UserSuspendedException {
         return new ResponseEntity<>(
                 moderatorService.authenticate(moderatorLoginInfo),
                 HttpStatus.OK);
@@ -78,12 +75,9 @@ public class AuthController extends SecureController {
 
     @Override
     public void postConstruct() {
-        if (this.endpoints == null) {
-            this.endpoints = new ArrayList<>();
-        }
-        this.endpoints.add(new Endpoint(HttpMethod.POST, AuthController.BILKENTEER_LOGIN, false));
-        this.endpoints.add(new Endpoint(HttpMethod.POST, AuthController.BILKENTEER_REGISTER, false));
-        this.endpoints.add(new Endpoint(HttpMethod.POST, AuthController.MODERATOR_REGISTER, false));
-        this.endpoints.add(new Endpoint(HttpMethod.POST, AuthController.MODERATOR_LOGIN, false));
+        this.addEndpoint(HttpMethod.POST, AuthController.BASE_URL,AuthController.BILKENTEER_LOGIN, SecurityScope.NONE);
+        this.addEndpoint(HttpMethod.POST, AuthController.BASE_URL,AuthController.BILKENTEER_REGISTER, SecurityScope.NONE);
+        this.addEndpoint(HttpMethod.POST, AuthController.BASE_URL,AuthController.MODERATOR_REGISTER, SecurityScope.NONE);
+        this.addEndpoint(HttpMethod.POST, AuthController.BASE_URL,AuthController.MODERATOR_LOGIN, SecurityScope.NONE);
     }
 }

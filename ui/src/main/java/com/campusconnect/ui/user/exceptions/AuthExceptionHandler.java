@@ -43,4 +43,13 @@ public class AuthExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(UserSuspendedException.class)
+    public ResponseEntity<Map<String, List<String>>> handleUserSuspended(UserSuspendedException ex) {
+        List<String> errors = new ArrayList<>();
+        errors.add("Account Suspended");
+        Map<String, List<String>> errorResponse = new HashMap<>();
+        errorResponse.put("errors", errors);
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.FORBIDDEN);
+    }
+
 }

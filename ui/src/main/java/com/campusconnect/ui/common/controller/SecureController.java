@@ -1,6 +1,10 @@
 package com.campusconnect.ui.common.controller;
 
+import com.campusconnect.domain.user.enums.Role;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.http.HttpMethod;
 
 import java.util.ArrayList;
@@ -18,34 +22,47 @@ public abstract class SecureController {
     @PostConstruct
     abstract public void postConstruct();
 
+    public enum SecurityScope {
+        NONE,
+        MODERATOR,
+        BILKENTEER,
+        SHARED
+    };
+
+    @ToString
+    @Getter
+    @Setter
     public static class Endpoint {
         HttpMethod method;
         String url;
-
-        Boolean secure;
-
-        public Endpoint(HttpMethod method, String url, Boolean secure) {
+        SecurityScope scope;
+        public Endpoint(HttpMethod method, String url, SecurityScope scope) {
             this.method = method;
             this.url = url;
-            this.secure = secure;
+            this.scope = scope;
         }
     }
 
-    protected List<Endpoint> endpoints;
+    private List<Endpoint> endpoints;
 
     public SecureController() {
         endpoints = new ArrayList<>();
     }
 
     protected void addEndpoint(
-            HttpMethod method, String url, Boolean secure
+            HttpMethod method,
+            String controllerUrl,
+            String mappingUrl,
+            SecurityScope scope
     ) {
-        this.endpoints.add(new Endpoint(method, url, secure));
+        if (this.endpoints == null) this.endpoints = new ArrayList<>();
+        this.endpoints.add(new Endpoint(method, controllerUrl+mappingUrl, scope));
     }
 
     protected void addEndPoints(
             Endpoint[] endpoints
     ) {
+        if (this.endpoints == null) this.endpoints = new ArrayList<>();
         this.endpoints.addAll(Arrays.asList(endpoints));
     }
 
@@ -56,7 +73,7 @@ public abstract class SecureController {
     public List<Endpoint> getSecureEndpoints() {
         return this.endpoints
                 .stream()
-                .filter(endpoint -> endpoint.secure)
+                .filter(endpoint -> endpoint.scope != SecurityScope.NONE)
                 .collect(Collectors.toList());
     }
 

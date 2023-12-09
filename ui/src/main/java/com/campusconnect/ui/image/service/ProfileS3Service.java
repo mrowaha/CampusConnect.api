@@ -22,6 +22,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -101,18 +102,18 @@ public class ProfileS3Service {
         }
     }
 
-    public void get(HttpServletResponse response, String email, Role role)
+    public void get(HttpServletResponse response, UUID userId, Role role)
         throws GenericMinIOFailureException, UserNotFoundException, IOException
     {
         String profilePictureName = null;
         User user = null;
         switch (role) {
             case BILKENTEER -> {
-                user = bilkenteerRepository.findByEmail(email)
+                user = bilkenteerRepository.findById(userId)
                         .orElseThrow(UserNotFoundException::new);
             }
             case MODERATOR -> {
-                user = moderatorRepository.findByEmail(email)
+                user = moderatorRepository.findById(userId)
                         .orElseThrow(UserNotFoundException::new);
             }
         }
