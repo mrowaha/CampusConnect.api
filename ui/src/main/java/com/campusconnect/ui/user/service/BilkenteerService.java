@@ -61,6 +61,25 @@ public class BilkenteerService implements UserDetailsService {
         }
     }
 
+    public BilkenteerLoginResponse authenticateWithToken(String email, String token)
+    throws  UserSuspendedException{
+        Bilkenteer bilkenteer = bilkenteerRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+
+        if (bilkenteer.getIsSuspended()) {
+            throw new UserSuspendedException();
+        }
+        return BilkenteerLoginResponse.builder()
+                .uuid(bilkenteer.getUserId())
+                .email(bilkenteer.getEmail())
+                .firstName(bilkenteer.getFirstName())
+                .lastName(bilkenteer.getLastName())
+                .role(bilkenteer.getRole())
+                .trustScore(bilkenteer.getTrustScore())
+                .token(new BearerToken(token, "Bearer "))
+                .build();
+    }
+
     public BilkenteerLoginResponse authenticate(UserLoginRequestDto loginDto)
             throws UserNotFoundException,InvalidPasswordException, UserSuspendedException
     {

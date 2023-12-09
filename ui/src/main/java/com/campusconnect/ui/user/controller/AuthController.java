@@ -3,7 +3,9 @@ package com.campusconnect.ui.user.controller;
 
 import com.campusconnect.domain.user.dto.*;
 
+import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.ui.common.controller.SecureController;
+import com.campusconnect.ui.config.JwtUtilities;
 import com.campusconnect.ui.user.exceptions.InvalidPasswordException;
 import com.campusconnect.ui.user.exceptions.UserAlreadyTakenException;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
@@ -33,6 +35,7 @@ public class AuthController extends SecureController {
 
     private final BilkenteerService bilkenteerService;
     private final ModeratorService moderatorService;
+    private final JwtUtilities jwtUtilities;
 
     @PostMapping(value = AuthController.BILKENTEER_REGISTER, consumes = "application/json", produces = "application/json")
     public ResponseEntity<BearerToken> registerBilkenteer(
@@ -73,11 +76,36 @@ public class AuthController extends SecureController {
                 HttpStatus.OK);
     }
 
+    @GetMapping
+    public ResponseEntity<UserLoginResponseDto> validateToken(
+            @RequestHeader(name="Authorization") String bearerToken
+    ) {
+        String token = jwtUtilities.getToken(bearerToken);
+        String email = jwtUtilities.extractUsername(token);
+        Role role = jwtUtilities.extractRole(token);
+        return switch(role) {
+            case BILKENTEER -> {
+                yield new ResponseEntity<>(
+                        bilkenteerService.authenticateWithToken(email, token),
+                        HttpStatus.OK
+                );
+            }
+            case MODERATOR -> {
+                yield new ResponseEntity<>(
+                        moderatorService.authenticateWithToken(email, token),
+                        HttpStatus.OK
+                );
+            }
+        };
+    }
+
+
     @Override
     public void postConstruct() {
-        this.addEndpoint(HttpMethod.POST, AuthController.BASE_URL,AuthController.BILKENTEER_LOGIN, SecurityScope.NONE);
-        this.addEndpoint(HttpMethod.POST, AuthController.BASE_URL,AuthController.BILKENTEER_REGISTER, SecurityScope.NONE);
-        this.addEndpoint(HttpMethod.POST, AuthController.BASE_URL,AuthController.MODERATOR_REGISTER, SecurityScope.NONE);
-        this.addEndpoint(HttpMethod.POST, AuthController.BASE_URL,AuthController.MODERATOR_LOGIN, SecurityScope.NONE);
+        this.addEndpoint(HttpMethod.POST, BASE_URL, BILKENTEER_REGISTER, SecurityScope.NONE);
+        this.addEndpoint(HttpMethod.POST, BASE_URL, BILKENTEER_LOGIN, SecurityScope.NONE);
+        this.addEndpoint(HttpMethod.POST, BASE_URL, MODERATOR_REGISTER, SecurityScope.NONE);
+        this.addEndpoint(HttpMethod.POST, BASE_URL, MODERATOR_LOGIN, SecurityScope.NONE);
+        this.addEndpoint(HttpMethod.GET, BASE_URL, "", SecurityScope.SHARED);
     }
 }

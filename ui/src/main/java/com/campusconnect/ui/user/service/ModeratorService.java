@@ -1,10 +1,7 @@
 package com.campusconnect.ui.user.service;
 
-import com.campusconnect.domain.user.dto.BearerToken;
-import com.campusconnect.domain.user.dto.UserLoginResponseDto;
+import com.campusconnect.domain.user.dto.*;
 import com.campusconnect.ui.config.JwtUtilities;
-import com.campusconnect.domain.user.dto.UserLoginRequestDto;
-import com.campusconnect.domain.user.dto.UserCreationDto;
 import com.campusconnect.domain.user.entity.Moderator;
 import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.ui.user.exceptions.InvalidPasswordException;
@@ -54,6 +51,25 @@ public class ModeratorService implements UserDetailsService {
             String token = jwtUtilities.generateToken(creationDto.getEmail(), Role.MODERATOR);
             return new BearerToken(token , "Bearer ");
         }
+    }
+
+    public UserLoginResponseDto authenticateWithToken(String email, String token) {
+        Moderator moderator = moderatorRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+
+        if (!moderator.getIsActive()) {
+            throw new UserSuspendedException();
+        }
+
+        return UserLoginResponseDto.builder()
+                .uuid(moderator.getUserId())
+                .email(moderator.getEmail())
+                .firstName(moderator.getFirstName())
+                .lastName(moderator.getLastName())
+                .role(moderator.getRole())
+                .token(new BearerToken(token, "Bearer "))
+                .build();
+
     }
 
     public UserLoginResponseDto authenticate(UserLoginRequestDto loginDto)
