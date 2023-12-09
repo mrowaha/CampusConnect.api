@@ -1,14 +1,14 @@
 package com.campusconnect.domain.user.dto;
 
 import com.campusconnect.domain.user.enums.Role;
+import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.SuperBuilder;
 
 import java.util.UUID;
 
 @Data
-@SuperBuilder
-public class UserLoginResponseDto {
+@Builder
+public class ModeratorLoginResponseDto {
     BearerToken token;
 
     UUID uuid;

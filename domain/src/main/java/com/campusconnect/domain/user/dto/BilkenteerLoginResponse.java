@@ -1,11 +1,26 @@
 package com.campusconnect.domain.user.dto;
 
+import com.campusconnect.domain.user.enums.Role;
 import lombok.Builder;
-import lombok.experimental.SuperBuilder;
+import lombok.Data;
+
+import java.util.UUID;
 
 
-@SuperBuilder
-public class BilkenteerLoginResponse extends UserLoginResponseDto {
+@Data
+@Builder
+public class BilkenteerLoginResponse {
+    BearerToken token;
+
+    UUID uuid;
+
+    String firstName;
+
+    String lastName;
+
+    Role role;
+
+    String email;
 
     Integer trustScore;
 }

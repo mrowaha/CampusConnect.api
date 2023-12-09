@@ -62,7 +62,8 @@ public class BilkenteerService implements UserDetailsService {
     }
 
     public BilkenteerLoginResponse authenticateWithToken(String email, String token)
-    throws  UserSuspendedException{
+    throws  UserSuspendedException
+    {
         Bilkenteer bilkenteer = bilkenteerRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
 

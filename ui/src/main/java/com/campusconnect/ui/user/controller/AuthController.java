@@ -68,7 +68,7 @@ public class AuthController extends SecureController {
     }
 
     @PostMapping(value = AuthController.MODERATOR_LOGIN, consumes = "application/json", produces = "application/json")
-    public ResponseEntity<UserLoginResponseDto> loginModerator(
+    public ResponseEntity<ModeratorLoginResponseDto> loginModerator(
             @Valid @RequestBody UserLoginRequestDto moderatorLoginInfo
     ) throws UsernameNotFoundException, InvalidPasswordException, UserSuspendedException {
         return new ResponseEntity<>(
@@ -77,7 +77,7 @@ public class AuthController extends SecureController {
     }
 
     @GetMapping
-    public ResponseEntity<UserLoginResponseDto> validateToken(
+    public ResponseEntity<?> validateToken(
             @RequestHeader(name="Authorization") String bearerToken
     ) {
         String token = jwtUtilities.getToken(bearerToken);

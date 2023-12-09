@@ -53,7 +53,7 @@ public class ModeratorService implements UserDetailsService {
         }
     }
 
-    public UserLoginResponseDto authenticateWithToken(String email, String token) {
+    public ModeratorLoginResponseDto authenticateWithToken(String email, String token) {
         Moderator moderator = moderatorRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -61,7 +61,7 @@ public class ModeratorService implements UserDetailsService {
             throw new UserSuspendedException();
         }
 
-        return UserLoginResponseDto.builder()
+        return ModeratorLoginResponseDto.builder()
                 .uuid(moderator.getUserId())
                 .email(moderator.getEmail())
                 .firstName(moderator.getFirstName())
@@ -72,7 +72,7 @@ public class ModeratorService implements UserDetailsService {
 
     }
 
-    public UserLoginResponseDto authenticate(UserLoginRequestDto loginDto)
+    public ModeratorLoginResponseDto authenticate(UserLoginRequestDto loginDto)
             throws UserNotFoundException, InvalidPasswordException
     {
         Moderator moderator = moderatorRepository.findByEmail(loginDto.getEmail())
@@ -88,7 +88,7 @@ public class ModeratorService implements UserDetailsService {
 
         String token = jwtUtilities.generateToken(moderator.getUsername(), Role.MODERATOR);
         BearerToken bearerToken = new BearerToken(token, "Bearer ");
-        return UserLoginResponseDto.builder()
+        return ModeratorLoginResponseDto.builder()
                 .uuid(moderator.getUserId())
                 .email(moderator.getEmail())
                 .firstName(moderator.getFirstName())

@@ -8,13 +8,12 @@ import lombok.experimental.SuperBuilder;
 import java.util.UUID;
 
 @Data
-@EqualsAndHashCode
-@MappedSuperclass
-@Getter
-@Setter
+//@MappedSuperclass
 @NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 @SuperBuilder
+@Entity(name = "cc_user")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class User{
 
     @Id
