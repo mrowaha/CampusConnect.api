@@ -1,6 +1,8 @@
 package com.campusconnect.domain.notification.entity;
 
 import com.campusconnect.domain.notification.enums.NotificationType;
+import com.campusconnect.domain.user.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -14,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @SuperBuilder
 @Entity
-@Table(name = "notifications")
+@Table(name = "cc_notifications")
 public class Notification{
 
     @Id
@@ -38,7 +40,9 @@ public class Notification{
     @Column(name = "seen", nullable = false)
     private boolean seen = false;
 
-    @Column(name = "receiver_id", nullable = false)
-    @NonNull
-    private UUID receiverId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", nullable = false)
+    @JsonIgnore
+    private User user;
+
 }

@@ -5,14 +5,12 @@ import com.campusconnect.domain.user.dto.BearerToken;
 import com.campusconnect.domain.user.dto.UserCreationDto;
 import com.campusconnect.domain.user.dto.UserLoginDto;
 
-import com.campusconnect.email.EmailSenderService;
 import com.campusconnect.ui.user.exceptions.InvalidPasswordException;
 import com.campusconnect.ui.user.exceptions.UserAlreadyTakenException;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
 import com.campusconnect.ui.user.service.BilkenteerService;
 import com.campusconnect.ui.user.service.ModeratorService;
 
-import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,7 +26,6 @@ public class AuthController {
 
     private final BilkenteerService bilkenteerService;
     private final ModeratorService moderatorService;
-    private final EmailSenderService emailSenderService;
 
     @PostMapping(value = "/bilkenteer/register", consumes = "application/json", produces = "application/json")
     public ResponseEntity<BearerToken> registerBilkenteer(
@@ -43,10 +40,7 @@ public class AuthController {
     @PostMapping(value = "/bilkenteer/login", consumes = "application/json", produces = "application/json")
     public ResponseEntity<BearerToken> loginBilkenteer(
             @Valid @RequestBody UserLoginDto bilkenteerLoginDto
-    ) throws UserNotFoundException, InvalidPasswordException, MessagingException {
-
-        emailSenderService.sendOTPEmail("atherilyas100@gmail.com","ABCDS" );
-
+    ) throws UserNotFoundException, InvalidPasswordException {
         return new ResponseEntity<>(
                 bilkenteerService.authenticate(bilkenteerLoginDto),
                 HttpStatus.OK

@@ -10,14 +10,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.UUID;
 
-@Data
 @EqualsAndHashCode
-@MappedSuperclass
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@Entity(name = "cc_user") //Need to add this to create relations with User
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS) //User itself won't have a table
 public class User{
 
     @Id
