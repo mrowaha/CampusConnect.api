@@ -59,12 +59,9 @@ public class MinioServiceImpl implements MinioService {
 
     private FileResponse putObject(MultipartFile multipartFile, String bucketName, String objectName) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException, InvalidFileTypeException {
         String fileType = imageTypeUtils.getImageType(multipartFile);
-        String fileName = multipartFile.getOriginalFilename();
         byte[] fileData = multipartFile.getBytes();
         Long fileSize = multipartFile.getSize();
         LocalDateTime createdTime = LocalDateTime.now();
-
-        objectName = objectName + fileName.substring(fileName.lastIndexOf("."));
         minioUtil.putObject(bucketName, fileData, objectName,fileType);
         return FileResponse.builder()
                 .fileName(objectName)

@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.Valid;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/s3")
@@ -62,10 +63,11 @@ public class S3Controller extends SecureController {
     @GetMapping(value = PROFILE_URL)
     public void getProfilePicture(
             HttpServletResponse response,
-            @Valid @RequestBody ProfilePictureRequestDto profilePictureRequestDto
+            @RequestParam("userid") UUID userid,
+            @RequestParam("role") Role role
             ) throws IOException {
         this.profileS3Service.get
-                (response, profilePictureRequestDto.getUuid(), profilePictureRequestDto.getRole());
+                (response, userid, role);
     }
 
     @Override
