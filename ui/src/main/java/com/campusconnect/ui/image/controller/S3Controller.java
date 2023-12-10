@@ -1,12 +1,11 @@
 package com.campusconnect.ui.image.controller;
 
-import com.campusconnect.domain.image.dto.ProfilePictureRequestDto;
 import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.image.dto.FileResponse;
 import com.campusconnect.image.exceptions.GenericMinIOFailureException;
 import com.campusconnect.image.exceptions.InvalidFileTypeException;
 import com.campusconnect.ui.common.controller.SecureController;
-import com.campusconnect.ui.config.JwtUtilities;
+import com.campusconnect.ui.utils.JwtUtilities;
 import com.campusconnect.ui.image.service.ProfileS3Service;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import jakarta.validation.Valid;
 
 import java.io.IOException;
 import java.util.UUID;

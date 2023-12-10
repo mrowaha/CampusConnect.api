@@ -1,5 +1,6 @@
 package com.campusconnect.domain.user.dto;
 
+import com.campusconnect.domain.security.dto.BearerToken;
 import com.campusconnect.domain.user.enums.Role;
 import lombok.Builder;
 import lombok.Data;

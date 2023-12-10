@@ -1,7 +1,7 @@
 package com.campusconnect;
 
 import com.campusconnect.image.BucketValidationRunner;
-import com.campusconnect.ui.config.RoledJwtProperties;
+import com.campusconnect.ui.config.properties.RoledJwtProperties;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationRunner;

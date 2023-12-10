@@ -1,6 +1,9 @@
 package com.campusconnect.ui.config;
 
 import com.campusconnect.ui.common.controller.SecureController;
+import com.campusconnect.ui.config.filters.JwtAuthenticationFilter;
+import com.campusconnect.ui.config.properties.AdminProperties;
+import com.campusconnect.ui.config.properties.RoledJwtProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +23,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableConfigurationProperties(RoledJwtProperties.class)
+@EnableConfigurationProperties({RoledJwtProperties.class, AdminProperties.class})
 public class SpringSecurityConfig {
 
     private List<String> WHITE_LIST_URLS;

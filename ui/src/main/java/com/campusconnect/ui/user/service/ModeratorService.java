@@ -1,7 +1,8 @@
 package com.campusconnect.ui.user.service;
 
+import com.campusconnect.domain.security.dto.BearerToken;
 import com.campusconnect.domain.user.dto.*;
-import com.campusconnect.ui.config.JwtUtilities;
+import com.campusconnect.ui.utils.JwtUtilities;
 import com.campusconnect.domain.user.entity.Moderator;
 import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.ui.user.exceptions.InvalidPasswordException;

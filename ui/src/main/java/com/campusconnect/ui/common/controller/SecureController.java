@@ -26,7 +26,8 @@ public abstract class SecureController {
         NONE,
         MODERATOR,
         BILKENTEER,
-        SHARED
+        SHARED,
+        ADMIN
     };
 
     @ToString

@@ -1,8 +1,8 @@
 package com.campusconnect.ui.user.service;
 
-import com.campusconnect.domain.user.dto.BearerToken;
+import com.campusconnect.domain.security.dto.BearerToken;
 import com.campusconnect.domain.user.dto.BilkenteerLoginResponse;
-import com.campusconnect.ui.config.JwtUtilities;
+import com.campusconnect.ui.utils.JwtUtilities;
 import com.campusconnect.ui.user.exceptions.InvalidPasswordException;
 import com.campusconnect.ui.user.exceptions.UserAlreadyTakenException;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;

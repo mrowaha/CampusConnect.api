@@ -1,9 +1,9 @@
-package com.campusconnect.ui.config;
+package com.campusconnect.ui.utils;
 
 import com.campusconnect.domain.user.enums.Role;
 
+import com.campusconnect.ui.config.properties.RoledJwtProperties;
 import io.jsonwebtoken.*;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +49,8 @@ public class JwtUtilities{
             return Role.valueOf((String)claims.get("role"));
         } catch (IllegalArgumentException e) {
             log.error("failed to cast role string to enum");
+            return null;
+        } catch (NullPointerException e) {
             return null;
         }
     }

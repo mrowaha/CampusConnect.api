@@ -1,11 +1,12 @@
 package com.campusconnect.ui.user.controller;
 
 
+import com.campusconnect.domain.security.dto.BearerToken;
 import com.campusconnect.domain.user.dto.*;
 
 import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.ui.common.controller.SecureController;
-import com.campusconnect.ui.config.JwtUtilities;
+import com.campusconnect.ui.utils.JwtUtilities;
 import com.campusconnect.ui.user.exceptions.InvalidPasswordException;
 import com.campusconnect.ui.user.exceptions.UserAlreadyTakenException;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
@@ -60,8 +61,10 @@ public class AuthController extends SecureController {
 
     @PostMapping(value = AuthController.MODERATOR_REGISTER, consumes = "application/json", produces = "application/json")
     public ResponseEntity<BearerToken> registerModerator(
+            @RequestHeader("x-api-key") String apikey,
             @Valid @RequestBody UserCreationDto moderatorCreationInfo
     ) throws UserAlreadyTakenException {
+        System.out.println(apikey);
         return new ResponseEntity<>(
                 moderatorService.register(moderatorCreationInfo),
                 HttpStatus.OK);
@@ -104,7 +107,7 @@ public class AuthController extends SecureController {
     public void postConstruct() {
         this.addEndpoint(HttpMethod.POST, BASE_URL, BILKENTEER_REGISTER, SecurityScope.NONE);
         this.addEndpoint(HttpMethod.POST, BASE_URL, BILKENTEER_LOGIN, SecurityScope.NONE);
-        this.addEndpoint(HttpMethod.POST, BASE_URL, MODERATOR_REGISTER, SecurityScope.NONE);
+        this.addEndpoint(HttpMethod.POST, BASE_URL, MODERATOR_REGISTER, SecurityScope.ADMIN);
         this.addEndpoint(HttpMethod.POST, BASE_URL, MODERATOR_LOGIN, SecurityScope.NONE);
         this.addEndpoint(HttpMethod.GET, BASE_URL, "", SecurityScope.SHARED);
     }
