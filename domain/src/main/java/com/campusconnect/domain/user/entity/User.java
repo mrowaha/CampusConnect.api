@@ -7,9 +7,8 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.UUID;
 
-@Data
-//@MappedSuperclass
 @NoArgsConstructor
+@Data
 @RequiredArgsConstructor
 @SuperBuilder
 @Entity(name = "cc_user") //Need to add this to create relations with User
