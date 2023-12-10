@@ -104,7 +104,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-
+        System.out.println("applying jwt filter");
         AntPathMatcher pathMatcher = new AntPathMatcher();
         boolean isSharedRoute = sharedRoutes.stream().anyMatch(
                 route -> pathMatcher.match(route, request.getServletPath())

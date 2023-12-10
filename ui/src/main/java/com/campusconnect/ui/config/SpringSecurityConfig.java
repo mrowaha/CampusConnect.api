@@ -100,6 +100,7 @@ public class SpringSecurityConfig {
         adminAuthenticationFilter.insertAdminRoutes(ADMIN_URLS);
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(adminAuthenticationFilter, JwtAuthenticationFilter.class);
         return  http.build();
     }
 

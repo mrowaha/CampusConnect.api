@@ -11,9 +11,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class AdminAuthenticationFilter extends GenericFilterBean {
+public class AdminAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTH_TOKEN_HEADER_NAME = "X-API-KEY";
 
     private final AdminProperties adminProperties;
@@ -39,21 +40,22 @@ public class AdminAuthenticationFilter extends GenericFilterBean {
     }
 
     @Override
-    public void doFilter(
-            ServletRequest request, ServletResponse response, FilterChain filterChain
-    ) throws ServletException, IOException {
-        HttpServletRequest httpRequest = (HttpServletRequest)request;
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain)
+            throws ServletException, IOException {
+        System.out.println("applying admin filter");
+
         AntPathMatcher pathMatcher = new AntPathMatcher();
         boolean isAdminRoute = adminRoutes.stream().anyMatch(
-                route -> pathMatcher.match(route, httpRequest.getServletPath())
+                route -> pathMatcher.match(route, request.getServletPath())
         );
         if (isAdminRoute) {
-            String apiKey = httpRequest.getHeader(AUTH_TOKEN_HEADER_NAME);
+            String apiKey = request.getHeader(AUTH_TOKEN_HEADER_NAME);
             if (apiKey == null || !apiKey.equals(adminProperties.getApiKey())) {
-                HttpServletResponse httpResponse = (HttpServletResponse) response;
-                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                httpResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                PrintWriter writer = httpResponse.getWriter();
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                PrintWriter writer = response.getWriter();
                 writer.print(new ObjectMapper()
                         .writeValueAsString(new ApiKeyError("invalid or missing api key")));
                 writer.flush();
