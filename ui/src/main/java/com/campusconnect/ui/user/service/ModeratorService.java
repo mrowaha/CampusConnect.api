@@ -1,15 +1,14 @@
 package com.campusconnect.ui.user.service;
 
-import com.campusconnect.domain.user.dto.BearerToken;
+import com.campusconnect.domain.user.dto.*;
 import com.campusconnect.ui.config.JwtUtilities;
-import com.campusconnect.domain.user.dto.UserLoginDto;
-import com.campusconnect.domain.user.dto.UserCreationDto;
 import com.campusconnect.domain.user.entity.Moderator;
 import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.ui.user.exceptions.InvalidPasswordException;
 import com.campusconnect.ui.user.exceptions.UserAlreadyTakenException;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
 import com.campusconnect.domain.user.repository.ModeratorRepository;
+import com.campusconnect.ui.user.exceptions.UserSuspendedException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -54,7 +53,26 @@ public class ModeratorService implements UserDetailsService {
         }
     }
 
-    public BearerToken authenticate(UserLoginDto loginDto)
+    public ModeratorLoginResponseDto authenticateWithToken(String email, String token) {
+        Moderator moderator = moderatorRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+
+        if (!moderator.getIsActive()) {
+            throw new UserSuspendedException();
+        }
+
+        return ModeratorLoginResponseDto.builder()
+                .uuid(moderator.getUserId())
+                .email(moderator.getEmail())
+                .firstName(moderator.getFirstName())
+                .lastName(moderator.getLastName())
+                .role(moderator.getRole())
+                .token(new BearerToken(token, "Bearer "))
+                .build();
+
+    }
+
+    public ModeratorLoginResponseDto authenticate(UserLoginRequestDto loginDto)
             throws UserNotFoundException, InvalidPasswordException
     {
         Moderator moderator = moderatorRepository.findByEmail(loginDto.getEmail())
@@ -64,7 +82,19 @@ public class ModeratorService implements UserDetailsService {
             throw new InvalidPasswordException();
         }
 
+        if (!moderator.getIsActive()) {
+            throw new UserSuspendedException();
+        }
+
         String token = jwtUtilities.generateToken(moderator.getUsername(), Role.MODERATOR);
-        return new BearerToken(token, "Bearer ");
+        BearerToken bearerToken = new BearerToken(token, "Bearer ");
+        return ModeratorLoginResponseDto.builder()
+                .uuid(moderator.getUserId())
+                .email(moderator.getEmail())
+                .firstName(moderator.getFirstName())
+                .lastName(moderator.getLastName())
+                .role(moderator.getRole())
+                .token(bearerToken)
+                .build();
     }
 }

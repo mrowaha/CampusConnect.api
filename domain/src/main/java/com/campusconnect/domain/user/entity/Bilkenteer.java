@@ -12,12 +12,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
+@Data
 @Entity
 @Table(name="cc_bilkenteer")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 @SuperBuilder
 public class Bilkenteer extends User implements UserDetails {
 
