@@ -169,6 +169,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             new InvalidBearerDto("invalid token bearer", email),
                             response
                     );
+                    return;
                 }
             }
             else {
@@ -177,8 +178,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new JwtError("invalid token"),
                         response
                 );
+                return;
             }
-            return;
         }
 
         filterChain.doFilter(request,response);

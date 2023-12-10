@@ -17,6 +17,7 @@ public class BilkenteerController extends SecureController {
 
     @GetMapping(value = "/s")
     public ResponseEntity<ProtectedDto> protectedBilkenteerRoute() {
+        System.out.println("in bilkenteer protected");
         return new ResponseEntity<>(new ProtectedDto("Authorized"), HttpStatus.OK);
     }
 
