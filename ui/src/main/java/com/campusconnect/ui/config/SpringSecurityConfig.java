@@ -80,7 +80,8 @@ public class SpringSecurityConfig {
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeHttpRequests()
-            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(new String[]{"/auth/**", "/products", "/products/**"}).permitAll();
 
         for (SecureController appController : this.secureControllerList) {
             for (SecureController.Endpoint endpoint : appController.getEndpoints()) {
