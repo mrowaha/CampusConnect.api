@@ -1,5 +1,7 @@
 package com.campusconnect.ui.admin.controller;
 
+import com.campusconnect.domain.security.RequiredScope;
+import com.campusconnect.domain.security.SecurityScope;
 import com.campusconnect.domain.user.dto.ProtectedDto;
 import com.campusconnect.ui.common.controller.SecureController;
 import lombok.RequiredArgsConstructor;
@@ -14,14 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AdminController extends SecureController {
 
-    private final static String BASE_URL = "/admin";
     @GetMapping
+    @RequiredScope(scope = SecurityScope.ADMIN)
     public ResponseEntity<ProtectedDto> validateApiKey() {
         return ResponseEntity.ok(new ProtectedDto("admin authorized"));
     }
 
-    @Override
-    public void postConstruct() {
-        this.addEndpoint(HttpMethod.GET, BASE_URL, "", SecurityScope.ADMIN);
-    }
 }

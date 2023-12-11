@@ -55,25 +55,6 @@ public class ModeratorService implements UserService {
         }
     }
 
-    public ModeratorLoginResponseDto authenticateWithToken(String email, String token) {
-        Moderator moderator = moderatorRepository.findByEmail(email)
-                .orElseThrow(UserNotFoundException::new);
-
-        if (!moderator.getIsActive()) {
-            throw new UserSuspendedException();
-        }
-
-        return ModeratorLoginResponseDto.builder()
-                .uuid(moderator.getUserId())
-                .email(moderator.getEmail())
-                .firstName(moderator.getFirstName())
-                .lastName(moderator.getLastName())
-                .role(moderator.getRole())
-                .token(new BearerToken(token, "Bearer "))
-                .build();
-
-    }
-
     public ModeratorLoginResponseDto authenticate(UserLoginRequestDto loginDto)
             throws UserNotFoundException, InvalidPasswordException
     {

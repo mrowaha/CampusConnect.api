@@ -1,9 +1,13 @@
 package com.campusconnect.ui.user.controller;
 
 
+import com.campusconnect.domain.security.RequiredScope;
+import com.campusconnect.domain.security.SecurityScope;
 import com.campusconnect.domain.security.dto.BearerToken;
 import com.campusconnect.domain.user.dto.*;
 
+import com.campusconnect.domain.user.entity.Bilkenteer;
+import com.campusconnect.domain.user.entity.User;
 import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.ui.common.controller.SecureController;
 import com.campusconnect.ui.utils.JwtUtilities;
@@ -14,11 +18,12 @@ import com.campusconnect.ui.user.exceptions.UserSuspendedException;
 import com.campusconnect.ui.user.service.BilkenteerService;
 import com.campusconnect.ui.user.service.ModeratorService;
 
+import com.campusconnect.ui.utils.UserUtilities;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,17 +33,12 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController extends SecureController {
 
-    private static final String BASE_URL = "/auth";
-    private static final String BILKENTEER_LOGIN = "/bilkenteer/login";
-    private static final String MODERATOR_LOGIN = "/moderator/login";
-    private static final String BILKENTEER_REGISTER = "/bilkenteer/register";
-    private  static final String MODERATOR_REGISTER = "/moderator/register";
-
     private final BilkenteerService bilkenteerService;
     private final ModeratorService moderatorService;
-    private final JwtUtilities jwtUtilities;
+    private final UserUtilities userUtilities;
 
-    @PostMapping(value = AuthController.BILKENTEER_REGISTER, consumes = "application/json", produces = "application/json")
+    @PostMapping(value = "/bilkenteer/register", consumes = "application/json", produces = "application/json")
+    @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<BearerToken> registerBilkenteer(
             @Valid @RequestBody UserCreationDto bilkenteerCreationInfo
     ) throws UserAlreadyTakenException {
@@ -48,7 +48,8 @@ public class AuthController extends SecureController {
         );
     }
 
-    @PostMapping(value = AuthController.BILKENTEER_LOGIN, consumes = "application/json", produces = "application/json")
+    @PostMapping(value = "/bilkenteer/login", consumes = "application/json", produces = "application/json")
+    @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<BilkenteerLoginResponse> loginBilkenteer(
             @Valid @RequestBody UserLoginRequestDto bilkenteerLoginDto
     ) throws UserNotFoundException, InvalidPasswordException, UserSuspendedException {
@@ -59,18 +60,19 @@ public class AuthController extends SecureController {
     }
 
 
-    @PostMapping(value = AuthController.MODERATOR_REGISTER, consumes = "application/json", produces = "application/json")
+    @PostMapping(value = "/moderator/register", consumes = "application/json", produces = "application/json")
+    @RequiredScope(scope = SecurityScope.ADMIN)
     public ResponseEntity<BearerToken> registerModerator(
             @RequestHeader("x-api-key") String apikey,
             @Valid @RequestBody UserCreationDto moderatorCreationInfo
     ) throws UserAlreadyTakenException {
-        System.out.println(apikey);
         return new ResponseEntity<>(
                 moderatorService.register(moderatorCreationInfo),
                 HttpStatus.OK);
     }
 
-    @PostMapping(value = AuthController.MODERATOR_LOGIN, consumes = "application/json", produces = "application/json")
+    @PostMapping(value = "/moderator/login", consumes = "application/json", produces = "application/json")
+    @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<ModeratorLoginResponseDto> loginModerator(
             @Valid @RequestBody UserLoginRequestDto moderatorLoginInfo
     ) throws UsernameNotFoundException, InvalidPasswordException, UserSuspendedException {
@@ -80,35 +82,35 @@ public class AuthController extends SecureController {
     }
 
     @GetMapping
+    @RequiredScope(scope = SecurityScope.SHARED)
     public ResponseEntity<?> validateToken(
-            @RequestHeader(name="Authorization") String bearerToken
-    ) {
-        String token = jwtUtilities.getToken(bearerToken);
-        String email = jwtUtilities.extractUsername(token);
-        Role role = jwtUtilities.extractRole(token);
-        return switch(role) {
+            Authentication authentication
+    )  throws UserUtilities.AuthToUserException {
+        User user = userUtilities.getUserFromAuth(authentication);
+        return switch(user.getRole()) {
             case BILKENTEER -> {
-                yield new ResponseEntity<>(
-                        bilkenteerService.authenticateWithToken(email, token),
-                        HttpStatus.OK
+                yield ResponseEntity.ok(
+                        BilkenteerLoginResponse.builder()
+                                .uuid(user.getUserId())
+                                .email(user.getEmail())
+                                .firstName(user.getFirstName())
+                                .lastName(user.getLastName())
+                                .role(user.getRole())
+                                .trustScore(((Bilkenteer) user).getTrustScore())
+                                .build()
                 );
             }
             case MODERATOR -> {
-                yield new ResponseEntity<>(
-                        moderatorService.authenticateWithToken(email, token),
-                        HttpStatus.OK
+                yield ResponseEntity.ok(
+                        ModeratorLoginResponseDto.builder()
+                                .uuid(user.getUserId())
+                                .email(user.getEmail())
+                                .firstName(user.getFirstName())
+                                .lastName(user.getLastName())
+                                .role(user.getRole())
+                                .build()
                 );
             }
         };
-    }
-
-
-    @Override
-    public void postConstruct() {
-        this.addEndpoint(HttpMethod.POST, BASE_URL, BILKENTEER_REGISTER, SecurityScope.NONE);
-        this.addEndpoint(HttpMethod.POST, BASE_URL, BILKENTEER_LOGIN, SecurityScope.NONE);
-        this.addEndpoint(HttpMethod.POST, BASE_URL, MODERATOR_REGISTER, SecurityScope.ADMIN);
-        this.addEndpoint(HttpMethod.POST, BASE_URL, MODERATOR_LOGIN, SecurityScope.NONE);
-        this.addEndpoint(HttpMethod.GET, BASE_URL, "", SecurityScope.SHARED);
     }
 }

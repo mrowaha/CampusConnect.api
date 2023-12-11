@@ -1,6 +1,8 @@
 package com.campusconnect.ui.image.controller;
 
 import cn.hutool.core.lang.Pair;
+import com.campusconnect.domain.security.RequiredScope;
+import com.campusconnect.domain.security.SecurityScope;
 import com.campusconnect.domain.user.entity.User;
 import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.image.dto.FileResponse;
@@ -34,11 +36,6 @@ import java.util.UUID;
 @RequestMapping("/s3")
 public class S3Controller extends SecureController {
 
-    private static final String BASE_URL = "/s3";
-
-    private static final String PROFILE_URL = "/profile-picture";
-
-    private final JwtUtilities jwtUtilities;
     private final ProfileS3Service profileS3Service;
 
     private final UserUtilities userUtilities;
@@ -46,15 +43,14 @@ public class S3Controller extends SecureController {
     @Autowired
     public S3Controller(
             ProfileS3Service profileS3Service,
-            JwtUtilities jwtUtilities,
             UserUtilities userUtilities
             ) {
         this.profileS3Service = profileS3Service;
-        this.jwtUtilities = jwtUtilities;
         this.userUtilities = userUtilities;
     }
 
-    @PostMapping(value = PROFILE_URL)
+    @PostMapping(value = "/profile-picture")
+    @RequiredScope(scope = SecurityScope.SHARED)
     public ResponseEntity<FileResponse> uploadProfilePicture(
             Authentication authentication,
             @RequestPart(value = "file") MultipartFile imageFile
@@ -72,7 +68,8 @@ public class S3Controller extends SecureController {
                 ), HttpStatus.OK);
     }
 
-    @GetMapping(value = PROFILE_URL)
+    @GetMapping(value = "/profile-picture")
+    @RequiredScope(scope = SecurityScope.NONE)
     public void getProfilePicture(
             HttpServletResponse response,
             @RequestParam("userid") UUID userid,
@@ -82,9 +79,4 @@ public class S3Controller extends SecureController {
                 (response, userid, role);
     }
 
-    @Override
-    public void postConstruct() {
-        this.addEndpoint(HttpMethod.POST, BASE_URL, PROFILE_URL, SecurityScope.SHARED);
-        this.addEndpoint(HttpMethod.GET, BASE_URL, PROFILE_URL,  SecurityScope.NONE);
-    }
 }

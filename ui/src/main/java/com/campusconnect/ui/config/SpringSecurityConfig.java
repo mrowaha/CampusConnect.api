@@ -1,5 +1,7 @@
 package com.campusconnect.ui.config;
 
+import com.campusconnect.domain.security.RequiredScope;
+import com.campusconnect.domain.security.SecurityScope;
 import com.campusconnect.ui.common.controller.SecureController;
 import com.campusconnect.ui.config.filters.AdminAuthenticationFilter;
 import com.campusconnect.ui.config.filters.JwtAuthenticationFilter;
@@ -7,6 +9,7 @@ import com.campusconnect.ui.config.properties.AdminProperties;
 import com.campusconnect.ui.config.properties.RoledJwtProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,6 +24,7 @@ import org.springframework.util.AntPathMatcher;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @Configuration
@@ -49,6 +53,7 @@ public class SpringSecurityConfig {
             AdminAuthenticationFilter adminAuthenticationFilter,
             List<SecureController> secureControllerList
     ) {
+
         this.jwtAuthenticationFilter = filter;
         this.adminAuthenticationFilter = adminAuthenticationFilter;
 
@@ -59,8 +64,9 @@ public class SpringSecurityConfig {
         this.WHITE_LIST_URLS = new ArrayList<>();
         this.ADMIN_URLS = new ArrayList<>();
         for (SecureController appController : this.secureControllerList) {
+//            appController.getScopes();
             for (SecureController.Endpoint endpoint : appController.getEndpoints()) {
-                SecureController.SecurityScope scope = endpoint.getScope();
+                SecurityScope scope = endpoint.getScope();
                 switch (scope) {
                     case NONE -> this.WHITE_LIST_URLS.add(endpoint.getUrl());
                     case BILKENTEER -> this.BILKENTEER_URLS.add(endpoint.getUrl());
@@ -75,6 +81,7 @@ public class SpringSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain (HttpSecurity http) throws Exception
     {
+
         http
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -84,7 +91,7 @@ public class SpringSecurityConfig {
 
         for (SecureController appController : this.secureControllerList) {
             for (SecureController.Endpoint endpoint : appController.getEndpoints()) {
-                if (endpoint.getScope() != SecureController.SecurityScope.NONE && endpoint.getScope() != SecureController.SecurityScope.ADMIN) {
+                if (endpoint.getScope() != SecurityScope.NONE && endpoint.getScope() != SecurityScope.ADMIN) {
                     http.authorizeHttpRequests().
                             requestMatchers(endpoint.getMethod(), endpoint.getUrl()).authenticated();
                 } else {
