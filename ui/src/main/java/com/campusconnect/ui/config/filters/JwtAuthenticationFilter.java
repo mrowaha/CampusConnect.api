@@ -2,6 +2,8 @@ package com.campusconnect.ui.config.filters;
 
 
 import com.campusconnect.domain.security.dto.*;
+import com.campusconnect.domain.security.token.UserAuthenticationToken;
+import com.campusconnect.domain.user.entity.User;
 import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.ui.user.service.BilkenteerService;
 import com.campusconnect.ui.user.service.ModeratorService;
@@ -14,9 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -143,12 +143,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (valid) {
                 String email = jwtUtilities.extractUsername(token);
                 try {
-                    UserDetails userDetails = switch (userRole) {
+                    User user = switch (userRole) {
                         case BILKENTEER -> bilkenteerDetailsService.loadUserByUsername(email);
                         case MODERATOR -> moderatorDetailsService.loadUserByUsername(email);
                     };
-                    if (userDetails != null) {
-                        if (!userDetails.isEnabled()) {
+                    if (user != null) {
+                        if (!user.isEnabled()) {
                             this.invalidateRequest(
                                     HttpServletResponse.SC_UNAUTHORIZED,
                                     new DisabledUserDto("account suspended", email),
@@ -156,9 +156,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             );
                             return;
                         }
-                        UsernamePasswordAuthenticationToken authentication =
-                                new UsernamePasswordAuthenticationToken(userDetails.getUsername() ,null , userDetails.getAuthorities());
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                        UserAuthenticationToken authenticationToken =
+                                new UserAuthenticationToken(user, user.getAuthorities());
+                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                     } else {
                         throw new UsernameNotFoundException("invalid token bearer");
                     }

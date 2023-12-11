@@ -23,7 +23,7 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class Moderator extends User implements UserDetails {
+public class Moderator extends User {
 
     @Column(name = "is_active")
     private Boolean isActive = true;
@@ -34,27 +34,6 @@ public class Moderator extends User implements UserDetails {
         authorities.add(authority);
         return authorities;
     }
-
-    @Override
-    public String getUsername() {
-        return this.email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
     @Override
     public boolean isEnabled() {
         return this.isActive;

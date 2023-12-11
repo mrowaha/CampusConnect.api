@@ -2,6 +2,7 @@ package com.campusconnect.ui.user.service;
 
 import com.campusconnect.domain.security.dto.BearerToken;
 import com.campusconnect.domain.user.dto.BilkenteerLoginResponse;
+import com.campusconnect.domain.user.entity.User;
 import com.campusconnect.ui.utils.JwtUtilities;
 import com.campusconnect.ui.user.exceptions.InvalidPasswordException;
 import com.campusconnect.ui.user.exceptions.UserAlreadyTakenException;
@@ -25,14 +26,14 @@ import java.util.ArrayList;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class BilkenteerService implements UserDetailsService {
+public class BilkenteerService implements UserService {
 
     private final BilkenteerRepository bilkenteerRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtilities jwtUtilities;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public User loadUserByUsername(String email) throws UsernameNotFoundException {
         return bilkenteerRepository.findByEmail(email).orElseThrow(() ->
                 new UsernameNotFoundException("User not found"));
     }

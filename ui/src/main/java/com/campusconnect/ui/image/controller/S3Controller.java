@@ -1,6 +1,7 @@
 package com.campusconnect.ui.image.controller;
 
 import cn.hutool.core.lang.Pair;
+import com.campusconnect.domain.user.entity.User;
 import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.image.dto.FileResponse;
 import com.campusconnect.image.exceptions.GenericMinIOFailureException;
@@ -62,12 +63,12 @@ public class S3Controller extends SecureController {
             UserUtilities.AuthToUserException,
             GenericMinIOFailureException
     {
-        Pair<String, Role> userDetails = userUtilities.getUserDetailsFromAuth(authentication);
+        User user = userUtilities.getUserFromAuth(authentication);
         return new ResponseEntity<>(
             this.profileS3Service.upload(
                     imageFile,
-                    userDetails.getKey(),
-                    userDetails.getValue()
+                    user.getEmail(),
+                    user.getRole()
                 ), HttpStatus.OK);
     }
 
