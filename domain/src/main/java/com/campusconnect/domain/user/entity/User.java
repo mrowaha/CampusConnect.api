@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import com.campusconnect.domain.user.enums.Role;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 
+import java.util.Collection;
 import java.util.UUID;
 
 @Data
@@ -49,5 +52,4 @@ public class User{
 
     @Column(name = "profile_picture", nullable = true)
     private String profilePicture;
-
 }

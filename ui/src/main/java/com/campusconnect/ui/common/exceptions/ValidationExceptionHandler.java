@@ -28,7 +28,6 @@ public class ValidationExceptionHandler {
                 .stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.toList());
-
         return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 

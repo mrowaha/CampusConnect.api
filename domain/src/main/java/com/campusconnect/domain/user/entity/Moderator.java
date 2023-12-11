@@ -1,5 +1,6 @@
 package com.campusconnect.domain.user.entity;
 
+import com.campusconnect.domain.user.enums.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -11,6 +12,7 @@ import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 
@@ -27,7 +29,10 @@ public class Moderator extends User implements UserDetails {
     private Boolean isActive = true;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        GrantedAuthority authority = Role.MODERATOR::name;
+        ArrayList<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(authority);
+        return authorities;
     }
 
     @Override

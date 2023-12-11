@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AdminController extends SecureController {
 
+    private final static String BASE_URL = "/admin";
     @GetMapping
     public ResponseEntity<ProtectedDto> validateApiKey() {
         return ResponseEntity.ok(new ProtectedDto("admin authorized"));
@@ -21,7 +22,6 @@ public class AdminController extends SecureController {
 
     @Override
     public void postConstruct() {
-        String BASE_URL = "/admin";
         this.addEndpoint(HttpMethod.GET, BASE_URL, "", SecurityScope.ADMIN);
     }
 }

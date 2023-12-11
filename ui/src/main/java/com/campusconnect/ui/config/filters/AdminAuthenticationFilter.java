@@ -27,7 +27,8 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
 
     private final AdminProperties adminProperties;
 
-    private List<String> adminRoutes;
+    private final List<String> adminRoutes;
+
 
     @Autowired
     public AdminAuthenticationFilter(AdminProperties adminProperties) {
@@ -44,8 +45,6 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-        System.out.println("applying admin filter");
-
         AntPathMatcher pathMatcher = new AntPathMatcher();
         boolean isAdminRoute = adminRoutes.stream().anyMatch(
                 route -> pathMatcher.match(route, request.getServletPath())
