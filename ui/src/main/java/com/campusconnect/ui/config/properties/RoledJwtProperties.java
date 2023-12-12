@@ -1,4 +1,4 @@
-package com.campusconnect.ui.config;
+package com.campusconnect.ui.config.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

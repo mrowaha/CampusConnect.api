@@ -7,9 +7,11 @@ import jakarta.persistence.*;
 import com.campusconnect.domain.user.enums.Role;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Collection;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -20,7 +22,7 @@ import java.util.UUID;
 @SuperBuilder
 @Entity(name = "cc_user") //Need to add this to create relations with User
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS) //User itself won't have a table
-public class User{
+public abstract class User{
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -55,6 +57,13 @@ public class User{
 
     @Column(name = "profile_picture", nullable = true)
     private String profilePicture;
+
+    public String getUsername() {
+        return this.email;
+    }
+    public abstract Collection<? extends GrantedAuthority> getAuthorities();
+    public abstract boolean isEnabled();
+
 
     @OneToMany(mappedBy = "initiatingUser")
     @JsonManagedReference(value = "initiating_user_id")

@@ -8,6 +8,7 @@ import com.campusconnect.image.dto.FileResponse;
 import com.campusconnect.image.exceptions.GenericMinIOFailureException;
 import com.campusconnect.image.exceptions.InvalidFileTypeException;
 import com.campusconnect.image.service.MinioService;
+import com.campusconnect.image.util.ImageTypeUtils;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class ProfileS3Service {
     private final BilkenteerRepository bilkenteerRepository;
     private final ModeratorRepository moderatorRepository;
     private final MinioService minioService;
-
+    private final ImageTypeUtils imageTypeUtils;
 
     public interface  SaltedObjectName {
         String saltedObjectName(final String email, final Role role) throws GenericMinIOFailureException;
@@ -65,9 +66,14 @@ public class ProfileS3Service {
         }, email, role);
 
         log.info("Salted Name for email {} and role {} is {}", email, role.toString(), saltedName);
-        String fileName = imageFile.getOriginalFilename();
-        String objectName = saltedName + fileName.substring(fileName.lastIndexOf("."));
-
+        String fileType = null;
+        try {
+           fileType = imageTypeUtils.getImageType(imageFile);
+        } catch (IOException e) {
+            throw new GenericMinIOFailureException();
+        }
+        String objectName = saltedName + fileType.substring(fileType.lastIndexOf("/")).replaceAll("/", ".");
+        log.info("Object Name {}", objectName);
         int updatedRows = 0;
         switch (role) {
             case BILKENTEER -> {
@@ -88,7 +94,7 @@ public class ProfileS3Service {
         }
 
         try {
-            return minioService.putProfilePicture(imageFile, saltedName);
+            return minioService.putProfilePicture(imageFile, objectName);
         } catch (InvalidFileTypeException | GenericMinIOFailureException exception) {
             switch (role) {
                 case BILKENTEER -> {

@@ -1,5 +1,7 @@
 package com.campusconnect.ui.user.controller;
 
+import com.campusconnect.domain.security.RequiredScope;
+import com.campusconnect.domain.security.SecurityScope;
 import com.campusconnect.domain.user.dto.ProtectedDto;
 import com.campusconnect.ui.common.controller.SecureController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +19,10 @@ import java.util.ArrayList;
 @RequestMapping("/moderator")
 public class ModeratorController extends SecureController {
 
-    private static final String BASE_URL = "/moderator";
     @GetMapping(value = "/s")
+    @RequiredScope(scope = SecurityScope.MODERATOR)
     public ResponseEntity<ProtectedDto> protectedModeratorRoute() {
         return new ResponseEntity<>(new ProtectedDto("Authorized"), HttpStatus.OK);
     }
 
-    @Override
-    public void postConstruct() {
-        this.addEndpoint(HttpMethod.GET, BASE_URL,"/s", SecurityScope.MODERATOR);
-    }
 }

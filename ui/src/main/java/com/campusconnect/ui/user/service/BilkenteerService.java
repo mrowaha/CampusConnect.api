@@ -1,8 +1,9 @@
 package com.campusconnect.ui.user.service;
 
-import com.campusconnect.domain.user.dto.BearerToken;
+import com.campusconnect.domain.security.dto.BearerToken;
 import com.campusconnect.domain.user.dto.BilkenteerLoginResponse;
-import com.campusconnect.ui.config.JwtUtilities;
+import com.campusconnect.domain.user.entity.User;
+import com.campusconnect.ui.utils.JwtUtilities;
 import com.campusconnect.ui.user.exceptions.InvalidPasswordException;
 import com.campusconnect.ui.user.exceptions.UserAlreadyTakenException;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
@@ -25,14 +26,14 @@ import java.util.ArrayList;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class BilkenteerService implements UserDetailsService {
+public class BilkenteerService implements UserService {
 
     private final BilkenteerRepository bilkenteerRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtilities jwtUtilities;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public User loadUserByUsername(String email) throws UsernameNotFoundException {
         return bilkenteerRepository.findByEmail(email).orElseThrow(() ->
                 new UsernameNotFoundException("User not found"));
     }
@@ -59,26 +60,6 @@ public class BilkenteerService implements UserDetailsService {
             String token = jwtUtilities.generateToken(creationDto.getEmail(), Role.BILKENTEER);
             return new BearerToken(token , "Bearer ");
         }
-    }
-
-    public BilkenteerLoginResponse authenticateWithToken(String email, String token)
-    throws  UserSuspendedException
-    {
-        Bilkenteer bilkenteer = bilkenteerRepository.findByEmail(email)
-                .orElseThrow(UserNotFoundException::new);
-
-        if (bilkenteer.getIsSuspended()) {
-            throw new UserSuspendedException();
-        }
-        return BilkenteerLoginResponse.builder()
-                .uuid(bilkenteer.getUserId())
-                .email(bilkenteer.getEmail())
-                .firstName(bilkenteer.getFirstName())
-                .lastName(bilkenteer.getLastName())
-                .role(bilkenteer.getRole())
-                .trustScore(bilkenteer.getTrustScore())
-                .token(new BearerToken(token, "Bearer "))
-                .build();
     }
 
     public BilkenteerLoginResponse authenticate(UserLoginRequestDto loginDto)

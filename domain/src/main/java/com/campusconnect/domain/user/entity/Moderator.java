@@ -1,5 +1,6 @@
 package com.campusconnect.domain.user.entity;
 
+import com.campusconnect.domain.user.enums.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -11,6 +12,7 @@ import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 
@@ -21,37 +23,19 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class Moderator extends User implements UserDetails {
+public class Moderator extends User {
 
     @Column(name = "is_active")
     private Boolean isActive = true;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        GrantedAuthority authority = Role.MODERATOR::name;
+        ArrayList<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(authority);
+        return authorities;
     }
-
-    @Override
-    public String getUsername() {
-        return this.email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.isActive;
     }
 }

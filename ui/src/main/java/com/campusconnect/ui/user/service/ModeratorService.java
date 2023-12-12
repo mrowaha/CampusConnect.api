@@ -1,7 +1,9 @@
 package com.campusconnect.ui.user.service;
 
+import com.campusconnect.domain.security.dto.BearerToken;
 import com.campusconnect.domain.user.dto.*;
-import com.campusconnect.ui.config.JwtUtilities;
+import com.campusconnect.domain.user.entity.User;
+import com.campusconnect.ui.utils.JwtUtilities;
 import com.campusconnect.domain.user.entity.Moderator;
 import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.ui.user.exceptions.InvalidPasswordException;
@@ -21,14 +23,14 @@ import org.springframework.stereotype.Service;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class ModeratorService implements UserDetailsService {
+public class ModeratorService implements UserService {
 
     private final ModeratorRepository moderatorRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtilities jwtUtilities;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public User loadUserByUsername(String email) throws UserNotFoundException {
         return moderatorRepository.findByEmail(email).orElseThrow(() ->
                 new UsernameNotFoundException("User not found")
         );
@@ -51,25 +53,6 @@ public class ModeratorService implements UserDetailsService {
             String token = jwtUtilities.generateToken(creationDto.getEmail(), Role.MODERATOR);
             return new BearerToken(token , "Bearer ");
         }
-    }
-
-    public ModeratorLoginResponseDto authenticateWithToken(String email, String token) {
-        Moderator moderator = moderatorRepository.findByEmail(email)
-                .orElseThrow(UserNotFoundException::new);
-
-        if (!moderator.getIsActive()) {
-            throw new UserSuspendedException();
-        }
-
-        return ModeratorLoginResponseDto.builder()
-                .uuid(moderator.getUserId())
-                .email(moderator.getEmail())
-                .firstName(moderator.getFirstName())
-                .lastName(moderator.getLastName())
-                .role(moderator.getRole())
-                .token(new BearerToken(token, "Bearer "))
-                .build();
-
     }
 
     public ModeratorLoginResponseDto authenticate(UserLoginRequestDto loginDto)

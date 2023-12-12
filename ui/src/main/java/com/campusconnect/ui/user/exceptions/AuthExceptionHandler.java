@@ -1,5 +1,6 @@
 package com.campusconnect.ui.user.exceptions;
 
+import com.campusconnect.ui.utils.UserUtilities;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,6 @@ public class AuthExceptionHandler extends ResponseEntityExceptionHandler {
         errorResponse.put("errors", errors);
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.FORBIDDEN);
     }
-
     @ExceptionHandler(UserSuspendedException.class)
     public ResponseEntity<Map<String, List<String>>> handleUserSuspended(UserSuspendedException ex) {
         List<String> errors = new ArrayList<>();
@@ -52,4 +52,12 @@ public class AuthExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(UserUtilities.AuthToUserException.class)
+    public ResponseEntity<Map<String, List<String>>> handleUserFromAuth(UserUtilities.AuthToUserException ex) {
+        List<String> errors = new ArrayList<>();
+        errors.add("Internal Server Error");
+        Map<String, List<String>> errorResponse = new HashMap<>();
+        errorResponse.put("errors", errors);
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
