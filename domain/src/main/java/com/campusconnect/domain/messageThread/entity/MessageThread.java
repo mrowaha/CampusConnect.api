@@ -30,14 +30,14 @@ public class MessageThread{
     @Column(name = "id")
     protected UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "initiating_user_id", nullable = false)
-    @JsonBackReference(value = "initiating_user_id")
+//    @JsonBackReference(value = "initiating_user_id")
     private User initiatingUser;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "receiving_user_id", nullable = false)
-    @JsonBackReference(value = "receiving_user_id")
+//    @JsonBackReference(value = "receiving_user_id")
     private User receivingUser;
 
     @OneToMany(mappedBy = "messageThread", cascade = CascadeType.ALL)

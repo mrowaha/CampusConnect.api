@@ -5,19 +5,16 @@ import com.campusconnect.domain.message.entity.Message;
 import com.campusconnect.domain.message.repository.MessageRepository;
 import com.campusconnect.domain.messageThread.entity.MessageThread;
 import com.campusconnect.domain.messageThread.repository.MessageThreadRepository;
-import com.campusconnect.domain.user.dto.BearerToken;
-import com.campusconnect.domain.user.dto.UserCreationDto;
-import com.campusconnect.domain.user.dto.UserLoginDto;
-import com.campusconnect.domain.user.entity.Moderator;
 import com.campusconnect.domain.user.entity.User;
-import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.domain.user.repository.BilkenteerRepository;
 import com.campusconnect.domain.user.repository.ModeratorRepository;
-import com.campusconnect.ui.user.exceptions.InvalidPasswordException;
-import com.campusconnect.ui.user.exceptions.UserAlreadyTakenException;
+import com.campusconnect.email.EmailSenderService;
+import com.campusconnect.ui.messageThread.exceptions.MessageNotFoundException;
+import com.campusconnect.ui.notification.controller.WebSocketNotificationController;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 
 @Service
@@ -35,6 +33,11 @@ public class MessageThreadService {
     private final MessageThreadRepository messageThreadRepository;
     private final BilkenteerRepository bilkenteerRepository;
     private final ModeratorRepository moderatorRepository;
+
+    @Autowired
+    private WebSocketNotificationController notificationController;
+
+    private static final Logger log = Logger.getLogger(MessageThreadService.class.getName());
 
     public Optional<List<MessageThread>> getAllMessageThreads(UUID userId) {
         return messageThreadRepository.findAllByUserId(userId);
@@ -60,8 +63,26 @@ public class MessageThreadService {
         message.setTimeStamp(LocalDateTime.now());
 
         messageRepository.save(message);
+
+        String notification = "You have a new message from " + messageDto.getSenderId();
+        notificationController.notifyUser(messageDto.getReceiverId().toString(), notification);
+        log.info("User Notified Successfully");
     }
 
+    @Transactional
+    public void markMessagesAsSeen(UUID userId, List<MessageDto> messageDtos) {
+        for (MessageDto messageDto : messageDtos) {
+
+            Message message = messageRepository.findById(messageDto.getId())
+                    .orElseThrow(MessageNotFoundException::new);
+
+            //Only Mark as seen if user is the one who received message
+            if (userId.equals(message.getReceiverId())){
+                message.setSeen(true);
+                messageRepository.save(message);
+            }
+        }
+    }
 
     private MessageThread addMessageThread(UUID senderId, UUID receiverId) throws UserNotFoundException {
 

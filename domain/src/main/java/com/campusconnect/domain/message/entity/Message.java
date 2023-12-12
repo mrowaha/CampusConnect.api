@@ -27,7 +27,7 @@ public class Message{
     protected UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "messageThreadID")
+    @JoinColumn(name = "message_thread_id")
     @JsonBackReference(value = "messages")
     @NonNull
     private MessageThread messageThread;
@@ -44,14 +44,29 @@ public class Message{
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "senderId")
+    @JoinColumn(name = "sender_Id")
     @JsonBackReference(value = "sender")
     private User sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiverId")
+    @JoinColumn(name = "receiver_Id")
     @JsonBackReference(value = "receiver")
     private User receiver;
 
+    @Transient
+    private UUID senderId;
+
+    @Transient
+    private UUID receiverId;
+
+    @PostLoad
+    private void fillTransientFields() {
+        if (sender != null) {
+            this.senderId = sender.getUserId();
+        }
+        if (receiver != null) {
+            this.receiverId = receiver.getUserId();
+        }
+    }
     //TODO Image URL
 }
