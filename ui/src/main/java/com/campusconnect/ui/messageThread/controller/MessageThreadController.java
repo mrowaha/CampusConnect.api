@@ -45,11 +45,4 @@ public class MessageThreadController extends SecureController {
         return ResponseEntity.ok(null);
     }
 
-//    @Override
-//    public void postConstruct() {
-//        this.addEndpoint(HttpMethod.GET, BASE_URL, GET_MESSAGE_THREAD, SecurityScope.NONE);
-//        this.addEndpoint(HttpMethod.POST, BASE_URL, SEND_MESSAGE, SecurityScope.NONE);
-//        this.addEndpoint(HttpMethod.PUT, BASE_URL, MARK_SEEN, SecurityScope.NONE);
-//        this.addEndpoint(HttpMethod.GET, "/ws", "/topic/messages/{userId}", SecurityScope.NONE);
-//    }
 }

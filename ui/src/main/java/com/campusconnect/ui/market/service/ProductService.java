@@ -1,10 +1,9 @@
 package com.campusconnect.ui.market.service;
 
-import com.campusconnect.ui.market.dto.ProductDto;
-import com.campusconnect.ui.market.entity.Product;
-import com.campusconnect.ui.market.enums.ProductStatus;
-import com.campusconnect.ui.market.enums.ProductType;
-import com.campusconnect.ui.market.repository.ProductRepository;
+import com.campusconnect.domain.product.dto.ProductDto;
+import com.campusconnect.domain.product.entity.Product;
+import com.campusconnect.domain.product.enums.ProductStatus;
+import com.campusconnect.domain.product.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,8 +31,8 @@ public class ProductService {
                 .type(productCreationInfo.getType()) // for now
                 .status(ProductStatus.AVAILABLE)
                 .wishListedBy(new HashSet<UUID>())
-                .bids(new ArrayList<Integer>())
-                .categorizesId(new HashSet<Integer>()).build();
+                .bids(new ArrayList<UUID>())
+                .tagsId(new HashSet<UUID>()).build();
 
         productRepository.save(product);
         return new ResponseEntity<>( "Product Id:" + product.getProductId(), HttpStatus.OK);
@@ -43,7 +42,7 @@ public class ProductService {
         return (List<Product>)productRepository.findAll();
     }
 
-    public Product updateProduct(ProductDto productCreationInfo, Long productId){
+    public Product updateProduct(ProductDto productCreationInfo, UUID productId){
         Product productDB = productRepository.findById(productId).get();
 
         if (Objects.nonNull(productCreationInfo.getName()) && !"".equalsIgnoreCase(productCreationInfo.getName())){
@@ -61,7 +60,7 @@ public class ProductService {
         return productRepository.save(productDB);
     }
 
-    public void deleteProductById(Long productId){
+    public void deleteProductById(UUID productId){
         productRepository.deleteById(productId);
     }
 }

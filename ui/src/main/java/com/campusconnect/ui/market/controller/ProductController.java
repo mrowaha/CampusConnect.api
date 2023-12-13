@@ -1,7 +1,9 @@
 package com.campusconnect.ui.market.controller;
 
-import com.campusconnect.ui.market.dto.ProductDto;
-import com.campusconnect.ui.market.entity.Product;
+import com.campusconnect.domain.product.dto.ProductDto;
+import com.campusconnect.domain.product.entity.Product;
+import com.campusconnect.domain.security.RequiredScope;
+import com.campusconnect.domain.security.SecurityScope;
 import com.campusconnect.ui.market.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,35 +12,39 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@Controller
+@RequestMapping("/products")
 public class ProductController {
 
     private final ProductService productService;
 
-    @PostMapping("/products")
+    @PostMapping()
+    @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<?> saveProduct(@Valid @RequestBody ProductDto productCreationInfo) {
-        return productService.saveProduct(productCreationInfo);
+        return ResponseEntity.ok(productService.saveProduct(productCreationInfo));
     }
 
-    @GetMapping("/products")
-    public List<Product> fetchProductList(){
-        return productService.fetchProductList();
+    @GetMapping()
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<List<Product>> fetchProductList(){
+        return ResponseEntity.ok(productService.fetchProductList());
     }
 
-    @PutMapping("/products/{id}")
-    public Product updateProduct(@RequestBody ProductDto productCreationInfo, @PathVariable("id") Long productId){
-        return productService.updateProduct(productCreationInfo, productId);
+    @PutMapping("/")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<Product> updateProduct(@RequestBody ProductDto productCreationInfo, @RequestParam("productId") UUID productId){
+        return ResponseEntity.ok(productService.updateProduct(productCreationInfo, productId));
     }
 
-    @DeleteMapping("/products/{id}")
-    public String deleteProductById(@PathVariable("id") Long productId)
-    {
-        productService.deleteProductById(productId);
-        return "Deleted Successfully";
-    }
+//    @DeleteMapping("/")
+//    @RequiredScope(scope = SecurityScope.NONE)
+//    public ResponseEntity<Void> deleteProductById@RequestParam("productId") UUID productId){
+//        productService.deleteProductById(productId);
+//        return ResponseEntity.ok(null);
+//    }
 }
 
 

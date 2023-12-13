@@ -1,7 +1,7 @@
-package com.campusconnect.ui.market.entity;
+package com.campusconnect.domain.product.entity;
 
-import com.campusconnect.ui.market.enums.ProductStatus;
-import com.campusconnect.ui.market.enums.ProductType;
+import com.campusconnect.domain.product.enums.ProductType;
+import com.campusconnect.domain.product.enums.ProductStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -22,7 +22,7 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "product_id")
-    protected Long productId;
+    protected UUID productId;
 
     @Column(name = "seller_id", nullable = false)
     protected UUID sellerId;
@@ -40,7 +40,7 @@ public class Product {
 
     @Column(name = "product_price", nullable = false)
     @NotNull
-    protected Integer price;
+    protected Double price;
 
     //protected ArrayList<String> images;
 
@@ -60,15 +60,15 @@ public class Product {
     @Column(name = "wish_listed_by")
     protected Set<UUID> wishListedBy = new HashSet<>();
 
-    @ElementCollection(targetClass =  Integer.class, fetch = FetchType.EAGER)
+    @ElementCollection(targetClass =  UUID.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "bids_table", joinColumns = @JoinColumn(name = "bilkenteer_id"))
     @Column(name = "bids")
-    protected List<Integer> bids = new ArrayList<>();
+    protected List<UUID> bids = new ArrayList<>();
 
-    @ElementCollection(targetClass =  Integer.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "categorises_id_table", joinColumns = @JoinColumn(name = "bilkenteer_id"))
-    @Column(name = "categorises_id")
-    protected Set<Integer> categorizesId = new HashSet<>();
+    @ElementCollection(targetClass =  UUID.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "tags_id_table", joinColumns = @JoinColumn(name = "bilkenteer_id"))
+    @Column(name = "tags_id")
+    protected Set<UUID> tagsId = new HashSet<>();
 
     //public void addImage()
     //public void removeImage()

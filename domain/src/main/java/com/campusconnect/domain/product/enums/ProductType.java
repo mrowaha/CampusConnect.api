@@ -1,4 +1,4 @@
-package com.campusconnect.ui.market.enums;
+package com.campusconnect.domain.product.enums;
 
 public enum ProductType {
 

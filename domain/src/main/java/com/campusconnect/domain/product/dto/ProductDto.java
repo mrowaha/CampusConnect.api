@@ -1,6 +1,6 @@
-package com.campusconnect.ui.market.dto;
+package com.campusconnect.domain.product.dto;
 
-import com.campusconnect.ui.market.enums.ProductType;
+import com.campusconnect.domain.product.enums.ProductType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -25,7 +25,7 @@ public class ProductDto {
     private String description;
 
     @NotNull(message = "Product price cannot be null")
-    private Integer price;
+    private Double price;
 
     @NotNull(message = "Product type must be chosen")
     private ProductType type;
