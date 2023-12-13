@@ -1,7 +1,9 @@
 package com.campusconnect.domain.notification.entity;
 
+import com.campusconnect.domain.messageThread.entity.MessageThread;
 import com.campusconnect.domain.notification.enums.NotificationType;
 import com.campusconnect.domain.user.entity.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -41,7 +43,8 @@ public class Notification{
     private boolean seen = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference(value = "notifications")
     @JsonIgnore
     private User user;
 

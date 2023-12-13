@@ -12,6 +12,7 @@ import com.campusconnect.email.EmailSenderService;
 import com.campusconnect.ui.messageThread.exceptions.MessageNotFoundException;
 import com.campusconnect.ui.notification.controller.WebSocketNotificationController;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
+import com.campusconnect.ui.user.service.BilkenteerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +32,7 @@ public class MessageThreadService {
 
     private final MessageRepository messageRepository;
     private final MessageThreadRepository messageThreadRepository;
-    private final BilkenteerRepository bilkenteerRepository;
-    private final ModeratorRepository moderatorRepository;
+    private final BilkenteerService bilkenteerService;
 
     @Autowired
     private WebSocketNotificationController notificationController;
@@ -57,8 +57,8 @@ public class MessageThreadService {
         Message message = new Message();
 
         message.setMessageThread(messageThread);
-        message.setSender(findUser(messageDto.getSenderId()));
-        message.setReceiver(findUser(messageDto.getReceiverId()));
+        message.setSender(bilkenteerService.findUser(messageDto.getSenderId()));
+        message.setReceiver(bilkenteerService.findUser(messageDto.getReceiverId()));
         message.setContent(messageDto.getContent());
         message.setTimeStamp(LocalDateTime.now());
 
@@ -88,12 +88,12 @@ public class MessageThreadService {
 
         MessageThread messageThread = new MessageThread();
 
-        User initiatingUser = findUser(senderId);
+        User initiatingUser = bilkenteerService.findUser(senderId);
         if (Objects.isNull(initiatingUser)) {
             throw new UserNotFoundException();
         }
 
-        User receivingUser = findUser(receiverId);
+        User receivingUser = bilkenteerService.findUser(receiverId);
         if (Objects.isNull(receivingUser)) {
             throw new UserNotFoundException();
         }
@@ -104,17 +104,5 @@ public class MessageThreadService {
 
         return messageThread;
     }
-
-    public User findUser(UUID userId) {
-
-        User user = moderatorRepository.findById(userId).orElse(null);
-
-        if (Objects.isNull(user)) {
-            user = bilkenteerRepository.findById(userId).orElse(null);
-        }
-
-        return user;
-    }
-
 
 }
