@@ -1,5 +1,7 @@
 package com.campusconnect.ui.user.exceptions;
 
+import com.campusconnect.ui.messageThread.exceptions.MessageNotFoundException;
+import com.campusconnect.ui.notification.exceptions.NotificationNotFoundException;
 import com.campusconnect.ui.utils.UserUtilities;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -60,4 +62,32 @@ public class AuthExceptionHandler extends ResponseEntityExceptionHandler {
         errorResponse.put("errors", errors);
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(NotificationNotFoundException.class)
+    public ResponseEntity<Map<String, List<String>>> handleUserAlreadyTaken(NotificationNotFoundException ex) {
+        List<String> errors = new ArrayList<>();
+        errors.add("Notification Not Found");
+        Map<String, List<String>> errorResponse = new HashMap<>();
+        errorResponse.put("errors", errors);
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Map<String, List<String>>> handleUserNotFoundException(UserNotFoundException ex) {
+        List<String> errors = new ArrayList<>();
+        errors.add("User Not Found");
+        Map<String, List<String>> errorResponse = new HashMap<>();
+        errorResponse.put("errors", errors);
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(MessageNotFoundException.class)
+    public ResponseEntity<Map<String, List<String>>> handleMessageNotFoundException(MessageNotFoundException ex) {
+        List<String> errors = new ArrayList<>();
+        errors.add("Message Not Found");
+        Map<String, List<String>> errorResponse = new HashMap<>();
+        errorResponse.put("errors", errors);
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
 }

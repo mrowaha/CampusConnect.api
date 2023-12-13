@@ -1,21 +1,20 @@
 package com.campusconnect.ui.notification.service;
 
-import com.campusconnect.domain.messageThread.entity.MessageThread;
 import com.campusconnect.domain.notification.dto.NotificationDto;
 import com.campusconnect.domain.notification.entity.Notification;
 import com.campusconnect.domain.notification.repository.NotificationRepository;
 import com.campusconnect.domain.user.entity.User;
+import com.campusconnect.ui.notification.exceptions.NotificationNotFoundException;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
 import com.campusconnect.ui.user.service.BilkenteerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 
 @Service
@@ -26,7 +25,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final BilkenteerService bilkenteerService;
 
-    private Notification saveNotification(UUID userId, NotificationDto notificationDto){
+    public Notification saveNotification(UUID userId, NotificationDto notificationDto) throws UserNotFoundException{
 
         Notification notification = new Notification();
 
@@ -46,8 +45,8 @@ public class NotificationService {
         return notification;
     }
 
-    public List<Notification> getNotificationList(){
-        return (List<Notification>)notificationRepository.findAll();
+    public List<Notification> getUserNotificationList(UUID userId){
+        return notificationRepository.findAllByUserUserId(userId).orElse(null);
     }
 
 
@@ -55,4 +54,20 @@ public class NotificationService {
     public void deleteNotification(UUID notificationId){
         notificationRepository.deleteById(notificationId);
     }
+
+
+    @Transactional
+    public void markNotificationsAsSeen(List<UUID> notificationIds) throws NotificationNotFoundException{
+        for (UUID notificationId : notificationIds) {
+
+            Notification notification = notificationRepository.findById(notificationId)
+                    .orElseThrow(NotificationNotFoundException::new);
+
+
+            notification.setSeen(true);
+            notificationRepository.save(notification);
+
+        }
+    }
+
 }
