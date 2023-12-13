@@ -17,18 +17,18 @@ public class ForumPostDto {
 
     private String posterId;
 
-    @NotBlank(message = "Post Title Can not be Blank")
-    @NotNull(message = "Post Title Can not be Null")
+//    @NotBlank(message = "Post Title Can not be Blank")
+//    @NotNull(message = "Post Title Can not be Null")
     private String title;
 
-    @NotBlank(message = "Description Can not be Blank")
-    @NotNull(message = "Description Can not be Null")
+//    @NotBlank(message = "Description Can not be Blank")
+//    @NotNull(message = "Description Can not be Null")
     private String description;
 
-    @NotBlank(message = "postType Can not be Blank")
-    @NotNull(message = "postType Can not be Null")
+//    @NotBlank(message = "postType Can not be Blank")
+//    @NotNull(message = "postType Can not be Null")
     private ForumPostType postType;
 
-    private ForumPostStatus postStatus = ForumPostStatus.Unresolved;
+    private ForumPostStatus postStatus;
 
 }

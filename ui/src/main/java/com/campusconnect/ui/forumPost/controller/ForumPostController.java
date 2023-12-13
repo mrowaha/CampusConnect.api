@@ -5,6 +5,7 @@ import com.campusconnect.domain.forumPost.entity.ForumPost;
 import com.campusconnect.domain.notification.entity.Notification;
 import com.campusconnect.domain.security.RequiredScope;
 import com.campusconnect.domain.security.SecurityScope;
+import com.campusconnect.ui.common.controller.SecureController;
 import com.campusconnect.ui.forumPost.service.ForumPostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +18,13 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/forumPosts")
-public class ForumPostController {
+public class ForumPostController extends SecureController {
 
     private final ForumPostService forumPostService;
 
     @PostMapping("/user/")
     @RequiredScope(scope = SecurityScope.NONE)
-    public ResponseEntity<?> saveForumPost(@RequestParam("userId") UUID userId, @Valid @RequestBody ForumPostDto forumPostDto) {
+    public ResponseEntity<?> saveForumPost(@RequestParam("userId") UUID userId,@Valid @RequestBody ForumPostDto forumPostDto) {
         return ResponseEntity.ok(forumPostService.saveForumPost(userId, forumPostDto));
     }
 

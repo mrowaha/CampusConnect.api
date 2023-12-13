@@ -50,6 +50,6 @@ public class ForumPost {
 
     @Column(name = "postStatus")
     @Enumerated(EnumType.STRING)
-    private ForumPostStatus postStatus = ForumPostStatus.Unresolved;
+    private ForumPostStatus postStatus = ForumPostStatus.UNRESOLVED;
 
 }

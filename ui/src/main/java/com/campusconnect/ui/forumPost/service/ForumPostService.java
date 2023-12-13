@@ -45,11 +45,12 @@ public class ForumPostService {
         }
 
         forumPost.setPostingUser(user);
+        forumPost.setTitle(forumPostDto.getTitle());
         forumPost.setCreatedAt(LocalDateTime.now());
         forumPost.setPostType(forumPostDto.getPostType());
         forumPost.setDescription(forumPostDto.getDescription());
         forumPost.setViewCount(0);
-        forumPost.setPostStatus(ForumPostStatus.Unresolved);
+        forumPost.setPostStatus(ForumPostStatus.UNRESOLVED);
 
         forumPostRepository.save(forumPost);
 
@@ -68,8 +69,8 @@ public class ForumPostService {
             forumPost.setDescription(forumPostDto.getDescription());
         }
 
-        if (forumPostDto.getPostStatus().equals(ForumPostStatus.Resolved)){
-            forumPost.setPostStatus(ForumPostStatus.Resolved);
+        if (forumPostDto.getPostStatus().equals(ForumPostStatus.RESOLVED)){
+            forumPost.setPostStatus(ForumPostStatus.RESOLVED);
         }
 
         return forumPostRepository.save(forumPost);
