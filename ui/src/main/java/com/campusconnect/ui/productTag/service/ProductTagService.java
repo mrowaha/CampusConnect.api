@@ -6,12 +6,14 @@ import com.campusconnect.domain.ProductTag.dto.ProductTagDto;
 import com.campusconnect.domain.ProductTag.entity.ProductTag;
 import com.campusconnect.domain.ProductTag.enums.ProductTagStatus;
 import com.campusconnect.domain.ProductTag.repository.ProductTagRepository;
+import com.campusconnect.ui.productTag.exceptions.TagAlreadyExistsException;
+import com.campusconnect.ui.productTag.exceptions.TagNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -19,33 +21,34 @@ import java.util.UUID;
 public class ProductTagService {
     private final ProductTagRepository productTagRepository;
 
-    public ProductTag requestProductTag(String tagName){
-//        // Implement the logic to request a new product tag
-//        // This is a simplistic example. You'll need to add your business logic here.
-//        ProductTag productTag = new ProductTag();
-//        productTag.setName(tagName);
-//        productTag.setTagStatus(ProductTagStatus.REQUESTED);
-//        return productTagRepository.save(productTag);
-
-        System.out.println("Trying to request tag");
-        return null;
+    public ProductTag requestProductTag(ProductTagDto requestedTag) {
+        Optional<ProductTag> existingTag = productTagRepository.findByName(requestedTag.getName());
+        if (existingTag.isPresent()) {
+//            throw new IllegalStateException("A tag with the name '" + requestedTag.getName() + "' already exists.");
+            throw new TagAlreadyExistsException();
+        } else {
+            ProductTag productTag = new ProductTag();
+            productTag.setName(requestedTag.getName());
+            productTag.setTagStatus(ProductTagStatus.REQUESTED);
+            productTag.setRequestedByID(requestedTag.getRequestedByID());
+            return productTagRepository.save(productTag);
+        }
     }
 
-    public List<ProductTag> getAllTags(){
-//        return productTagRepository.findAll();
-        System.out.println("Trying to find all tags");
-        return null;
+    public List<ProductTag> getAllTags() {
+        return productTagRepository.findAll();
     }
 
-    public ProductTag approveTag(String tagName){
-//        // Implement the logic to approve a tag
-//        ProductTag productTag = productTagRepository.findByName(tagName);
-//        if(productTag != null){
-//            productTag.setTagStatus(ProductTagStatus.APPROVED);
-//            return productTagRepository.save(productTag);
-//        }
-//        return null; // Or throw an exception if preferred
-        System.out.println("Trying to approve tag");
-        return null;
+    public ProductTag approveTag(String tagName) {
+        Optional<ProductTag> optionalProductTag = productTagRepository.findByName(tagName);
+        if (optionalProductTag.isPresent()) {
+            ProductTag productTag = optionalProductTag.get();
+            productTag.setTagStatus(ProductTagStatus.APPROVED);
+            return productTagRepository.save(productTag);
+        } else {
+            // Handle the case when the tag is not found. You could throw a custom exception or return null.
+//            throw new IllegalStateException("Tag with name '" + tagName + "' not found.");
+            throw new TagNotFoundException();
+        }
     }
 }

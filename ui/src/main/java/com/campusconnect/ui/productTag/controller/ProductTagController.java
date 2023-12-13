@@ -23,7 +23,7 @@ public class ProductTagController extends SecureController {
     @PostMapping()
     @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<ProductTag> requestProductTag(@Valid @RequestBody ProductTagDto productTagDto) {
-        ProductTag productTag = productTagService.requestProductTag(productTagDto.getName());
+        ProductTag productTag = productTagService.requestProductTag(productTagDto);
         return ResponseEntity.ok(productTag);
     }
 
@@ -35,7 +35,7 @@ public class ProductTagController extends SecureController {
     }
 
     @PutMapping("/approve/")
-    @RequiredScope(scope = SecurityScope.MODERATOR)
+    @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<ProductTag> approveTag(@RequestParam("tagName") String tagName){
         ProductTag productTag = productTagService.approveTag(tagName);
         if(productTag != null){
