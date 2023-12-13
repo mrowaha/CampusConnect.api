@@ -39,12 +39,12 @@ public class ProductController {
         return ResponseEntity.ok(productService.updateProduct(productCreationInfo, productId));
     }
 
-//    @DeleteMapping("/")
-//    @RequiredScope(scope = SecurityScope.NONE)
-//    public ResponseEntity<Void> deleteProductById@RequestParam("productId") UUID productId){
-//        productService.deleteProductById(productId);
-//        return ResponseEntity.ok(null);
-//    }
+    @DeleteMapping("/")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<Void> deleteProductById(@RequestParam("productId") UUID productId){
+        productService.deleteProductById(productId);
+        return ResponseEntity.ok(null);
+    }
 }
 
 
