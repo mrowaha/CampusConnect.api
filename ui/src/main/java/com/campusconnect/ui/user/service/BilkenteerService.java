@@ -67,6 +67,9 @@ public class BilkenteerService implements UserService {
     {
         Bilkenteer bilkenteer = bilkenteerRepository.findByEmail(loginDto.getEmail())
                 .orElseThrow(UserNotFoundException::new);
+
+        System.out.println("USER id = " + bilkenteer.getUserId());
+
         if (!passwordEncoder.matches(loginDto.getPassword(), bilkenteer.getPassword())) {
             throw new InvalidPasswordException();
         }

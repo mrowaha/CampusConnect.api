@@ -21,3 +21,4 @@ public class BilkenteerController extends SecureController {
         return new ResponseEntity<>(new ProtectedDto("Authorized"), HttpStatus.OK);
     }
 }
+

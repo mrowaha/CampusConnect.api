@@ -1,21 +1,27 @@
 package com.campusconnect.domain.user.entity;
 
+import com.campusconnect.domain.messageThread.entity.MessageThread;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import com.campusconnect.domain.user.enums.Role;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Collection;
 import java.util.UUID;
 
-@Data
-//@MappedSuperclass
 @NoArgsConstructor
+@Data
+@Getter
+@Setter
 @RequiredArgsConstructor
 @SuperBuilder
-@Entity(name = "cc_user")
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Entity(name = "cc_user") //Need to add this to create relations with User
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS) //User itself won't have a table
 public abstract class User{
 
     @Id
@@ -57,4 +63,23 @@ public abstract class User{
     }
     public abstract Collection<? extends GrantedAuthority> getAuthorities();
     public abstract boolean isEnabled();
+
+
+    @OneToMany(mappedBy = "initiatingUser")
+    @JsonManagedReference(value = "initiating_user_id")
+    @JsonIgnore
+    private Set<MessageThread> initiatedThreads = new HashSet<>();
+
+    @OneToMany(mappedBy = "receivingUser")
+    @JsonManagedReference(value = "receiving_user_id")
+    @JsonIgnore
+    private Set<MessageThread> receivedThreads = new HashSet<>();
+
+//    @Transient
+//    public Set<MessageThread> getAllMessageThreads() {
+//        Set<MessageThread> allThreads = new HashSet<>();
+//        allThreads.addAll(initiatedThreads);
+//        allThreads.addAll(receivedThreads);
+//        return allThreads;
+//    }
 }
