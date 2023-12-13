@@ -35,6 +35,7 @@ public class ProductTagController extends SecureController {
     }
 
     @PutMapping("/approve/")
+    // For testing using security scope of none. Should be MODERATOR
     @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<ProductTag> approveTag(@RequestParam("tagName") String tagName){
         ProductTag productTag = productTagService.approveTag(tagName);
