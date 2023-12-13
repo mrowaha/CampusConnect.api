@@ -1,15 +1,17 @@
 package com.campusconnect.domain.user.entity;
 
+import com.campusconnect.domain.forumPost.entity.ForumPost;
+import com.campusconnect.domain.messageThread.entity.MessageThread;
 import com.campusconnect.domain.user.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -35,6 +37,10 @@ public class Bilkenteer extends User {
     @Nullable
     private BilkenteerAddress address;
 
+//    @OneToMany(mappedBy = "postingUser", fetch = FetchType.LAZY)
+//    @JsonManagedReference(value = "posting_user_id")
+//    @JsonIgnore
+//    private Set<ForumPost> forumPosts = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
