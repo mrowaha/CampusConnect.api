@@ -6,16 +6,17 @@ import com.campusconnect.domain.product.enums.ProductStatus;
 import com.campusconnect.domain.product.repository.ProductRepository;
 import com.campusconnect.domain.user.entity.Bilkenteer;
 import com.campusconnect.domain.user.repository.BilkenteerRepository;
+import com.campusconnect.domain.transaction.entity.Bid;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import com.campusconnect.ui.user.exceptions.UserNotFoundException;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -39,7 +40,7 @@ public class ProductService {
                 .type(productCreationInfo.getType()) // for now
                 .status(ProductStatus.AVAILABLE)
                 .wishListedBy(new HashSet<UUID>())
-                .bids(new ArrayList<UUID>())
+                .bids(new ArrayList<Bid>())
                 .tagsId(new HashSet<UUID>()).build();
 
         productRepository.save(product);
@@ -48,7 +49,13 @@ public class ProductService {
     }
 
     public List<Product> fetchProductList(){
-        return (List<Product>)productRepository.findAll();
+        List<Product> allProducts = (List<Product>) productRepository.findAll();
+
+        List<Product> availableProducts = allProducts.stream()
+                .filter(product -> product.getStatus() == ProductStatus.AVAILABLE)
+                .collect(Collectors.toList());
+
+        return availableProducts;
     }
 
     public Product updateProduct(ProductDto productCreationInfo, UUID productId){
