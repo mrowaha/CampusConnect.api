@@ -66,9 +66,9 @@ public class Product {
     protected List<UUID> bids = new ArrayList<>();
 
     @ElementCollection(targetClass =  UUID.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "tags_id_table", joinColumns = @JoinColumn(name = "bilkenteer_id"))
-    @Column(name = "tags_id")
-    protected Set<UUID> tagsId = new HashSet<>();
+    @CollectionTable(name = "product_tags_table", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "tag_id")
+    protected Set<UUID> tagIDs = new HashSet<>();
 
     //public void addImage()
     //public void removeImage()

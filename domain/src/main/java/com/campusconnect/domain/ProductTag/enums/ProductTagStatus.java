@@ -1,7 +1,7 @@
 package com.campusconnect.domain.ProductTag.enums;
 
 public enum ProductTagStatus {
-    AVAILABLE,
+    DISABLED,
     REQUESTED,
     APPROVED
 }

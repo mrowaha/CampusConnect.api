@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -39,6 +40,15 @@ public class ProductTagService {
         return productTagRepository.findAll();
     }
 
+    public ProductTag getProductTag(UUID id) {
+        Optional<ProductTag> optionalProductTag = productTagRepository.findById(id);
+        if (optionalProductTag.isPresent()) {
+            return optionalProductTag.get();
+        } else {
+            throw new TagNotFoundException();
+        }
+    }
+
     public ProductTag approveTag(String tagName) {
         Optional<ProductTag> optionalProductTag = productTagRepository.findByName(tagName);
         if (optionalProductTag.isPresent()) {
@@ -46,8 +56,6 @@ public class ProductTagService {
             productTag.setTagStatus(ProductTagStatus.APPROVED);
             return productTagRepository.save(productTag);
         } else {
-            // Handle the case when the tag is not found. You could throw a custom exception or return null.
-//            throw new IllegalStateException("Tag with name '" + tagName + "' not found.");
             throw new TagNotFoundException();
         }
     }

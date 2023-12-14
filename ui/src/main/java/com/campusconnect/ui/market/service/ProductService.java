@@ -1,5 +1,8 @@
 package com.campusconnect.ui.market.service;
 
+import com.campusconnect.domain.ProductTag.entity.ProductTag;
+import com.campusconnect.domain.ProductTag.enums.ProductTagStatus;
+import com.campusconnect.domain.ProductTag.repository.ProductTagRepository;
 import com.campusconnect.domain.product.dto.ProductDto;
 import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.product.enums.ProductStatus;
@@ -18,6 +21,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final ProductTagRepository productTagRepository;
 
     public ResponseEntity<?> saveProduct(ProductDto productCreationInfo){
 
@@ -32,7 +36,7 @@ public class ProductService {
                 .status(ProductStatus.AVAILABLE)
                 .wishListedBy(new HashSet<UUID>())
                 .bids(new ArrayList<UUID>())
-                .tagsId(new HashSet<UUID>()).build();
+                .tagIDs(new HashSet<UUID>()).build();
 
         productRepository.save(product);
         return new ResponseEntity<>( "Product Id:" + product.getProductId(), HttpStatus.OK);
@@ -58,6 +62,18 @@ public class ProductService {
         }
 
         return productRepository.save(productDB);
+    }
+
+    public Product assignTag(String tagName, UUID productId){
+        Product product = productRepository.findById(productId).get();
+        ProductTag tag = productTagRepository.findByName(tagName).get();
+
+        if (tag.getTagStatus() == ProductTagStatus.APPROVED) {
+            product.setTagIDs(Collections.singleton(tag.getId()));
+        } else {
+            throw new IllegalStateException("Cannot assign unapproved tag");
+        }
+        return product;
     }
 
     public void deleteProductById(UUID productId){
