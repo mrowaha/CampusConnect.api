@@ -1,4 +1,4 @@
-package com.campusconnect.domain.notification.dto;
+package com.campusconnect.domain.message.dto;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,22 +16,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class NotificationDto {
-
+public class MessageDto {
 
     private UUID id;
 
-    @NotBlank(message = "type field cannot be blank")
-    @NotNull(message = "type cannot be null")
-    private NotificationType type;
-
-    private LocalDateTime createdAt;
-
-    @NotBlank(message = "content field cannot be blank")
-    @NotNull(message = "content cannot be null")
-    private String content;
+    private UUID threadID;
 
     private boolean seen = false;
 
-    private Long receiverId;
+    private LocalDateTime timestamp;
+
+    private String content;
+
+    private UUID senderId;
+
+    private UUID receiverId;
+
+    //TODO Add Image
 }

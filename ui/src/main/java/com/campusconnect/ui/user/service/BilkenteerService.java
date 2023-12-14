@@ -3,6 +3,7 @@ package com.campusconnect.ui.user.service;
 import com.campusconnect.domain.security.dto.BearerToken;
 import com.campusconnect.domain.user.dto.BilkenteerLoginResponse;
 import com.campusconnect.domain.user.entity.User;
+import com.campusconnect.domain.user.repository.ModeratorRepository;
 import com.campusconnect.ui.utils.JwtUtilities;
 import com.campusconnect.ui.user.exceptions.InvalidPasswordException;
 import com.campusconnect.ui.user.exceptions.UserAlreadyTakenException;
@@ -22,6 +23,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -30,6 +33,7 @@ public class BilkenteerService implements UserService {
 
     private final BilkenteerRepository bilkenteerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ModeratorRepository moderatorRepository;
     private final JwtUtilities jwtUtilities;
 
     @Override
@@ -67,6 +71,9 @@ public class BilkenteerService implements UserService {
     {
         Bilkenteer bilkenteer = bilkenteerRepository.findByEmail(loginDto.getEmail())
                 .orElseThrow(UserNotFoundException::new);
+
+        System.out.println("USER id = " + bilkenteer.getUserId());
+
         if (!passwordEncoder.matches(loginDto.getPassword(), bilkenteer.getPassword())) {
             throw new InvalidPasswordException();
         }
@@ -86,5 +93,16 @@ public class BilkenteerService implements UserService {
                 .trustScore(bilkenteer.getTrustScore())
                 .token(bearerToken)
                 .build();
+    }
+
+    public User findUser(UUID userId) {
+
+        User user = moderatorRepository.findById(userId).orElse(null);
+
+        if (Objects.isNull(user)) {
+            user = bilkenteerRepository.findById(userId).orElse(null);
+        }
+
+        return user;
     }
 }

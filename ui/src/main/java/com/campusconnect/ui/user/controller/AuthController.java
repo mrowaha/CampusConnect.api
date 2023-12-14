@@ -27,6 +27,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/auth")
@@ -112,4 +115,5 @@ public class AuthController extends SecureController {
             }
         };
     }
+
 }
