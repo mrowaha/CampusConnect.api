@@ -65,10 +65,10 @@ public class Product {
     @Column(name = "bids")
     protected List<UUID> bids = new ArrayList<>();
 
-    @ElementCollection(targetClass =  UUID.class, fetch = FetchType.EAGER)
+    @ElementCollection(targetClass =  String.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "product_tags_table", joinColumns = @JoinColumn(name = "product_id"))
-    @Column(name = "tag_id")
-    protected Set<UUID> tagIDs = new HashSet<>();
+    @Column(name = "tags")
+    protected Set<String> tags = new HashSet<>();
 
     //public void addImage()
     //public void removeImage()

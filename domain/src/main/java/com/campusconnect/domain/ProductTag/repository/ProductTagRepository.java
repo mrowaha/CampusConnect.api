@@ -17,10 +17,7 @@ public interface ProductTagRepository extends JpaRepository<ProductTag, UUID> {
     @Query("SELECT t from ProductTag t WHERE t.name = :tagName")
     Optional<ProductTag> findByName(@Param("tagName") String tagName);
 
-//    @Query("SELECT t from ProductTag  t WHERE t.id = :id")
-//    Optional<ProductTag> findById(@Param("id") UUID id);
-
-    @Query("SELECT p FROM Product p INNER JOIN p.tagIDs t WHERE t = :tagName")
+    @Query("SELECT p FROM Product p INNER JOIN p.tags t WHERE t = :tagName")
     List<Product> findProducts(@Param("tagName") String tagName);
 
 //     addProduct(tagName, productId)

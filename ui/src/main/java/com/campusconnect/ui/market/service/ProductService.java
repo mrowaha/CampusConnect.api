@@ -36,7 +36,7 @@ public class ProductService {
                 .status(ProductStatus.AVAILABLE)
                 .wishListedBy(new HashSet<UUID>())
                 .bids(new ArrayList<UUID>())
-                .tagIDs(new HashSet<UUID>()).build();
+                .tags(new HashSet<String>()).build();
 
         productRepository.save(product);
         return new ResponseEntity<>( "Product Id:" + product.getProductId(), HttpStatus.OK);
@@ -69,7 +69,9 @@ public class ProductService {
         ProductTag tag = productTagRepository.findByName(tagName).get();
 
         if (tag.getTagStatus() == ProductTagStatus.APPROVED) {
-            product.setTagIDs(Collections.singleton(tag.getId()));
+            Set<String> existingTags = product.getTags();
+            existingTags.add(tag.getName());
+            product.setTags(existingTags);
         } else {
             throw new IllegalStateException("Cannot assign unapproved tag");
         }

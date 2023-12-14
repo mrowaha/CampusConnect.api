@@ -15,9 +15,6 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class ProductTagDto {
-
-    private UUID id;
-
     @NotBlank(message = "Tag name cannot be blank")
     @NotNull(message = "Tag name cannot be null")
     private String name;
@@ -25,5 +22,4 @@ public class ProductTagDto {
     private ProductTagStatus tagStatus;
     private UUID requestedByID;
     private UUID acceptedByID;
-    private UUID categoriesID;
 }

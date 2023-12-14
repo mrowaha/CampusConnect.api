@@ -37,8 +37,8 @@ public class ProductTagController extends SecureController {
 
     @GetMapping("/tag")
     @RequiredScope(scope = SecurityScope.NONE)
-    public ResponseEntity<ProductTag> getProductTag(@RequestParam("id") UUID id){
-        ProductTag productTag = productTagService.getProductTag(id);
+    public ResponseEntity<ProductTag> getProductTag(@RequestParam("tagName") String tagName){
+        ProductTag productTag = productTagService.getProductTag(tagName);
         if(productTag != null){
             return ResponseEntity.ok(productTag);
         } else {

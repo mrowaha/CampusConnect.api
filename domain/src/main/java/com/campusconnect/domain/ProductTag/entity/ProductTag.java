@@ -20,10 +20,6 @@ import java.util.UUID;
 @Table(name = "cc_product_tags")
 public class ProductTag {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "tag_id")
-    protected UUID id;
-
     @Column(name = "tag_name", nullable = false)
     private String name;
 

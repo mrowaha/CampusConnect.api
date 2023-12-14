@@ -39,15 +39,15 @@ public class ProductTagService {
     public List<ProductTag> getAllTags() {
         return productTagRepository.findAll();
     }
-
-    public ProductTag getProductTag(UUID id) {
-        Optional<ProductTag> optionalProductTag = productTagRepository.findById(id);
+    public ProductTag getProductTag(String tagName) {
+        Optional<ProductTag> optionalProductTag = productTagRepository.findByName(tagName);
         if (optionalProductTag.isPresent()) {
             return optionalProductTag.get();
         } else {
             throw new TagNotFoundException();
         }
     }
+
 
     public ProductTag approveTag(String tagName) {
         Optional<ProductTag> optionalProductTag = productTagRepository.findByName(tagName);
