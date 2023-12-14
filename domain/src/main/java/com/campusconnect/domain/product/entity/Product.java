@@ -2,6 +2,7 @@ package com.campusconnect.domain.product.entity;
 
 import com.campusconnect.domain.product.enums.ProductType;
 import com.campusconnect.domain.product.enums.ProductStatus;
+import com.campusconnect.domain.user.entity.Bilkenteer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -23,6 +24,10 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "product_id")
     protected UUID productId;
+
+    @ManyToOne
+    @JoinColumn(name = "bilkenteer_id", referencedColumnName = "id")
+    private Bilkenteer bilkenteer;
 
     @Column(name = "seller_id", nullable = false)
     protected UUID sellerId;

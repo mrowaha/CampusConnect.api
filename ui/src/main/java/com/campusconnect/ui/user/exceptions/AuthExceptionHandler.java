@@ -72,14 +72,6 @@ public class AuthExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Map<String, List<String>>> handleUserNotFoundException(UserNotFoundException ex) {
-        List<String> errors = new ArrayList<>();
-        errors.add("User Not Found");
-        Map<String, List<String>> errorResponse = new HashMap<>();
-        errorResponse.put("errors", errors);
-        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
-    }
 
     @ExceptionHandler(MessageNotFoundException.class)
     public ResponseEntity<Map<String, List<String>>> handleMessageNotFoundException(MessageNotFoundException ex) {

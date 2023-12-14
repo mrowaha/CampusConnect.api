@@ -1,6 +1,8 @@
 package com.campusconnect.domain.user.entity;
 
+import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.user.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -35,6 +38,9 @@ public class Bilkenteer extends User {
     @Nullable
     private BilkenteerAddress address;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Product> products = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
