@@ -4,9 +4,11 @@ import com.campusconnect.domain.notification.dto.NotificationDto;
 import com.campusconnect.domain.notification.entity.Notification;
 import com.campusconnect.domain.notification.repository.NotificationRepository;
 import com.campusconnect.domain.user.entity.User;
+import com.campusconnect.email.EmailSenderService;
 import com.campusconnect.ui.notification.exceptions.NotificationNotFoundException;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
 import com.campusconnect.ui.user.service.BilkenteerService;
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,8 +26,9 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final BilkenteerService bilkenteerService;
+    private final EmailSenderService emailSenderService;
 
-    public Notification saveNotification(UUID userId, NotificationDto notificationDto) throws UserNotFoundException{
+    public Notification saveNotification(UUID userId, NotificationDto notificationDto) throws UserNotFoundException {
 
         Notification notification = new Notification();
 
@@ -41,6 +44,39 @@ public class NotificationService {
         notification.setContent(notificationDto.getContent());
 
         notificationRepository.save(notification);
+
+        if (user.getEnableEmailNotification()){
+
+            String subject = "CampusConnect: ";
+
+            // Different subjects according to notification type
+            switch (notificationDto.getType()) {
+                case PRODUCT:
+                    subject += "Notification about Product Posting";
+                    break;
+                case FORUMPOST:
+                    subject += "Update on your Forum Post";
+                    break;
+                case INBOX:
+                    subject += "You have received a new Message";
+                    break;
+                case REPORT:
+                    subject += "Update on your Report";
+                    break;
+                case TAG:
+                    subject += "Tag Notification";
+                    break;
+                case BID:
+                    subject += "Update on your Bid";
+                    break;
+                default:
+                    subject += "New Notification";
+                    break;
+            }
+
+            emailSenderService.sendNotificationEmail(user.getFirstName(), user.getEmail(), subject, notificationDto.getContent());
+
+        }
 
         return notification;
     }
