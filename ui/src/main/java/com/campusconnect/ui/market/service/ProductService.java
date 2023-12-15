@@ -53,7 +53,7 @@ public class ProductService {
     }
 
     public List<Product> fetchProductList(){
-        List<Product> allProducts = (List<Product>) productRepository.findAll();
+        List<Product> allProducts = productRepository.findAll();
 
         List<Product> availableProducts = allProducts.stream()
                 .filter(product -> product.getStatus() == ProductStatus.AVAILABLE)
