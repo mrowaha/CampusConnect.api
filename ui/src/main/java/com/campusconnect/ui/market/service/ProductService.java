@@ -45,7 +45,7 @@ public class ProductService {
                 .status(ProductStatus.AVAILABLE)
                 .wishListedBy(new HashSet<UUID>())
                 .bids(new ArrayList<Bid>())
-                .tagsId(new HashSet<UUID>()).build();
+                .tags(new HashSet<String>()).build();
 
         productRepository.save(product);
         bilkenteer.getProducts().add(product);
