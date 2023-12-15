@@ -2,11 +2,16 @@ package com.campusconnect.domain.product.entity;
 
 import com.campusconnect.domain.product.enums.ProductType;
 import com.campusconnect.domain.product.enums.ProductStatus;
+import com.campusconnect.domain.transaction.entity.Bid;
+import com.campusconnect.domain.user.entity.Bilkenteer;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
 import java.time.LocalDate;
 import java.util.*;
 @Data
@@ -23,6 +28,11 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "product_id")
     protected UUID productId;
+
+    @ManyToOne
+    @JoinColumn(name = "bilkenteer_id", referencedColumnName = "id")
+    @JsonBackReference
+    private Bilkenteer bilkenteer;
 
     @Column(name = "seller_id", nullable = false)
     protected UUID sellerId;
@@ -42,6 +52,9 @@ public class Product {
     @NotNull
     protected Double price;
 
+    private LocalDate rentalStartDate;
+    private LocalDate rentalEndDate;
+
     //protected ArrayList<String> images;
 
     @Column(name = "view_count", nullable = false)
@@ -60,15 +73,14 @@ public class Product {
     @Column(name = "wish_listed_by")
     protected Set<UUID> wishListedBy = new HashSet<>();
 
-    @ElementCollection(targetClass =  UUID.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "bids_table", joinColumns = @JoinColumn(name = "bilkenteer_id"))
-    @Column(name = "bids")
-    protected List<UUID> bids = new ArrayList<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    protected List<Bid> bids = new ArrayList<>();
 
-    @ElementCollection(targetClass =  UUID.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "tags_id_table", joinColumns = @JoinColumn(name = "bilkenteer_id"))
-    @Column(name = "tags_id")
-    protected Set<UUID> tagsId = new HashSet<>();
+    @ElementCollection(targetClass =  String.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "product_tags_table", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "tags")
+    protected Set<String> tags = new HashSet<>();
 
     //public void addImage()
     //public void removeImage()

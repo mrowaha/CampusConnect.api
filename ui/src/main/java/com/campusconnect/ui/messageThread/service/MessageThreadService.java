@@ -60,14 +60,14 @@ public class MessageThreadService {
 
         messageRepository.save(message);
 
+        //Creating Notification for User
         NotificationDto notificationDto = new NotificationDto();
         notificationDto.setType(NotificationType.INBOX);
         notificationDto.setContent("You have a new message from " + message.getSender().getFirstName());
 
-//        notificationController.notifyUser(messageDto.getReceiverId().toString(), notificationDto.getContent());
-
         notificationService.saveNotification(messageDto.getReceiverId(), notificationDto);
-        log.info("User Notified Successfully");
+
+        log.info("User Notified about Message Successfully");
     }
 
     @Transactional

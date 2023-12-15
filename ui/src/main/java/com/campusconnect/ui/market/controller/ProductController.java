@@ -33,10 +33,22 @@ public class ProductController {
         return ResponseEntity.ok(productService.fetchProductList());
     }
 
+    @GetMapping("/user/{userId}")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<List<Product>> fetchProductsByUserId(@PathVariable UUID userId){
+        return ResponseEntity.ok(productService.fetchProductsByUserId(userId));
+    }
+
     @PutMapping("/")
     @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<Product> updateProduct(@RequestBody ProductDto productCreationInfo, @RequestParam("productId") UUID productId){
         return ResponseEntity.ok(productService.updateProduct(productCreationInfo, productId));
+    }
+
+    @PutMapping("/tag")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<Product> assignTag(@RequestParam("tagName") String tagName, @RequestParam("productId") UUID productId){
+        return ResponseEntity.ok(productService.assignTag(tagName, productId));
     }
 
     @DeleteMapping("/")

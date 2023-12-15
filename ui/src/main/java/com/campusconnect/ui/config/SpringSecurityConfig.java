@@ -88,7 +88,7 @@ public class SpringSecurityConfig {
             .and()
             .authorizeHttpRequests()
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers(new String[]{"/auth/**", "/products", "/products/**"}).permitAll();
+                .requestMatchers(new String[]{"/auth/**", "/products", "/products/**", "/transactions/", "/transactions/**"}).permitAll();
 
         for (SecureController appController : this.secureControllerList) {
             for (SecureController.Endpoint endpoint : appController.getEndpoints()) {

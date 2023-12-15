@@ -1,5 +1,6 @@
 package com.campusconnect.domain.user.entity;
 
+import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.forumPost.entity.ForumPost;
 import com.campusconnect.domain.messageThread.entity.MessageThread;
 import com.campusconnect.domain.user.enums.Role;
@@ -11,7 +12,9 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -37,10 +40,9 @@ public class Bilkenteer extends User {
     @Nullable
     private BilkenteerAddress address;
 
-//    @OneToMany(mappedBy = "postingUser", fetch = FetchType.LAZY)
-//    @JsonManagedReference(value = "posting_user_id")
-//    @JsonIgnore
-//    private Set<ForumPost> forumPosts = new HashSet<>();
+    @OneToMany(cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Product> products = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

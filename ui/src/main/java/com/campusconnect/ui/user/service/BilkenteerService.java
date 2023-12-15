@@ -41,7 +41,6 @@ public class BilkenteerService implements UserService {
         return bilkenteerRepository.findByEmail(email).orElseThrow(() ->
                 new UsernameNotFoundException("User not found"));
     }
-
     public BearerToken register(UserCreationDto creationDto) throws UserAlreadyTakenException {
         if(bilkenteerRepository.existsByEmail(creationDto.getEmail())) {
             throw new UserAlreadyTakenException();
