@@ -44,6 +44,7 @@ public class Bilkenteer extends User {
     private List<Product> products = new ArrayList<>();
 
     @OneToMany(mappedBy = "postingUser", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<ForumPost> forumPosts = new HashSet<>();
 
     @Override
@@ -61,7 +62,6 @@ public class Bilkenteer extends User {
 
     @Override
     public String toString() {
-        // Include all fields except 'seller'
         return "";
     }
 }

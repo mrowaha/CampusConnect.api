@@ -3,14 +3,13 @@ package com.campusconnect.domain.forumPost.entity;
 import com.campusconnect.domain.forumPost.enums.ForumPostStatus;
 import com.campusconnect.domain.forumPost.enums.ForumPostType;
 import com.campusconnect.domain.user.entity.Bilkenteer;
-import com.campusconnect.domain.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.util.*;
 @Getter
