@@ -2,7 +2,6 @@ package com.campusconnect.domain.user.entity;
 
 import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.forumPost.entity.ForumPost;
-import com.campusconnect.domain.messageThread.entity.MessageThread;
 import com.campusconnect.domain.user.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;

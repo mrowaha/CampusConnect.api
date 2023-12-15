@@ -22,6 +22,16 @@ public interface BilkenteerRepository extends ListCrudRepository<Bilkenteer, UUI
 
     @Modifying
     @Transactional
+    @Query("UPDATE Bilkenteer SET isSuspended = true WHERE userId = :uuid")
+    void disable(UUID uuid);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Bilkenteer SET isSuspended = false WHERE userId = :uuid")
+    void enable(UUID uuid);
+
+    @Modifying
+    @Transactional
     @Query("UPDATE Bilkenteer SET profilePicture = :profilePicture WHERE email = :email")
     int updateProfilePictureByEmail(@Param("email") String email, @Param("profilePicture") String profilePicture);
 }

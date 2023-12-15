@@ -1,7 +1,10 @@
 package com.campusconnect.ui.user.service;
 
+import com.campusconnect.domain.admin.dto.UserSuspendRequestDto;
+import com.campusconnect.domain.admin.dto.UserSuspendResponseDto;
 import com.campusconnect.domain.security.dto.BearerToken;
 import com.campusconnect.domain.user.dto.BilkenteerLoginResponse;
+import com.campusconnect.domain.user.dto.UserInfoDto;
 import com.campusconnect.domain.user.entity.User;
 import com.campusconnect.domain.user.repository.ModeratorRepository;
 import com.campusconnect.ui.utils.JwtUtilities;
@@ -23,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -41,6 +45,47 @@ public class BilkenteerService implements UserService {
         return bilkenteerRepository.findByEmail(email).orElseThrow(() ->
                 new UsernameNotFoundException("User not found"));
     }
+
+    @Override
+    public List<UserInfoDto> listAll() {
+        List<Bilkenteer> bilkenteers = bilkenteerRepository.findAll();
+        return bilkenteers.stream()
+                .map(bilkenteer -> UserInfoDto.builder()
+                        .uuid(bilkenteer.getUserId())
+                        .email(bilkenteer.getEmail())
+                        .lastName(bilkenteer.getLastName())
+                        .firstName(bilkenteer.getFirstName())
+                        .role(bilkenteer.getRole())
+                        .isActive(!bilkenteer.getIsSuspended())
+                        .build()
+                )
+                .toList();
+    }
+
+    @Override
+    public UserSuspendResponseDto suspend(UserSuspendRequestDto suspendRequestDto) throws UserNotFoundException {
+        bilkenteerRepository.findById(suspendRequestDto.getUuid())
+                .orElseThrow(UserNotFoundException::new);
+        bilkenteerRepository.disable(suspendRequestDto.getUuid());
+        return UserSuspendResponseDto.builder()
+                .uuid(suspendRequestDto.getUuid())
+                .successStatus(true)
+                .message(String.format("Bilkenteer %s suspended", suspendRequestDto.getUuid().toString()))
+                .build();
+    }
+
+    @Override
+    public UserSuspendResponseDto unsuspend(UserSuspendRequestDto suspendRequestDto) throws UserNotFoundException {
+        bilkenteerRepository.findById(suspendRequestDto.getUuid())
+                .orElseThrow(UserNotFoundException::new);
+        bilkenteerRepository.enable(suspendRequestDto.getUuid());
+        return UserSuspendResponseDto.builder()
+                .uuid(suspendRequestDto.getUuid())
+                .successStatus(true)
+                .message(String.format("Bilkenteer %s activated", suspendRequestDto.getUuid().toString()))
+                .build();
+    }
+
     public BearerToken register(UserCreationDto creationDto) throws UserAlreadyTakenException {
         if(bilkenteerRepository.existsByEmail(creationDto.getEmail())) {
             throw new UserAlreadyTakenException();
