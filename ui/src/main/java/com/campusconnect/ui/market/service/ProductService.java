@@ -34,8 +34,7 @@ public class ProductService {
                 .orElseThrow(UserNotFoundException::new);
 
         Product product = Product.builder()
-                .sellerId(UUID.fromString(productCreationInfo.getSellerId()))
-//                .bilkenteer(bilkenteer)
+                .seller(bilkenteer)
                 .creationDate(LocalDate.now())
                 .name(productCreationInfo.getName())
                 .description(productCreationInfo.getDescription())
@@ -48,7 +47,6 @@ public class ProductService {
                 .tags(new HashSet<String>()).build();
 
         productRepository.save(product);
-//        bilkenteer.getProducts().add(product);
         return new ResponseEntity<>( "Product Id:" + product.getProductId(), HttpStatus.OK);
     }
 
@@ -99,6 +97,6 @@ public class ProductService {
     }
 
     public List<Product> fetchProductsByUserId(UUID userId) throws UserNotFoundException {
-        return productRepository.findAllBySellerId(userId).orElseThrow(UserNotFoundException::new);
+        return productRepository.findAllBySellerUserId(userId).orElseThrow(UserNotFoundException::new);
     }
 }

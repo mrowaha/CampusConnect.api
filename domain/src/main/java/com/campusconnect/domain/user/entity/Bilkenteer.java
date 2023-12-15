@@ -12,9 +12,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -40,9 +38,13 @@ public class Bilkenteer extends User {
     @Nullable
     private BilkenteerAddress address;
 
-//    @OneToMany(mappedBy = "bilkenteer", cascade = CascadeType.ALL)
-//    @JsonIgnore
-//    private List<Product> products = new ArrayList<>();
+    @OneToMany(mappedBy = "seller", fetch = FetchType.EAGER)
+    @JsonManagedReference(value = "seller_id")
+    @JsonIgnore
+    private List<Product> products = new ArrayList<>();
+
+    @OneToMany(mappedBy = "postingUser", cascade = CascadeType.ALL)
+    private Set<ForumPost> forumPosts = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -57,4 +59,9 @@ public class Bilkenteer extends User {
         return !this.isSuspended;
     }
 
+    @Override
+    public String toString() {
+        // Include all fields except 'seller'
+        return "";
+    }
 }

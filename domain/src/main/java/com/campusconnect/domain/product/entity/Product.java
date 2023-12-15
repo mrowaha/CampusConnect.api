@@ -23,6 +23,7 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@Table(name = "product")
 public class Product {
 
     @Id
@@ -30,19 +31,9 @@ public class Product {
     @Column(name = "product_id")
     protected UUID productId;
 
-//    @ManyToOne
-//    @JoinColumn(name = "bilkenteer_id", referencedColumnName = "id")
-//    @JsonBackReference
-//    private Bilkenteer bilkenteer;
-
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "bilkenteer_id")
-//    @JsonBackReference(value = "products")
-//    @NonNull
-//    private Bilkenteer bilkenteer;
-
-    @Column(name = "seller_id", nullable = false)
-    protected UUID sellerId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "seller_id", nullable = false)
+    private Bilkenteer seller;
 
     @Column(name = "creation_date", nullable = false)
     protected LocalDate creationDate;
@@ -60,6 +51,7 @@ public class Product {
     protected Double price;
 
     private LocalDate rentalStartDate;
+
     private LocalDate rentalEndDate;
 
     //protected ArrayList<String> images;
@@ -105,6 +97,10 @@ public class Product {
 
     public Integer getHighestBid(){ return 0;}
 
-
+    @Override
+    public String toString() {
+        // Include all fields except 'seller'
+        return "";
+    }
 
 }

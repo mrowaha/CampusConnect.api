@@ -1,6 +1,7 @@
 package com.campusconnect.domain.messageThread.entity;
 
 import com.campusconnect.domain.message.entity.Message;
+import com.campusconnect.domain.user.entity.Bilkenteer;
 import com.campusconnect.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -35,4 +36,5 @@ public class MessageThread{
 
     @OneToMany(mappedBy = "messageThread", cascade = CascadeType.ALL)
     private Set<Message> messages = new HashSet();
+
 }

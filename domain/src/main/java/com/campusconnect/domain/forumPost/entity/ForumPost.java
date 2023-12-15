@@ -2,7 +2,9 @@ package com.campusconnect.domain.forumPost.entity;
 
 import com.campusconnect.domain.forumPost.enums.ForumPostStatus;
 import com.campusconnect.domain.forumPost.enums.ForumPostType;
+import com.campusconnect.domain.user.entity.Bilkenteer;
 import com.campusconnect.domain.user.entity.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -26,8 +28,10 @@ public class ForumPost {
     protected UUID forumPostId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "posting_user_id", nullable = false)
-    protected User postingUser;
+    @JoinColumn(name = "posting_user_id")
+    @JsonBackReference(value = "forumPosts")
+    @NonNull
+    protected Bilkenteer postingUser;
 
     @Column(name = "created_at", nullable = false)
     protected LocalDateTime createdAt;

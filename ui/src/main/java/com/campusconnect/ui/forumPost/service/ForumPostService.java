@@ -11,7 +11,9 @@ import com.campusconnect.domain.product.dto.ProductDto;
 import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.product.enums.ProductStatus;
 import com.campusconnect.domain.product.repository.ProductRepository;
+import com.campusconnect.domain.user.entity.Bilkenteer;
 import com.campusconnect.domain.user.entity.User;
+import com.campusconnect.domain.user.repository.BilkenteerRepository;
 import com.campusconnect.ui.forumPost.exceptions.ForumPostNotFound;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
 import com.campusconnect.ui.user.service.BilkenteerService;
@@ -30,7 +32,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ForumPostService {
     private final ForumPostRepository forumPostRepository;
-    private final BilkenteerService bilkenteerService;
+    private final BilkenteerRepository bilkenteerRepository;
 
     public List<ForumPost> fetchUserForumPostList(UUID userId){
         return forumPostRepository.findAllByPostingUserUserId(userId).orElse(null);
@@ -48,12 +50,12 @@ public class ForumPostService {
 
         ForumPost forumPost = new ForumPost();
 
-        User user = bilkenteerService.findUser(userId);
-        if (Objects.isNull(user)) {
+        Bilkenteer bilkenteer = bilkenteerRepository.findById(userId).orElse(null);
+        if (Objects.isNull(bilkenteer)) {
             throw new UserNotFoundException();
         }
 
-        forumPost.setPostingUser(user);
+        forumPost.setPostingUser(bilkenteer);
         forumPost.setTitle(forumPostDto.getTitle());
         forumPost.setCreatedAt(LocalDateTime.now());
         forumPost.setPostType(forumPostDto.getPostType());
