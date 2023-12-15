@@ -1,5 +1,6 @@
 package com.campusconnect.domain.product.entity;
 
+import com.campusconnect.domain.messageThread.entity.MessageThread;
 import com.campusconnect.domain.product.enums.ProductType;
 import com.campusconnect.domain.product.enums.ProductStatus;
 import com.campusconnect.domain.transaction.entity.Bid;
@@ -29,10 +30,16 @@ public class Product {
     @Column(name = "product_id")
     protected UUID productId;
 
-    @ManyToOne
-    @JoinColumn(name = "bilkenteer_id", referencedColumnName = "id")
-    @JsonBackReference
-    private Bilkenteer bilkenteer;
+//    @ManyToOne
+//    @JoinColumn(name = "bilkenteer_id", referencedColumnName = "id")
+//    @JsonBackReference
+//    private Bilkenteer bilkenteer;
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "bilkenteer_id")
+//    @JsonBackReference(value = "products")
+//    @NonNull
+//    private Bilkenteer bilkenteer;
 
     @Column(name = "seller_id", nullable = false)
     protected UUID sellerId;

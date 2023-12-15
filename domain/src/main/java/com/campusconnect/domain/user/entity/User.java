@@ -77,6 +77,7 @@ public abstract class User{
     private Set<MessageThread> receivedThreads = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<Notification> notifications = new HashSet();
 
 //    @Transient

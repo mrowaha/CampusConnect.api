@@ -40,9 +40,9 @@ public class Bilkenteer extends User {
     @Nullable
     private BilkenteerAddress address;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<Product> products = new ArrayList<>();
+//    @OneToMany(mappedBy = "bilkenteer", cascade = CascadeType.ALL)
+//    @JsonIgnore
+//    private List<Product> products = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

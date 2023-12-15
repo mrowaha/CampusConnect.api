@@ -3,6 +3,7 @@ package com.campusconnect.ui.forumPost.service;
 import com.campusconnect.domain.forumPost.dto.ForumPostDto;
 import com.campusconnect.domain.forumPost.entity.ForumPost;
 import com.campusconnect.domain.forumPost.enums.ForumPostStatus;
+import com.campusconnect.domain.forumPost.enums.ForumPostType;
 import com.campusconnect.domain.forumPost.repository.ForumPostRepository;
 import com.campusconnect.domain.notification.dto.NotificationDto;
 import com.campusconnect.domain.notification.entity.Notification;
@@ -33,6 +34,14 @@ public class ForumPostService {
 
     public List<ForumPost> fetchUserForumPostList(UUID userId){
         return forumPostRepository.findAllByPostingUserUserId(userId).orElse(null);
+    }
+
+    public List<ForumPost> fetchLostForumPostList(){
+        return forumPostRepository.findAllByPostTypeAndPostStatus(ForumPostType.LOST, ForumPostStatus.UNRESOLVED).orElse(null);
+    }
+
+    public List<ForumPost> fetchFoundForumPostList(){
+        return forumPostRepository.findAllByPostTypeAndPostStatus(ForumPostType.FOUND, ForumPostStatus.UNRESOLVED).orElse(null);
     }
 
     public ForumPost saveForumPost(UUID userId, ForumPostDto forumPostDto) throws UserNotFoundException {

@@ -35,6 +35,18 @@ public class ForumPostController extends SecureController {
         return ResponseEntity.ok(forumPostService.fetchUserForumPostList(userId));
     }
 
+    @GetMapping("/lostForum")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<List<ForumPost>> fetchLostForumPostList(){
+        return ResponseEntity.ok(forumPostService.fetchLostForumPostList());
+    }
+
+    @GetMapping("/foundForum")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<List<ForumPost>> fetchFoundForumPostList(){
+        return ResponseEntity.ok(forumPostService.fetchFoundForumPostList());
+    }
+
     @PutMapping("/")
     @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<ForumPost> updateForumPost(@Valid @RequestBody ForumPostDto ForumPostCreationInfo, @RequestParam("forumPostId") UUID ForumPostId){
