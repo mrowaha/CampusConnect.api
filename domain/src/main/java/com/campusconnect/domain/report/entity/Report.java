@@ -29,16 +29,15 @@ public class Report {
     @Column(name = "description")
     private String descrption;
 
-    //  image
+    // image
 
-    @Column(name = "reportedEntity", nullable = false)
-    @NonNull
-    private ReportableEntity reportedEntity;
+    // @Column(name = "reportedEntity", nullable = false)
+    // @NonNull
+    // private ReportableEntity reportedEntity;
 
     @Column(name = "reportedEntityID", nullable = false)
     @NonNull
     private UUID reportedEntityID;
-
 
     @Column(name = "reported_at", nullable = false)
     @NonNull
@@ -47,7 +46,6 @@ public class Report {
     @Column(name = "reporterID", nullable = false)
     @NonNull
     private UUID reporterID;
-
 
     @Column(name = "status")
     private ReportStatus status;
