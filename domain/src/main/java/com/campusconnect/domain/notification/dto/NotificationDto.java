@@ -1,6 +1,7 @@
 package com.campusconnect.domain.notification.dto;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.campusconnect.domain.notification.enums.NotificationType;
 import jakarta.validation.constraints.NotBlank;
@@ -17,27 +18,20 @@ import lombok.NoArgsConstructor;
 @Builder
 public class NotificationDto {
 
-    @NotBlank(message = "subject field cannot be blank")
-    @NotNull(message = "subject cannot be null")
-    private Long id;
 
-    @NotBlank(message = "subject field cannot be blank")
-    @NotNull(message = "subject cannot be null")
+    private UUID id;
+
+    @NotBlank(message = "type field cannot be blank")
+    @NotNull(message = "type cannot be null")
     private NotificationType type;
 
-    @NotBlank(message = "subject field cannot be blank")
-    @NotNull(message = "subject cannot be null")
     private LocalDateTime createdAt;
 
-    @NotBlank(message = "subject field cannot be blank")
-    @NotNull(message = "subject cannot be null")
+    @NotBlank(message = "content field cannot be blank")
+    @NotNull(message = "content cannot be null")
     private String content;
 
-    @NotBlank(message = "subject field cannot be blank")
-    @NotNull(message = "subject cannot be null")
-    private Boolean seen;
+    private boolean seen = false;
 
-    @NotBlank(message = "subject field cannot be blank")
-    @NotNull(message = "subject cannot be null")
     private Long receiverId;
 }

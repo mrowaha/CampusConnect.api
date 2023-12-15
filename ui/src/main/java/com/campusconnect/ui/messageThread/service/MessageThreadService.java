@@ -5,16 +5,15 @@ import com.campusconnect.domain.message.entity.Message;
 import com.campusconnect.domain.message.repository.MessageRepository;
 import com.campusconnect.domain.messageThread.entity.MessageThread;
 import com.campusconnect.domain.messageThread.repository.MessageThreadRepository;
+import com.campusconnect.domain.notification.dto.NotificationDto;
+import com.campusconnect.domain.notification.enums.NotificationType;
 import com.campusconnect.domain.user.entity.User;
-import com.campusconnect.domain.user.repository.BilkenteerRepository;
-import com.campusconnect.domain.user.repository.ModeratorRepository;
-import com.campusconnect.email.EmailSenderService;
 import com.campusconnect.ui.messageThread.exceptions.MessageNotFoundException;
-import com.campusconnect.ui.notification.controller.WebSocketNotificationController;
+import com.campusconnect.ui.notification.service.NotificationService;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
+import com.campusconnect.ui.user.service.BilkenteerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,11 +30,8 @@ public class MessageThreadService {
 
     private final MessageRepository messageRepository;
     private final MessageThreadRepository messageThreadRepository;
-    private final BilkenteerRepository bilkenteerRepository;
-    private final ModeratorRepository moderatorRepository;
-
-    @Autowired
-    private WebSocketNotificationController notificationController;
+    private final BilkenteerService bilkenteerService;
+    private final NotificationService notificationService;
 
     private static final Logger log = Logger.getLogger(MessageThreadService.class.getName());
 
@@ -57,15 +53,20 @@ public class MessageThreadService {
         Message message = new Message();
 
         message.setMessageThread(messageThread);
-        message.setSender(findUser(messageDto.getSenderId()));
-        message.setReceiver(findUser(messageDto.getReceiverId()));
+        message.setSender(bilkenteerService.findUser(messageDto.getSenderId()));
+        message.setReceiver(bilkenteerService.findUser(messageDto.getReceiverId()));
         message.setContent(messageDto.getContent());
         message.setTimeStamp(LocalDateTime.now());
 
         messageRepository.save(message);
 
-        String notification = "You have a new message from " + messageDto.getSenderId();
-        notificationController.notifyUser(messageDto.getReceiverId().toString(), notification);
+        NotificationDto notificationDto = new NotificationDto();
+        notificationDto.setType(NotificationType.INBOX);
+        notificationDto.setContent("You have a new message from " + message.getSender().getFirstName());
+
+//        notificationController.notifyUser(messageDto.getReceiverId().toString(), notificationDto.getContent());
+
+        notificationService.saveNotification(messageDto.getReceiverId(), notificationDto);
         log.info("User Notified Successfully");
     }
 
@@ -88,12 +89,12 @@ public class MessageThreadService {
 
         MessageThread messageThread = new MessageThread();
 
-        User initiatingUser = findUser(senderId);
+        User initiatingUser = bilkenteerService.findUser(senderId);
         if (Objects.isNull(initiatingUser)) {
             throw new UserNotFoundException();
         }
 
-        User receivingUser = findUser(receiverId);
+        User receivingUser = bilkenteerService.findUser(receiverId);
         if (Objects.isNull(receivingUser)) {
             throw new UserNotFoundException();
         }
@@ -104,17 +105,5 @@ public class MessageThreadService {
 
         return messageThread;
     }
-
-    public User findUser(UUID userId) {
-
-        User user = moderatorRepository.findById(userId).orElse(null);
-
-        if (Objects.isNull(user)) {
-            user = bilkenteerRepository.findById(userId).orElse(null);
-        }
-
-        return user;
-    }
-
 
 }

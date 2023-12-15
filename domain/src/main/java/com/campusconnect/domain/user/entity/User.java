@@ -1,6 +1,8 @@
 package com.campusconnect.domain.user.entity;
 
+import com.campusconnect.domain.message.entity.Message;
 import com.campusconnect.domain.messageThread.entity.MessageThread;
+import com.campusconnect.domain.notification.entity.Notification;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -64,7 +66,6 @@ public abstract class User{
     public abstract Collection<? extends GrantedAuthority> getAuthorities();
     public abstract boolean isEnabled();
 
-
     @OneToMany(mappedBy = "initiatingUser")
     @JsonManagedReference(value = "initiating_user_id")
     @JsonIgnore
@@ -74,6 +75,9 @@ public abstract class User{
     @JsonManagedReference(value = "receiving_user_id")
     @JsonIgnore
     private Set<MessageThread> receivedThreads = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<Notification> notifications = new HashSet();
 
 //    @Transient
 //    public Set<MessageThread> getAllMessageThreads() {
