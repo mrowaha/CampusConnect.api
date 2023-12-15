@@ -34,3 +34,7 @@ build/
 
 ### MINIO STORAGE ###
 s3
+
+##Local application properties##
+
+application-local.properties
