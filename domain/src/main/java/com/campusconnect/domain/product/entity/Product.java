@@ -77,10 +77,10 @@ public class Product {
     @JsonManagedReference
     protected List<Bid> bids = new ArrayList<>();
 
-    @ElementCollection(targetClass =  UUID.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "tags_id_table", joinColumns = @JoinColumn(name = "bilkenteer_id"))
-    @Column(name = "tags_id")
-    protected Set<UUID> tagsId = new HashSet<>();
+    @ElementCollection(targetClass =  String.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "product_tags_table", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "tags")
+    protected Set<String> tags = new HashSet<>();
 
     //public void addImage()
     //public void removeImage()

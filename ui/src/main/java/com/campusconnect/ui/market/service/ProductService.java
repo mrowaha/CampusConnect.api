@@ -1,5 +1,8 @@
 package com.campusconnect.ui.market.service;
 
+import com.campusconnect.domain.ProductTag.entity.ProductTag;
+import com.campusconnect.domain.ProductTag.enums.ProductTagStatus;
+import com.campusconnect.domain.ProductTag.repository.ProductTagRepository;
 import com.campusconnect.domain.product.dto.ProductDto;
 import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.product.enums.ProductStatus;
@@ -23,6 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final ProductTagRepository productTagRepository;
     private final BilkenteerRepository bilkenteerRepository;
 
     public ResponseEntity<?> saveProduct(ProductDto productCreationInfo){
@@ -74,6 +78,20 @@ public class ProductService {
         }
 
         return productRepository.save(productDB);
+    }
+
+    public Product assignTag(String tagName, UUID productId){
+        Product product = productRepository.findById(productId).get();
+        ProductTag tag = productTagRepository.findByName(tagName).get();
+
+        if (tag.getTagStatus() == ProductTagStatus.APPROVED) {
+            Set<String> existingTags = product.getTags();
+            existingTags.add(tag.getName());
+            product.setTags(existingTags);
+        } else {
+            throw new IllegalStateException("Cannot assign unapproved tag");
+        }
+        return product;
     }
 
     public void deleteProductById(UUID productId){

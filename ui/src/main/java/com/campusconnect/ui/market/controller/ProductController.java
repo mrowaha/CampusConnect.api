@@ -45,6 +45,12 @@ public class ProductController {
         return ResponseEntity.ok(productService.updateProduct(productCreationInfo, productId));
     }
 
+    @PutMapping("/tag")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<Product> assignTag(@RequestParam("tagName") String tagName, @RequestParam("productId") UUID productId){
+        return ResponseEntity.ok(productService.assignTag(tagName, productId));
+    }
+
     @DeleteMapping("/")
     @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<Void> deleteProductById(@RequestParam("productId") UUID productId){
