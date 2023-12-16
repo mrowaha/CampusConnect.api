@@ -1,5 +1,6 @@
 package com.campusconnect.domain.forumPost.entity;
 
+import com.campusconnect.domain.comment.entity.Comment;
 import com.campusconnect.domain.forumPost.enums.ForumPostStatus;
 import com.campusconnect.domain.forumPost.enums.ForumPostType;
 import com.campusconnect.domain.user.entity.Bilkenteer;
@@ -9,15 +10,17 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
 @Entity
+@EntityListeners(ForumPostListener.class)
 @Table(name = "cc_forum_post")
 public class ForumPost {
 
@@ -46,7 +49,6 @@ public class ForumPost {
     @Column(name = "view_count", nullable = false)
     protected Integer viewCount = 0;
 
-
     @Column(name = "postType")
     @Enumerated(EnumType.STRING)
     protected ForumPostType postType;
@@ -55,4 +57,6 @@ public class ForumPost {
     @Enumerated(EnumType.STRING)
     private ForumPostStatus postStatus = ForumPostStatus.UNRESOLVED;
 
+    @OneToMany(mappedBy = "forumPost", cascade = CascadeType.ALL)
+    private Set<Comment> comments = new HashSet();
 }

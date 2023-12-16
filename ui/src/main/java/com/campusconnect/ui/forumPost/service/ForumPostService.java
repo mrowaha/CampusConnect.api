@@ -1,5 +1,8 @@
 package com.campusconnect.ui.forumPost.service;
 
+import com.campusconnect.domain.comment.dto.CommentDto;
+import com.campusconnect.domain.comment.entity.Comment;
+import com.campusconnect.domain.comment.repository.CommentRepository;
 import com.campusconnect.domain.forumPost.dto.ForumPostDto;
 import com.campusconnect.domain.forumPost.entity.ForumPost;
 import com.campusconnect.domain.forumPost.enums.ForumPostStatus;
@@ -10,6 +13,7 @@ import com.campusconnect.domain.user.repository.BilkenteerRepository;
 import com.campusconnect.ui.forumPost.exceptions.ForumPostNotFound;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Id;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +37,14 @@ public class ForumPostService {
 
     private final ForumPostRepository forumPostRepository;
     private final BilkenteerRepository bilkenteerRepository;
+    private final CommentRepository commentRepository;
 
     public List<ForumPost> fetchUserForumPostList(UUID userId){
         return forumPostRepository.findAllByPostingUserUserId(userId).orElse(null);
+    }
+
+    public ForumPost fetchForumPostById(UUID forumPostId){
+        return forumPostRepository.findById(forumPostId).orElse(null);
     }
 
     public List<ForumPost> fetchLostForumPostList(){
@@ -52,6 +61,32 @@ public class ForumPostService {
 
     public List<ForumPost> searchFoundForumPostList(String keywords){
         return forumPostRepository.findAllByKeywordsAndTypeAndStatus(keywords, ForumPostType.FOUND, ForumPostStatus.UNRESOLVED).orElse(null);
+    }
+
+    public Comment commentOnForumPost(UUID userId, CommentDto commentDto) throws UserNotFoundException {
+
+        Comment comment = new Comment();
+
+        // Check for Bilkenteer Exists
+        Bilkenteer bilkenteer = bilkenteerRepository.findById(userId).orElse(null);
+        if (Objects.isNull(bilkenteer)) {
+            throw new UserNotFoundException();
+        }
+
+        // Check for ForumPost Exists
+        ForumPost forumPost = forumPostRepository.findById(commentDto.getForumPostId()).orElse(null);
+        if (Objects.isNull(forumPost)) {
+            throw new ForumPostNotFound();
+        }
+
+        comment.setCommenter(bilkenteer);
+        comment.setContent(commentDto.getContent());
+        comment.setForumPost(forumPost);
+        comment.setTimeStamp(LocalDateTime.now());
+
+        commentRepository.save(comment);
+
+        return comment;
     }
 
     public ForumPost saveForumPost(UUID userId, ForumPostDto forumPostDto) throws UserNotFoundException {
