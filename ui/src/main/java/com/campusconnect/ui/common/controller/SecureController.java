@@ -47,6 +47,7 @@ public class SecureController {
                 RequestMethod method = mappingInfo.getMethodsCondition().getMethods()
                         .stream().findFirst()
                         .orElseThrow(RuntimeException::new);
+                System.out.println((mappingInfo.getDirectPaths()));
                 String path = mappingInfo.getDirectPaths()
                         .stream().findFirst()
                         .orElseThrow(RuntimeException::new);
