@@ -1,9 +1,12 @@
 package com.campusconnect.ui.user.service;
 
+import com.campusconnect.domain.ProductTag.entity.ProductTag;
+import com.campusconnect.domain.ProductTag.repository.ProductTagRepository;
 import com.campusconnect.domain.security.dto.BearerToken;
 import com.campusconnect.domain.user.dto.BilkenteerLoginResponse;
 import com.campusconnect.domain.user.entity.User;
 import com.campusconnect.domain.user.repository.ModeratorRepository;
+import com.campusconnect.ui.productTag.exceptions.TagNotFoundException;
 import com.campusconnect.ui.utils.JwtUtilities;
 import com.campusconnect.ui.user.exceptions.InvalidPasswordException;
 import com.campusconnect.ui.user.exceptions.UserAlreadyTakenException;
@@ -34,6 +37,7 @@ public class BilkenteerService implements UserService {
     private final BilkenteerRepository bilkenteerRepository;
     private final PasswordEncoder passwordEncoder;
     private final ModeratorRepository moderatorRepository;
+    ProductTagRepository productTagRepository;
     private final JwtUtilities jwtUtilities;
 
     @Override
@@ -103,5 +107,18 @@ public class BilkenteerService implements UserService {
         }
 
         return user;
+    }
+
+    public Bilkenteer subscribeToTag(UUID bilkenteerId, String tagName) {
+        Bilkenteer bilkenteer = bilkenteerRepository.findById(bilkenteerId)
+                .orElseThrow(UserNotFoundException::new);
+
+        ProductTag tag = productTagRepository.findByName(tagName)
+                .orElseThrow(() -> new TagNotFoundException());
+
+        bilkenteer.getSubscribedTags().add(tag);
+        bilkenteerRepository.save(bilkenteer);
+
+        return bilkenteer;
     }
 }

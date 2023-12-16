@@ -4,12 +4,17 @@ import com.campusconnect.domain.ProductTag.entity.ProductTag;
 import com.campusconnect.domain.ProductTag.enums.ProductTagStatus;
 import com.campusconnect.domain.ProductTag.repository.ProductTagRepository;
 import com.campusconnect.domain.forumPost.entity.ForumPost;
+import com.campusconnect.domain.notification.dto.NotificationDto;
+import com.campusconnect.domain.notification.entity.Notification;
+import com.campusconnect.domain.notification.enums.NotificationType;
+import com.campusconnect.domain.notification.repository.NotificationRepository;
 import com.campusconnect.domain.product.dto.ProductDto;
 import com.campusconnect.domain.product.dto.ProductSearchDto;
 import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.product.enums.ProductStatus;
 import com.campusconnect.domain.product.repository.ProductRepository;
 import com.campusconnect.domain.user.entity.Bilkenteer;
+import com.campusconnect.domain.user.entity.User;
 import com.campusconnect.domain.user.repository.BilkenteerRepository;
 import com.campusconnect.domain.transaction.entity.Bid;
 import com.campusconnect.ui.market.exceptions.ProductNotFoundException;
@@ -29,6 +34,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,6 +47,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductTagRepository productTagRepository;
     private final BilkenteerRepository bilkenteerRepository;
+    private final NotificationRepository notificationRepository;
 
     @Autowired
     private EntityManager entityManager;
@@ -70,6 +77,9 @@ public class ProductService {
 
         productRepository.save(product);
         bilkenteer.getProducts().add(product);
+
+        notifyUsersForTags(tags, product);
+
         return new ResponseEntity<>( "Product Id:" + product.getProductId(), HttpStatus.OK);
     }
 
@@ -188,4 +198,22 @@ public class ProductService {
         return query.getResultList();
     }
 
+    private void notifyUsersForTags(Set<String> tags, Product product) {
+        List<Bilkenteer> subscribedUsers = bilkenteerRepository.findBySubscribedTags_NameIn(tags);
+
+        for (User user : subscribedUsers) {
+            Notification notification = new Notification();
+            notification.setUser(user);
+            notification.setCreatedAt(LocalDateTime.now());
+            notification.setSeen(false);
+            notification.setType(NotificationType.PRODUCT);
+            notification.setContent("New product posted with tags: " + String.join(", ", tags));
+
+            // Save the notification to the repository
+            notificationRepository.save(notification);
+        }
+    }
+
+
 }
+

@@ -9,7 +9,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -24,4 +26,7 @@ public interface BilkenteerRepository extends ListCrudRepository<Bilkenteer, UUI
     @Transactional
     @Query("UPDATE Bilkenteer SET profilePicture = :profilePicture WHERE email = :email")
     int updateProfilePictureByEmail(@Param("email") String email, @Param("profilePicture") String profilePicture);
+
+    List<Bilkenteer> findBySubscribedTags_NameIn(Set<String> tagNames);
+
 }
