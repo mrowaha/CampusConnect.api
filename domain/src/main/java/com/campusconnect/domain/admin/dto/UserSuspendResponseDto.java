@@ -1,5 +1,6 @@
 package com.campusconnect.domain.admin.dto;
 
+import com.campusconnect.domain.user.dto.UserInfoDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,4 +16,5 @@ public class UserSuspendResponseDto {
     UUID uuid;
     Boolean successStatus;
     String message;
+    UserInfoDto user;
 }

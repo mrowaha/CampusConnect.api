@@ -15,6 +15,7 @@ import com.campusconnect.domain.user.repository.ModeratorRepository;
 import com.campusconnect.ui.user.exceptions.UserSuspendedException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.bouncycastle.math.raw.Mod;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -60,30 +61,46 @@ public class ModeratorService implements UserService {
     public UserSuspendResponseDto suspend(UserSuspendRequestDto suspendRequestDto)
         throws UserNotFoundException
     {
-        moderatorRepository.findById(suspendRequestDto.getUuid())
+        Moderator moderator = moderatorRepository.findById(suspendRequestDto.getUuid())
                 .orElseThrow(UserNotFoundException::new);
         moderatorRepository.disable(suspendRequestDto.getUuid());
         return UserSuspendResponseDto.builder()
                 .uuid(suspendRequestDto.getUuid())
                 .successStatus(true)
                 .message(String.format("Moderator %s suspended", suspendRequestDto.getUuid().toString()))
+                .user(UserInfoDto.builder()
+                        .firstName(moderator.getFirstName())
+                        .lastName(moderator.getLastName())
+                        .uuid(moderator.getUserId())
+                        .email(moderator.getEmail())
+                        .isActive(false)
+                        .build()
+                )
                 .build();
     }
 
     @Override
     public UserSuspendResponseDto unsuspend(UserSuspendRequestDto suspendRequestDto) throws UserNotFoundException {
-        moderatorRepository.findById(suspendRequestDto.getUuid())
+        Moderator moderator = moderatorRepository.findById(suspendRequestDto.getUuid())
                 .orElseThrow(UserNotFoundException::new);
         moderatorRepository.enable(suspendRequestDto.getUuid());
         return UserSuspendResponseDto.builder()
                 .uuid(suspendRequestDto.getUuid())
                 .successStatus(true)
                 .message(String.format("Moderator %s activated", suspendRequestDto.getUuid().toString()))
+                .user(UserInfoDto.builder()
+                        .firstName(moderator.getFirstName())
+                        .lastName(moderator.getLastName())
+                        .uuid(moderator.getUserId())
+                        .email(moderator.getEmail())
+                        .isActive(true)
+                        .build()
+                )
                 .build();
     }
 
 
-    public BearerToken register(UserCreationDto creationDto) throws UserAlreadyTakenException {
+    public UserInfoDto register(UserCreationDto creationDto) throws UserAlreadyTakenException {
         if(moderatorRepository.existsByEmail(creationDto.getEmail())) {
             throw new UserAlreadyTakenException();
         }
@@ -98,9 +115,15 @@ public class ModeratorService implements UserService {
                             .enableAppNotification(true)
                             .enableEmailNotification(true)
                             .build();
-            moderatorRepository.save(moderator);
-            String token = jwtUtilities.generateToken(creationDto.getEmail(), Role.MODERATOR);
-            return new BearerToken(token , "Bearer ");
+            Moderator savedModerator = moderatorRepository.save(moderator);
+            return UserInfoDto.builder()
+                    .firstName(moderator.getFirstName())
+                    .lastName(moderator.getLastName())
+                    .isActive(true)
+                    .email(moderator.getEmail())
+                    .uuid(savedModerator.getUserId())
+                    .build()
+                    ;
         }
     }
 

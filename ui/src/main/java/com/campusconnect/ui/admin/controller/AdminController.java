@@ -35,11 +35,12 @@ public class AdminController extends SecureController {
 
     @PostMapping(value = "/moderator/register", consumes = "application/json", produces = "application/json")
     @RequiredScope(scope = SecurityScope.ADMIN)
-    public ResponseEntity<?> registerModerator(
+    public ResponseEntity<UserInfoDto> registerModerator(
             @Valid @RequestBody UserCreationDto moderatorCreationInfo
     ) throws UserAlreadyTakenException {
-        moderatorService.register(moderatorCreationInfo);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                moderatorService.register(moderatorCreationInfo)
+        );
     }
 
     @GetMapping("/moderators")
