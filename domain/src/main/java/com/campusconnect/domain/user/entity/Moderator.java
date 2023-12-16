@@ -38,4 +38,9 @@ public class Moderator extends User {
     public boolean isEnabled() {
         return this.isActive;
     }
+
+    @Override
+    public String toString() {
+        return String.format("UUID: %s, ROLE: %s", this.userId.toString(), this.getRole().toString());
+    }
 }
