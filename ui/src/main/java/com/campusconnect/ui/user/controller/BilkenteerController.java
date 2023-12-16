@@ -75,5 +75,13 @@ public class BilkenteerController extends SecureController {
         System.out.println("in bilkenteer protected");
         return new ResponseEntity<>(new ProtectedDto("Authorized"), HttpStatus.OK);
     }
+
+    @GetMapping(value = "/{hello}")
+    @RequiredScope(scope = SecurityScope.BILKENTEER)
+    public ResponseEntity<String> test(
+            @PathVariable("hello") String hello
+    ) {
+        return ResponseEntity.ok(String.format("value: %s", hello));
+    }
 }
 
