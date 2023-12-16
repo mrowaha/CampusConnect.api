@@ -1,6 +1,6 @@
 package com.campusconnect.domain.report.dto;
 
-import com.campusconnect.domain.report.entity.ReportableEntity;
+import com.campusconnect.domain.report.enums.ReportableEntities;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -19,18 +19,16 @@ public class ReportDto {
     private UUID id;
 
     @NotBlank(message = "title field cannot be blank")
-    @NotNull(message = "title cannot be null")
     private String title;
 
     @NotBlank(message = "description field cannot be blank")
-    @NotNull(message = "description cannot be null")
     private String description;
 
-    // image;
+//    private String image;
 
     @NotBlank(message = "reportedEntity field cannot be blank")
     @NotNull(message = "reportedEntity cannot be null")
-    private ReportableEntity reportedEntity;
+    private ReportableEntities reportedEntity;
 
     @NotBlank(message = "reportedEntityID field cannot be blank")
     @NotNull(message = "reportedEntityID cannot be null")
@@ -40,7 +38,7 @@ public class ReportDto {
     @NotNull(message = "reportedAt cannot be null")
     private LocalDateTime reportedAt;
 
-    @NotBlank(message = "reportedID field cannot be blank")
-    @NotNull(message = "reportedID cannot be null")
+    @NotBlank(message = "reporterID field cannot be blank")
+    @NotNull(message = "reporterID cannot be null")
     private UUID reporterID;
 }

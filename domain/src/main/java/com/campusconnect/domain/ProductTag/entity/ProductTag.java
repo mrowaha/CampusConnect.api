@@ -32,10 +32,4 @@ public class ProductTag {
 
     @Column(name = "accepted_by_id")
     private UUID acceptedByID;
-
-//    @Column(nullable = false)
-//    private UUID categoriesID;
-
-    // Accept and Decline methods would be service layer operations and not part of the JPA entity.
-    // These operations would update the tagStatus field accordingly.
 }

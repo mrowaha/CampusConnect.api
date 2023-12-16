@@ -1,6 +1,7 @@
 package com.campusconnect.domain.report.entity;
 
 import com.campusconnect.domain.report.enums.ReportStatus;
+import com.campusconnect.domain.report.enums.ReportableEntities;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -16,10 +17,9 @@ import java.util.UUID;
 @Entity
 @Table(name = "cc_report")
 public class Report {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id")
+    @Column(name = "report_id")
     private UUID id;
 
     @Column(name = "title", nullable = false)
@@ -27,15 +27,16 @@ public class Report {
     private String title;
 
     @Column(name = "description")
-    private String descrption;
+    private String description;
 
-    // image
+    @Column(name = "image_url")
+    private String image;
 
-    // @Column(name = "reportedEntity", nullable = false)
-    // @NonNull
-    // private ReportableEntity reportedEntity;
+    @Column(name = "reported_entity")
+    @Enumerated(EnumType.STRING)
+    private ReportableEntities reportedEntity;
 
-    @Column(name = "reportedEntityID", nullable = false)
+    @Column(name = "reported_entity_id", nullable = false)
     @NonNull
     private UUID reportedEntityID;
 
@@ -43,15 +44,13 @@ public class Report {
     @NonNull
     private LocalDateTime reportedAt;
 
-    @Column(name = "reporterID", nullable = false)
+    @Column(name = "reporter_id", nullable = false)
     @NonNull
     private UUID reporterID;
 
     @Column(name = "status")
     private ReportStatus status;
 
-    @Column(name = "resolverID")
+    @Column(name = "resolver_id")
     private UUID resolverID;
-
-    // Image
 }
