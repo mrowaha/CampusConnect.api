@@ -26,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -37,7 +38,7 @@ public class BilkenteerService implements UserService {
     private final BilkenteerRepository bilkenteerRepository;
     private final PasswordEncoder passwordEncoder;
     private final ModeratorRepository moderatorRepository;
-    ProductTagRepository productTagRepository;
+    private final ProductTagRepository productTagRepository;
     private final JwtUtilities jwtUtilities;
 
     @Override
@@ -62,6 +63,7 @@ public class BilkenteerService implements UserService {
                     .isSuspended(false)
                     .phoneNumbers(new ArrayList<>())
                     .address(null)
+                    .subscribedTags(new HashSet<>())
                     .build();
             bilkenteerRepository.save(bilkenteer);
             String token = jwtUtilities.generateToken(creationDto.getEmail(), Role.BILKENTEER);
@@ -121,4 +123,18 @@ public class BilkenteerService implements UserService {
 
         return bilkenteer;
     }
+
+    public Bilkenteer unsubscribeFromTag(UUID bilkenteerId, String tagName) {
+        Bilkenteer bilkenteer = bilkenteerRepository.findById(bilkenteerId)
+                .orElseThrow(UserNotFoundException::new);
+
+        ProductTag tag = productTagRepository.findByName(tagName)
+                .orElseThrow(() -> new TagNotFoundException());
+
+        bilkenteer.getSubscribedTags().remove(tag);
+        bilkenteerRepository.save(bilkenteer);
+
+        return bilkenteer;
+    }
+
 }

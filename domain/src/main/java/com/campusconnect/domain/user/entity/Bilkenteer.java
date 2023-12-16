@@ -48,7 +48,7 @@ public class Bilkenteer extends User {
     @JsonIgnore
     private Set<ForumPost> forumPosts = new HashSet<>();
 
-    @OneToMany(mappedBy = "name", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY)
     private Set<ProductTag> subscribedTags = new HashSet<>();
 
     @Override
