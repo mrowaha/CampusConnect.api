@@ -75,6 +75,19 @@ public class ProductService {
         return availableProducts;
     }
 
+    public Product fetchProductById(UUID productId){
+
+        Product product = productRepository.findById(productId).orElse(null);
+
+        if (Objects.nonNull(product)){
+            product.setViewCount(product.getViewCount() + 1);
+
+            productRepository.save(product);
+        }
+
+        return product;
+    }
+
     public Product updateProduct(ProductDto productCreationInfo, UUID productId){
         Product productDB = productRepository.findById(productId).get();
 

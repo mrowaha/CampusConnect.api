@@ -1,5 +1,6 @@
 package com.campusconnect.ui.forumPost.controller;
 
+import com.campusconnect.domain.comment.dto.CommentDto;
 import com.campusconnect.domain.forumPost.dto.ForumPostDto;
 import com.campusconnect.domain.forumPost.entity.ForumPost;
 import com.campusconnect.domain.security.RequiredScope;
@@ -34,6 +35,12 @@ public class ForumPostController extends SecureController {
     @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<List<ForumPost>> fetchUserForumPostList(@RequestParam("userId") UUID userId){
         return ResponseEntity.ok(forumPostService.fetchUserForumPostList(userId));
+    }
+
+    @GetMapping("/")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<ForumPost> fetchForumPostById(@RequestParam("forumPostId") UUID forumPostId){
+        return ResponseEntity.ok(forumPostService.fetchForumPostById(forumPostId));
     }
 
     @GetMapping("/lostForum")
@@ -73,6 +80,12 @@ public class ForumPostController extends SecureController {
     public ResponseEntity<Void> deleteForumPostById(@RequestParam("forumPostId") UUID ForumPostId){
         forumPostService.deleteForumPostById(ForumPostId);
         return ResponseEntity.ok(null);
+    }
+
+    @PostMapping("/comment/")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<?> commentOnForumPost(@RequestParam("userId") UUID userId, @Valid @RequestBody CommentDto commentDto) {
+        return ResponseEntity.ok(forumPostService.commentOnForumPost(userId, commentDto));
     }
 
 }

@@ -1,5 +1,6 @@
 package com.campusconnect.ui.market.controller;
 
+import com.campusconnect.domain.forumPost.entity.ForumPost;
 import com.campusconnect.domain.product.dto.ProductDto;
 import com.campusconnect.domain.product.dto.ProductSearchDto;
 import com.campusconnect.domain.product.entity.Product;
@@ -32,6 +33,12 @@ public class ProductController {
     @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<List<Product>> fetchProductList(){
         return ResponseEntity.ok(productService.fetchProductList());
+    }
+
+    @GetMapping("/")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<Product> fetchProductById(@RequestParam("productId") UUID productId){
+        return ResponseEntity.ok(productService.fetchProductById(productId));
     }
 
     @GetMapping("/user/{userId}")
