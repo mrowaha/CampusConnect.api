@@ -53,4 +53,5 @@ public class Report {
 
     @Column(name = "resolver_id")
     private UUID resolverID;
+
 }
