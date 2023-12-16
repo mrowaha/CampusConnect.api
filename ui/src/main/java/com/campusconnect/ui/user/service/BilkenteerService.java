@@ -3,16 +3,13 @@ package com.campusconnect.ui.user.service;
 import com.campusconnect.domain.admin.dto.UserSuspendRequestDto;
 import com.campusconnect.domain.admin.dto.UserSuspendResponseDto;
 import com.campusconnect.domain.security.dto.BearerToken;
-import com.campusconnect.domain.user.dto.BilkenteerLoginResponse;
-import com.campusconnect.domain.user.dto.UserInfoDto;
+import com.campusconnect.domain.user.dto.*;
 import com.campusconnect.domain.user.entity.User;
 import com.campusconnect.domain.user.repository.ModeratorRepository;
 import com.campusconnect.ui.utils.JwtUtilities;
 import com.campusconnect.ui.user.exceptions.InvalidPasswordException;
 import com.campusconnect.ui.user.exceptions.UserAlreadyTakenException;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
-import com.campusconnect.domain.user.dto.UserCreationDto;
-import com.campusconnect.domain.user.dto.UserLoginRequestDto;
 import com.campusconnect.domain.user.entity.Bilkenteer;
 import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.domain.user.repository.BilkenteerRepository;
@@ -137,6 +134,13 @@ public class BilkenteerService implements UserService {
                 .trustScore(bilkenteer.getTrustScore())
                 .token(bearerToken)
                 .build();
+    }
+
+    public void addContactInfo(UUID userid, BilkenteerContactInfoDto contactInfoDto) {
+        bilkenteerRepository.updateAddressBy(
+                userid,
+                contactInfoDto.getAddress()
+        );
     }
 
     public User findUser(UUID userId) {
