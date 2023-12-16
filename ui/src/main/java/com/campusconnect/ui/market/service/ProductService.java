@@ -179,6 +179,9 @@ public class ProductService {
                 case LATEST:
                     cq.orderBy(cb.desc(product.get("creationDate")));
                     break;
+                case TRENDING:
+                    cq.orderBy(cb.desc(product.get("viewCount")));
+                    break;
             }
         }
 

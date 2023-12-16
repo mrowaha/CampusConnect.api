@@ -6,5 +6,7 @@ public enum SortBy {
 
     PRICE_DESCENDING,
 
-    LATEST
+    LATEST,
+
+    TRENDING
 }
