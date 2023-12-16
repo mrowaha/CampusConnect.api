@@ -10,6 +10,8 @@ import com.campusconnect.domain.product.repository.ProductRepository;
 import com.campusconnect.domain.user.entity.Bilkenteer;
 import com.campusconnect.domain.user.repository.BilkenteerRepository;
 import com.campusconnect.domain.transaction.entity.Bid;
+import com.campusconnect.ui.market.exceptions.ProductNotFoundException;
+import com.campusconnect.ui.productTag.service.ProductTagService;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +31,16 @@ public class ProductService {
     private final ProductTagRepository productTagRepository;
     private final BilkenteerRepository bilkenteerRepository;
 
+
     public ResponseEntity<?> saveProduct(ProductDto productCreationInfo){
         Bilkenteer bilkenteer = bilkenteerRepository.findById(UUID.fromString(productCreationInfo.getSellerId()))
                 .orElseThrow(UserNotFoundException::new);
+        Set<String> tags = new HashSet<>(productCreationInfo.getTagNames());
+
+        List<ProductTag> acceptedTags = productTagRepository.findAll();
+        if (!tags.stream().allMatch(tag -> acceptedTags.stream().anyMatch(acceptedTag -> acceptedTag.getName().equals(tag)))) {
+            return new ResponseEntity<>("Invalid tags. Some tags are not accepted.", HttpStatus.BAD_REQUEST);
+        }
 
         Product product = Product.builder()
                 .sellerId(UUID.fromString(productCreationInfo.getSellerId()))
@@ -45,7 +54,7 @@ public class ProductService {
                 .status(ProductStatus.AVAILABLE)
                 .wishListedBy(new HashSet<UUID>())
                 .bids(new ArrayList<Bid>())
-                .tags(new HashSet<String>()).build();
+                .tags(acceptedTags.stream().map(ProductTag::getName).collect(Collectors.toSet())).build();
 
         productRepository.save(product);
         bilkenteer.getProducts().add(product);
@@ -60,6 +69,12 @@ public class ProductService {
                 .collect(Collectors.toList());
 
         return availableProducts;
+    }
+
+    public List<Bid> getProductBids(UUID productId) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException());
+
+        return product.getBids();
     }
 
     public Product updateProduct(ProductDto productCreationInfo, UUID productId){

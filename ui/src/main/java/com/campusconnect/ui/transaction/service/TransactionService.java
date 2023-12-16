@@ -2,6 +2,7 @@ package com.campusconnect.ui.transaction.service;
 
 import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.product.enums.ProductStatus;
+import com.campusconnect.domain.product.enums.ProductType;
 import com.campusconnect.domain.product.repository.ProductRepository;
 import com.campusconnect.domain.transaction.entity.Bid;
 import com.campusconnect.domain.transaction.repository.BidRepository;
@@ -46,16 +47,24 @@ public class TransactionService {
     }
 
     public void makeBid(UUID buyerId, UUID sellerId, UUID productId, double bidPrice, LocalDate returnDate) {
-
         Bilkenteer bilkenteer = bilkenteerRepository.findById(buyerId).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
 
-        Bid bid = Bid.builder().bilkenteer(bilkenteer).product(product)
-                .requestedPrice(bidPrice).period(Period.between(returnDate,LocalDate.now())).build();
+        boolean isRentingProduct = product.getType() == ProductType.RENT;
+
+        Period period = isRentingProduct ? Period.between(returnDate, LocalDate.now()) : null;
+
+        Bid bid = Bid.builder()
+                .bilkenteer(bilkenteer)
+                .product(product)
+                .requestedPrice(bidPrice)
+                .period(period)
+                .build();
 
         bidRepository.save(bid);
         product.getBids().add(bid);
     }
+
 
     public void sellProduct(UUID buyerId, UUID sellerId, UUID productId) {
         Bilkenteer buyer = bilkenteerRepository.findById(buyerId).orElseThrow(UserNotFoundException::new);

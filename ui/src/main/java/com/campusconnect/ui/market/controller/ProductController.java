@@ -4,6 +4,7 @@ import com.campusconnect.domain.product.dto.ProductDto;
 import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.security.RequiredScope;
 import com.campusconnect.domain.security.SecurityScope;
+import com.campusconnect.domain.transaction.entity.Bid;
 import com.campusconnect.ui.market.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,13 @@ public class ProductController {
     @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<List<Product>> fetchProductList(){
         return ResponseEntity.ok(productService.fetchProductList());
+    }
+
+    @GetMapping("/{productId}/bids")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<List<Bid>> getProductBids(@PathVariable UUID productId) {
+        List<Bid> productBids = productService.getProductBids(productId);
+        return ResponseEntity.ok(productBids);
     }
 
     @GetMapping("/user/{userId}")
