@@ -35,6 +35,7 @@ public class MessageThread{
     private User receivingUser;
 
     @OneToMany(mappedBy = "messageThread", cascade = CascadeType.ALL)
+    @OrderBy("timeStamp")
     private Set<Message> messages = new HashSet();
 
 }

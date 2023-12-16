@@ -1,6 +1,7 @@
 package com.campusconnect.domain.product.dto;
 
 import com.campusconnect.domain.ProductTag.entity.ProductTag;
+import com.campusconnect.domain.product.enums.ProductStatus;
 import com.campusconnect.domain.product.enums.ProductType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -34,4 +35,6 @@ public class ProductDto {
     private ProductType type;
 
     private ArrayList<String> tagNames;
+
+    private ProductStatus productStatus;
 }

@@ -1,5 +1,6 @@
 package com.campusconnect.domain.user.entity;
 
+import com.campusconnect.domain.comment.entity.Comment;
 import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.forumPost.entity.ForumPost;
 import com.campusconnect.domain.messageThread.entity.MessageThread;
@@ -44,7 +45,11 @@ public class Bilkenteer extends User {
     private List<Product> products = new ArrayList<>();
 
     @OneToMany(mappedBy = "postingUser", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<ForumPost> forumPosts = new HashSet<>();
+
+//    @OneToMany(mappedBy = "commenter", cascade = CascadeType.ALL)
+//    private Set<Comment> comments = new HashSet();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -61,7 +66,6 @@ public class Bilkenteer extends User {
 
     @Override
     public String toString() {
-        // Include all fields except 'seller'
         return "";
     }
 }

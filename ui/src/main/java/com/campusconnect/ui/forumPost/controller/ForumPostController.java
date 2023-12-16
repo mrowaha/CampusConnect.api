@@ -1,14 +1,15 @@
 package com.campusconnect.ui.forumPost.controller;
 
+import com.campusconnect.domain.comment.dto.CommentDto;
 import com.campusconnect.domain.forumPost.dto.ForumPostDto;
 import com.campusconnect.domain.forumPost.entity.ForumPost;
-import com.campusconnect.domain.notification.entity.Notification;
 import com.campusconnect.domain.security.RequiredScope;
 import com.campusconnect.domain.security.SecurityScope;
 import com.campusconnect.ui.common.controller.SecureController;
 import com.campusconnect.ui.forumPost.service.ForumPostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/forumPosts")
 public class ForumPostController extends SecureController {
 
@@ -35,6 +37,12 @@ public class ForumPostController extends SecureController {
         return ResponseEntity.ok(forumPostService.fetchUserForumPostList(userId));
     }
 
+    @GetMapping("/")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<ForumPost> fetchForumPostById(@RequestParam("forumPostId") UUID forumPostId){
+        return ResponseEntity.ok(forumPostService.fetchForumPostById(forumPostId));
+    }
+
     @GetMapping("/lostForum")
     @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<List<ForumPost>> fetchLostForumPostList(){
@@ -46,6 +54,20 @@ public class ForumPostController extends SecureController {
     public ResponseEntity<List<ForumPost>> fetchFoundForumPostList(){
         return ResponseEntity.ok(forumPostService.fetchFoundForumPostList());
     }
+
+    @GetMapping("/lostForum/")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<List<ForumPost>> searchLostForumPostList(@RequestParam("search") String keywords) {
+        return ResponseEntity.ok(forumPostService.searchLostForumPostList(keywords));
+    }
+
+
+    @GetMapping("/foundForum/")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<List<ForumPost>> searchFoundForumPostList(@RequestParam("search") String keywords) {
+        return ResponseEntity.ok(forumPostService.searchFoundForumPostList(keywords));
+    }
+
 
     @PutMapping("/")
     @RequiredScope(scope = SecurityScope.NONE)
@@ -59,6 +81,13 @@ public class ForumPostController extends SecureController {
         forumPostService.deleteForumPostById(ForumPostId);
         return ResponseEntity.ok(null);
     }
+
+    @PostMapping("/comment/")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<?> commentOnForumPost(@RequestParam("userId") UUID userId, @Valid @RequestBody CommentDto commentDto) {
+        return ResponseEntity.ok(forumPostService.commentOnForumPost(userId, commentDto));
+    }
+
 }
 
 

@@ -1,6 +1,8 @@
 package com.campusconnect.ui.market.controller;
 
+import com.campusconnect.domain.forumPost.entity.ForumPost;
 import com.campusconnect.domain.product.dto.ProductDto;
+import com.campusconnect.domain.product.dto.ProductSearchDto;
 import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.security.RequiredScope;
 import com.campusconnect.domain.security.SecurityScope;
@@ -33,6 +35,12 @@ public class ProductController {
         return ResponseEntity.ok(productService.fetchProductList());
     }
 
+    @GetMapping("/")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<Product> fetchProductById(@RequestParam("productId") UUID productId){
+        return ResponseEntity.ok(productService.fetchProductById(productId));
+    }
+
     @GetMapping("/user/{userId}")
     @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<List<Product>> fetchProductsByUserId(@PathVariable UUID userId){
@@ -57,6 +65,14 @@ public class ProductController {
         productService.deleteProductById(productId);
         return ResponseEntity.ok(null);
     }
+
+    @GetMapping("/search")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<List<Product>> searchProduct(@RequestBody ProductSearchDto productSearchDto) {
+        return ResponseEntity.ok(productService.searchProduct(productSearchDto));
+    }
+
+
 }
 
 
