@@ -1,7 +1,5 @@
 package com.campusconnect.ui.productTag.service;
 
-
-
 import com.campusconnect.domain.ProductTag.dto.ProductTagDto;
 import com.campusconnect.domain.ProductTag.entity.ProductTag;
 import com.campusconnect.domain.ProductTag.enums.ProductTagStatus;
@@ -25,29 +23,30 @@ public class ProductTagService {
     public ProductTag requestProductTag(ProductTagDto requestedTag) {
         Optional<ProductTag> existingTag = productTagRepository.findByName(requestedTag.getName());
         if (existingTag.isPresent()) {
-//            throw new IllegalStateException("A tag with the name '" + requestedTag.getName() + "' already exists.");
             throw new TagAlreadyExistsException();
-        } else {
-            ProductTag productTag = new ProductTag();
-            productTag.setName(requestedTag.getName());
-            productTag.setTagStatus(ProductTagStatus.REQUESTED);
-            productTag.setRequestedByID(requestedTag.getRequestedByID());
-            return productTagRepository.save(productTag);
         }
+        ProductTag productTag = new ProductTag();
+        productTag.setName(requestedTag.getName());
+        productTag.setTagStatus(ProductTagStatus.REQUESTED);
+        productTag.setRequestedByID(requestedTag.getRequestedByID());
+        return productTagRepository.save(productTag);
     }
 
     public List<ProductTag> getAllTags() {
         return productTagRepository.findAll();
     }
-    public ProductTag getProductTag(String tagName) {
-        Optional<ProductTag> optionalProductTag = productTagRepository.findByName(tagName);
-        if (optionalProductTag.isPresent()) {
-            return optionalProductTag.get();
-        } else {
-            throw new TagNotFoundException();
-        }
+
+    public List<ProductTag> getRequestedTags() {
+        return productTagRepository.getRequestedTags();
     }
 
+    public List<ProductTag> getApprovedTags() {
+        return productTagRepository.getApprovedTags();
+    }
+
+    public ProductTag getProductTag(String tagName) throws TagNotFoundException {
+        return productTagRepository.findByName(tagName).orElseThrow(TagNotFoundException::new);
+    }
 
     public ProductTag approveTag(String tagName) {
         Optional<ProductTag> optionalProductTag = productTagRepository.findByName(tagName);

@@ -6,6 +6,10 @@ public enum NotificationType {
     PRODUCT,
     FORUMPOST,
     INBOX,
-    REPORT
+    REPORT,
+
+    TAG,
+
+    BID
 
 }

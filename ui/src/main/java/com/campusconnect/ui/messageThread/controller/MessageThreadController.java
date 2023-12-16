@@ -6,6 +6,7 @@ import com.campusconnect.domain.security.RequiredScope;
 import com.campusconnect.domain.security.SecurityScope;
 import com.campusconnect.ui.common.controller.SecureController;
 import com.campusconnect.ui.messageThread.service.MessageThreadService;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
@@ -40,7 +41,7 @@ public class MessageThreadController extends SecureController {
 
     @PostMapping(value = "/sendMessage")
     @RequiredScope(scope = SecurityScope.NONE)
-    public ResponseEntity<Void> sendMessage(@Valid @RequestBody MessageDto messageDto) {
+    public ResponseEntity<Void> sendMessage(@Valid @RequestBody MessageDto messageDto) throws MessagingException {
         messageThreadService.sendMessage(messageDto);
         return ResponseEntity.ok(null);
     }

@@ -12,6 +12,7 @@ import com.campusconnect.ui.messageThread.exceptions.MessageNotFoundException;
 import com.campusconnect.ui.notification.service.NotificationService;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
 import com.campusconnect.ui.user.service.BilkenteerService;
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -63,7 +64,7 @@ public class MessageThreadService {
         //Creating Notification for User
         NotificationDto notificationDto = new NotificationDto();
         notificationDto.setType(NotificationType.INBOX);
-        notificationDto.setContent("You have a new message from " + message.getSender().getFirstName());
+        notificationDto.setContent("New message from " + message.getSender().getFirstName() + " : " + messageDto.getContent());
 
         notificationService.saveNotification(messageDto.getReceiverId(), notificationDto);
 
