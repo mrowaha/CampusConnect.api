@@ -1,5 +1,6 @@
 package com.campusconnect.domain.user.dto;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -29,4 +30,7 @@ public class UserCreationDto {
     @NotBlank(message = "password field cannot be blank")
     @NotNull(message = "password cannot be null")
     private String password;
+
+    @Nullable
+    private String otp;
 }

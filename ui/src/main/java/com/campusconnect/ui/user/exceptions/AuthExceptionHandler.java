@@ -82,4 +82,13 @@ public class AuthExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(OTPMismatchException.class)
+    public ResponseEntity<Map<String, List<String>>> handleOTPMismatch(OTPMismatchException ex) {
+        List<String> errors = new ArrayList<>();
+        errors.add("OTP validation failed");
+        Map<String, List<String>> errorResponse = new HashMap<>();
+        errorResponse.put("errors", errors);
+        return new ResponseEntity<>(errorResponse, new HttpHeaders(), HttpStatus.FORBIDDEN);
+    }
+
 }

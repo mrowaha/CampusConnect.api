@@ -9,12 +9,12 @@ import com.campusconnect.domain.user.dto.*;
 import com.campusconnect.domain.user.entity.Bilkenteer;
 import com.campusconnect.domain.user.entity.User;
 import com.campusconnect.domain.user.enums.Role;
+import com.campusconnect.email.EmailSenderService;
+import com.campusconnect.email.otp.OTPStrategy;
 import com.campusconnect.ui.common.controller.SecureController;
+import com.campusconnect.ui.config.properties.AuthProperties;
+import com.campusconnect.ui.user.exceptions.*;
 import com.campusconnect.ui.utils.JwtUtilities;
-import com.campusconnect.ui.user.exceptions.InvalidPasswordException;
-import com.campusconnect.ui.user.exceptions.UserAlreadyTakenException;
-import com.campusconnect.ui.user.exceptions.UserNotFoundException;
-import com.campusconnect.ui.user.exceptions.UserSuspendedException;
 import com.campusconnect.ui.user.service.BilkenteerService;
 import com.campusconnect.ui.user.service.ModeratorService;
 
@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 
 @RestController
@@ -39,12 +40,37 @@ public class AuthController extends SecureController {
     private final BilkenteerService bilkenteerService;
     private final ModeratorService moderatorService;
     private final UserUtilities userUtilities;
+    private final OTPStrategy otpStrategy;
+    private final EmailSenderService emailSenderService;
+
+    private final AuthProperties authProperties;
+
+    @PostMapping(value = "/otp")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<?> saveOTP(
+           @Valid @RequestBody OTPRequestDto otpRequestDto
+    ) {
+        String otp = otpStrategy.setOTPForEmail(otpRequestDto.getEmail());
+        CompletableFuture.runAsync(() -> {
+                    emailSenderService.sendOTPEmail(otpRequestDto.getEmail(), otp);
+        });
+        return ResponseEntity.noContent().build();
+    }
 
     @PostMapping(value = "/bilkenteer/register", consumes = "application/json", produces = "application/json")
     @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<BearerToken> registerBilkenteer(
             @Valid @RequestBody UserCreationDto bilkenteerCreationInfo
-    ) throws UserAlreadyTakenException {
+    ) throws UserAlreadyTakenException, OTPMismatchException {
+        String otp = otpStrategy.getOTPForEmail(bilkenteerCreationInfo.getEmail());
+        if (authProperties.getRequireOtp()) {
+            if (bilkenteerCreationInfo.getOtp() == null || otp == null) {
+                throw new OTPMismatchException();
+            }
+            if (!otp.equals(bilkenteerCreationInfo.getOtp())) {
+                throw new OTPMismatchException();
+            }
+        }
         return new ResponseEntity<>(
                 bilkenteerService.register(bilkenteerCreationInfo),
                 HttpStatus.OK

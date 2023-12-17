@@ -6,6 +6,7 @@ import com.campusconnect.ui.common.controller.SecureController;
 import com.campusconnect.ui.config.filters.AdminAuthenticationFilter;
 import com.campusconnect.ui.config.filters.JwtAuthenticationFilter;
 import com.campusconnect.ui.config.properties.AdminProperties;
+import com.campusconnect.ui.config.properties.AuthProperties;
 import com.campusconnect.ui.config.properties.RoledJwtProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -29,7 +30,7 @@ import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
-@EnableConfigurationProperties({RoledJwtProperties.class, AdminProperties.class})
+@EnableConfigurationProperties({RoledJwtProperties.class, AdminProperties.class, AuthProperties.class})
 public class SpringSecurityConfig {
 
     // Lists to store URL patterns for different roles
