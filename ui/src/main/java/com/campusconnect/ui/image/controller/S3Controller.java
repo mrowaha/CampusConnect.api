@@ -10,7 +10,9 @@ import com.campusconnect.image.dto.FileResponse;
 import com.campusconnect.image.exceptions.GenericMinIOFailureException;
 import com.campusconnect.image.exceptions.InvalidFileTypeException;
 import com.campusconnect.ui.common.controller.SecureController;
+import com.campusconnect.ui.image.exceptions.UnAuthorizedImageUpload;
 import com.campusconnect.ui.image.service.ProductS3Service;
+import com.campusconnect.ui.market.exceptions.ProductNotFoundException;
 import com.campusconnect.ui.utils.JwtUtilities;
 import com.campusconnect.ui.image.service.ProfileS3Service;
 import com.campusconnect.ui.utils.UserUtilities;
@@ -76,6 +78,7 @@ public class S3Controller extends SecureController {
             @RequestParam Map<String, String> allParams, HttpServletRequest request
     )
         throws UserUtilities.AuthToUserException, GenericMinIOFailureException
+                        , InvalidFileTypeException, ProductNotFoundException, UnAuthorizedImageUpload
     {
         if (!allParams.containsKey("productId")) throw new GenericMinIOFailureException();
         ProductIdDto productIdDto = null;
@@ -90,12 +93,13 @@ public class S3Controller extends SecureController {
         if (request instanceof MultipartHttpServletRequest multiRequest) {
             fileMap = multiRequest.getFileMap();
         }
-        fileMap.forEach((key,  value) -> {
-            System.out.println(key);
-            System.out.println(value);
-        });
-
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(
+                productS3Service.uploadBatch(
+                        fileMap,
+                        user.getEmail(),
+                        productIdDto.getId()
+                )
+        );
     }
 
 
@@ -106,9 +110,8 @@ public class S3Controller extends SecureController {
             @RequestPart(value = "file") MultipartFile imageFile,
             @RequestPart(value = "productId") ProductIdDto productId
     )
-            throws InvalidFileTypeException,
-            UserUtilities.AuthToUserException,
-            GenericMinIOFailureException
+            throws UserUtilities.AuthToUserException, GenericMinIOFailureException
+            , InvalidFileTypeException, ProductNotFoundException, UnAuthorizedImageUpload
     {
         User user = userUtilities.getUserFromAuth(authentication);
         return new ResponseEntity<>(
