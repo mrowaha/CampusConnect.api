@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/bilkenteer")
 public class BilkenteerController extends SecureController {
 
@@ -81,10 +80,6 @@ public class BilkenteerController extends SecureController {
     ) throws UserNotFoundException {
         return ResponseEntity.ok(bilkenteerService.unsuspend(unsuspendRequestDto));
     }
-
-
-    private final BilkenteerService bilkenteerService;
-    private final UserUtilities userUtilities;
 
     @GetMapping(value = "/s")
     @RequiredScope(scope = SecurityScope.BILKENTEER)
