@@ -5,6 +5,7 @@ import com.campusconnect.domain.ProductTag.entity.ProductTag;
 import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.forumPost.entity.ForumPost;
 import com.campusconnect.domain.user.converter.BilkenteerAddressConverter;
+import com.campusconnect.domain.user.converter.BilkenteerPhoneNumbersConverter;
 import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.domain.user.pojo.BilkenteerAddress;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -30,10 +31,9 @@ public class Bilkenteer extends User {
     @Column(name = "is_suspended")
     private Boolean isSuspended = false;
 
-    @ElementCollection(targetClass =  String.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "phone_numbers", joinColumns = @JoinColumn(name = "bilkenteer_id"))
-    @Column(name = "phone_number", nullable = false)
-    private List<String> phoneNumbers = new ArrayList<>();
+    @Column(name = "phone_number", nullable = true)
+    @Convert(converter = BilkenteerPhoneNumbersConverter.class )
+    private ArrayList<String> phoneNumbers = new ArrayList<>();
 
     @Column(name = "address")
     @Convert(converter =  BilkenteerAddressConverter.class)

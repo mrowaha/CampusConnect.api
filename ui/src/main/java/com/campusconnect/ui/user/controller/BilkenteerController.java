@@ -14,6 +14,7 @@ import com.campusconnect.ui.common.controller.SecureController;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
 import com.campusconnect.ui.user.service.BilkenteerService;
 import com.campusconnect.ui.utils.UserUtilities;
+import org.simpleframework.xml.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.campusconnect.ui.productTag.exceptions.TagNotFoundException;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
@@ -50,13 +51,21 @@ public class BilkenteerController extends SecureController {
 
     @PostMapping(value = "/contact", consumes = "application/json")
     @RequiredScope(scope = SecurityScope.BILKENTEER)
-    public ResponseEntity<String> updateContactInfo (
+    public ResponseEntity<?> updateContactInfo (
             Authentication authentication,
             @Valid @RequestBody BilkenteerContactInfoDto contactInfoDto
     ) throws UserUtilities.AuthToUserException {
         User user = userUtilities.getUserFromAuth(authentication);
         bilkenteerService.addContactInfo(user.getUserId(), contactInfoDto);
-        return ResponseEntity.ok("updated your contact info");
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(value = "/contact/{userId}")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<BilkenteerContactInfoDto> getContactInfo(
+            @Valid @PathVariable("userId") UUID userId
+    ) throws UserNotFoundException {
+        return ResponseEntity.ok(bilkenteerService.getContactInfo(userId));
     }
 
     @GetMapping("/all")
@@ -79,13 +88,6 @@ public class BilkenteerController extends SecureController {
         @Valid @RequestBody UserSuspendRequestDto unsuspendRequestDto
     ) throws UserNotFoundException {
         return ResponseEntity.ok(bilkenteerService.unsuspend(unsuspendRequestDto));
-    }
-
-    @GetMapping(value = "/s")
-    @RequiredScope(scope = SecurityScope.BILKENTEER)
-    public ResponseEntity<ProtectedDto> protectedBilkenteerRoute() {
-        System.out.println("in bilkenteer protected");
-        return new ResponseEntity<>(new ProtectedDto("Authorized"), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{hello}")
