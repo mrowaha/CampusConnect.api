@@ -29,11 +29,11 @@ public class ProductTag {
     private ProductTagStatus tagStatus;
 
     // The UUID of the Bilkenteer who requested the tag
-    @Column(name = "requested_by_id", nullable = false)
+    @Column(name = "requested_by_id", nullable = true)
     private UUID requestedByID;
 
     // The UUID of the Moderator who accepted the tag (can be null if not accepted yet)
-    @Column(name = "accepted_by_id")
+    @Column(name = "accepted_by_id", nullable = true)
     private UUID acceptedByID;
 
 //    @Column(nullable = false)

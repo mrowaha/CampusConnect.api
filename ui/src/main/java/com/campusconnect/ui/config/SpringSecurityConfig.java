@@ -34,11 +34,11 @@ import java.util.Map;
 public class SpringSecurityConfig {
 
     // Lists to store URL patterns for different roles
-    private List<String> WHITE_LIST_URLS;
-    private List<String> MODERATOR_URLS;
-    private List<String> BILKENTEER_URLS;
-    private List<String> SHARED_URLS;
-    private List<String> ADMIN_URLS;
+    private List<SecureController.Endpoint> WHITE_LIST_URLS;
+    private List<SecureController.Endpoint> MODERATOR_URLS;
+    private List<SecureController.Endpoint> BILKENTEER_URLS;
+    private List<SecureController.Endpoint> SHARED_URLS;
+    private List<SecureController.Endpoint> ADMIN_URLS;
 
     // List to store controllers with security configurations
     private final List<SecureController> secureControllerList;
@@ -66,15 +66,14 @@ public class SpringSecurityConfig {
         this.WHITE_LIST_URLS = new ArrayList<>();
         this.ADMIN_URLS = new ArrayList<>();
         for (SecureController appController : this.secureControllerList) {
-//            appController.getScopes();
             for (SecureController.Endpoint endpoint : appController.getEndpoints()) {
                 SecurityScope scope = endpoint.getScope();
                 switch (scope) {
-                    case NONE -> this.WHITE_LIST_URLS.add(endpoint.getUrl());
-                    case BILKENTEER -> this.BILKENTEER_URLS.add(endpoint.getUrl());
-                    case MODERATOR -> this.MODERATOR_URLS.add(endpoint.getUrl());
-                    case SHARED -> this.SHARED_URLS.add(endpoint.getUrl());
-                    case ADMIN -> this.ADMIN_URLS.add(endpoint.getUrl());
+                    case NONE -> this.WHITE_LIST_URLS.add(endpoint);
+                    case BILKENTEER -> this.BILKENTEER_URLS.add(endpoint);
+                    case MODERATOR -> this.MODERATOR_URLS.add(endpoint);
+                    case SHARED -> this.SHARED_URLS.add(endpoint);
+                    case ADMIN -> this.ADMIN_URLS.add(endpoint);
                 }
             }
         }

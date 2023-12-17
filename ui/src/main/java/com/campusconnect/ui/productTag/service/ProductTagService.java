@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -24,10 +25,11 @@ public class ProductTagService {
      * Requests a new product tag.
      *
      * @param requestedTag Information about the requested tag.
+     * @param requesterID user id of the requesting entity
      * @return The newly created product tag.
      * @throws TagAlreadyExistsException If the tag with the same name already exists.
      */
-    public ProductTag requestProductTag(ProductTagDto requestedTag) {
+    public ProductTag requestProductTag(ProductTagDto requestedTag, UUID requesterID) throws TagAlreadyExistsException {
         Optional<ProductTag> existingTag = productTagRepository.findByName(requestedTag.getName());
         if (existingTag.isPresent()) {
             throw new TagAlreadyExistsException();
@@ -35,7 +37,7 @@ public class ProductTagService {
         ProductTag productTag = new ProductTag();
         productTag.setName(requestedTag.getName());
         productTag.setTagStatus(ProductTagStatus.REQUESTED);
-        productTag.setRequestedByID(requestedTag.getRequestedByID());
+        productTag.setRequestedByID(requesterID);
         return productTagRepository.save(productTag);
     }
     /**
@@ -83,14 +85,28 @@ public class ProductTagService {
      * @return The approved product tag.
      * @throws TagNotFoundException If the tag with the specified name is not found.
      */
-    public ProductTag approveTag(String tagName) {
+    public ProductTag approveTag(String tagName, UUID approverId) throws TagNotFoundException {
         Optional<ProductTag> optionalProductTag = productTagRepository.findByName(tagName);
         if (optionalProductTag.isPresent()) {
             ProductTag productTag = optionalProductTag.get();
             productTag.setTagStatus(ProductTagStatus.APPROVED);
+            productTag.setAcceptedByID(approverId);
             return productTagRepository.save(productTag);
         } else {
             throw new TagNotFoundException();
         }
     }
+
+    public List<ProductTag> batchUploadTags(List<String> tags, UUID uploadedBy) {
+        List<ProductTag> tagEntites = tags.stream().map((tag) -> {
+            return ProductTag.builder()
+                    .tagStatus(ProductTagStatus.APPROVED)
+                    .acceptedByID(uploadedBy)
+                    .name(tag)
+                    .build();
+        }).collect(Collectors.toList());
+        productTagRepository.saveAll(tagEntites);
+        return tagEntites;
+    }
+
 }

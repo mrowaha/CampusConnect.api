@@ -26,4 +26,5 @@ public interface ProductTagRepository extends JpaRepository<ProductTag, UUID> {
 
     @Query("SELECT t from ProductTag t WHERE t.tagStatus = 'REQUESTED'")
     List<ProductTag> getRequestedTags();
+
 }

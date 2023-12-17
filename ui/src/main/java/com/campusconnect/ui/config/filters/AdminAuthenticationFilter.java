@@ -1,6 +1,7 @@
 package com.campusconnect.ui.config.filters;
 
 import com.campusconnect.domain.security.dto.ApiKeyError;
+import com.campusconnect.ui.common.controller.SecureController;
 import com.campusconnect.ui.config.properties.AdminProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -27,7 +28,7 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
 
     private final AdminProperties adminProperties;
 
-    private final List<String> adminRoutes;
+    private final List<SecureController.Endpoint> adminRoutes;
 
 
     @Autowired
@@ -36,7 +37,7 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
         this.adminProperties = adminProperties;
     }
 
-    public void insertAdminRoutes(List<String> routes) {
+    public void insertAdminRoutes(List<SecureController.Endpoint> routes) {
         this.adminRoutes.addAll(routes);
     }
 
@@ -47,7 +48,8 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         AntPathMatcher pathMatcher = new AntPathMatcher();
         boolean isAdminRoute = adminRoutes.stream().anyMatch(
-                route -> pathMatcher.match(route, request.getServletPath())
+                route -> pathMatcher.match(route.getUrl(), request.getServletPath()) &&
+                        route.getMethod().toString().equals(request.getMethod())
         );
         if (isAdminRoute) {
             String apiKey = request.getHeader(AUTH_TOKEN_HEADER_NAME);

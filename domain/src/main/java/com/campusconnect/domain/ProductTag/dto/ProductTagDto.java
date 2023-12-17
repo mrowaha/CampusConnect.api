@@ -18,8 +18,7 @@ public class ProductTagDto {
     @NotBlank(message = "Tag name cannot be blank")
     @NotNull(message = "Tag name cannot be null")
     private String name;
-
     private ProductTagStatus tagStatus;
-    private UUID requestedByID;
-    private UUID acceptedByID;
+//    private UUID requestedByID;
+//    private UUID acceptedByID;
 }
