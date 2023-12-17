@@ -20,8 +20,7 @@ import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -31,6 +30,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 @Slf4j
@@ -86,7 +87,6 @@ public class ProductS3Service {
             FileResponse response = minioService.putProductPicture(fileList.get(i), objectName);
             fileResponses.add(response);
         }
-        System.out.println(oldImages);
         product.setImages(oldImages);
         productRepository.save(product);
         return fileResponses;
@@ -101,7 +101,7 @@ public class ProductS3Service {
             throw new UnAuthorizedImageUpload();
         }
 
-        String base = email + "-" + productId;
+        String base = productId.toString();
         final MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("SHA-256");
@@ -133,6 +133,60 @@ public class ProductS3Service {
         FileResponse response = minioService.putProductPicture(imageFile, objectName);
         productRepository.save(product);
         return response;
+    }
+
+    public void get(HttpServletResponse response, UUID productId)
+            throws GenericMinIOFailureException, IOException
+    {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(ProductNotFoundException::new);
+
+        String base = product.toString();
+        final MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new GenericMinIOFailureException();
+        }
+        final byte[] hash = digest.digest(base.getBytes(StandardCharsets.UTF_8));
+        final StringBuilder hexString = new StringBuilder();
+        for (byte b : hash) {
+            final String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1)
+                hexString.append('0');
+            hexString.append(hex);
+        }
+        String saltedName =  hexString.toString();
+
+        File zipFile = File.createTempFile("files", ".zip");
+        try (FileOutputStream fos = new FileOutputStream(zipFile);
+             ZipOutputStream zos = new ZipOutputStream(fos)) {
+            List<String> fileNames = product.getImages();
+            for (String fileName : fileNames) {
+                InputStream in = null;
+                try {
+                    String objectName = saltedName + fileName + ".jpg";
+                    in = minioService.getProfilePicture(objectName);
+                    ZipEntry zipEntry = new ZipEntry(objectName);
+                    zos.putNextEntry(zipEntry);
+                    IOUtils.copy(in, zos);
+
+                } catch (Exception e) {
+                    throw new GenericMinIOFailureException();
+                } finally {
+                    if (in != null) in.close();
+                }
+            }
+
+            response.setContentType("application/zip");
+            response.setHeader("Content-Disposition", "attachment;filename=files.zip");
+            try (InputStream zipInputStream = new FileInputStream(zipFile)) {
+                IOUtils.copy(zipInputStream, response.getOutputStream());
+            }
+        } finally {
+            // Delete the temporary zip file
+            zipFile.delete();
+        }
     }
 
 

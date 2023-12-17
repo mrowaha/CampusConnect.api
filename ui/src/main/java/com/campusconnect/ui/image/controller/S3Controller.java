@@ -133,4 +133,14 @@ public class S3Controller extends SecureController {
                 (response, userid, role);
     }
 
+    @GetMapping(value = "/product-pictures/{id}")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public void getProductPictures(
+            HttpServletResponse response,
+            @PathVariable("id") UUID id
+    ) throws IOException {
+        this.productS3Service.get
+                (response, id);
+    }
+
 }

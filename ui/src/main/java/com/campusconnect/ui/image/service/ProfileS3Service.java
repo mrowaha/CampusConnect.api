@@ -166,7 +166,6 @@ public class ProfileS3Service {
             response.setHeader("Content-Disposition", "attachment;filename="
                     + URLEncoder.encode(profilePictureName, StandardCharsets.UTF_8));
             response.setCharacterEncoding("UTF-8");
-            // Remove bytes from InputStream Copied to the OutputStream .
             IOUtils.copy(in, response.getOutputStream());
         } catch (Exception e) {
             throw new GenericMinIOFailureException();
@@ -174,4 +173,5 @@ public class ProfileS3Service {
             if (in != null) in.close();
         }
     }
+
 }
