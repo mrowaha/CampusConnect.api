@@ -73,7 +73,9 @@ public class ProductS3Service {
         for (int i = 0 ; i < files.size(); i++) {
             String fileType = null;
             try {
+                log.info("file type");
                 fileType = imageTypeUtils.getImageType(fileList.get(i));
+                log.info("file type is {}", fileType);
             } catch (IOException e) {
                 throw new GenericMinIOFailureException();
             }
@@ -81,7 +83,7 @@ public class ProductS3Service {
             String objectName = saltedName + random + fileType.substring(fileType.lastIndexOf("/")).replaceAll("/", ".");
             log.info("Object Name {}", objectName);
             oldImages.add(random);
-            FileResponse response = minioService.putProductPicture(files.get(i), objectName);
+            FileResponse response = minioService.putProductPicture(fileList.get(i), objectName);
             fileResponses.add(response);
         }
         System.out.println(oldImages);
