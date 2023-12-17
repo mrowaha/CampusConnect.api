@@ -21,10 +21,7 @@ import com.campusconnect.ui.market.exceptions.ProductNotFoundException;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -220,8 +217,8 @@ public class ProductService {
             predicates.add(cb.or(namePredicate, descriptionPredicate));
         }
 
-        //Tags must be present
         if (productSearchDto.getTags() != null && !productSearchDto.getTags().isEmpty()) {
+            // Join the product with its tags and check if any of the tags in the request are present in the product
             predicates.add(product.join("tags").in(productSearchDto.getTags()));
         }
 

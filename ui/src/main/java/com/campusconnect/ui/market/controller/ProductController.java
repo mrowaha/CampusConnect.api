@@ -75,7 +75,7 @@ public class ProductController {
         return ResponseEntity.ok(null);
     }
 
-    @GetMapping("/search")
+    @PostMapping("/search")
     @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<List<Product>> searchProduct(@RequestBody ProductSearchDto productSearchDto) {
         return ResponseEntity.ok(productService.searchProduct(productSearchDto));
