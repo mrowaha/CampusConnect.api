@@ -47,10 +47,21 @@ public class SecureController {
                 RequestMethod method = mappingInfo.getMethodsCondition().getMethods()
                         .stream().findFirst()
                         .orElseThrow(RuntimeException::new);
-                System.out.println((mappingInfo.getDirectPaths()));
-                String path = mappingInfo.getDirectPaths()
-                        .stream().findFirst()
-                        .orElseThrow(RuntimeException::new);
+                String atIndexFirst = mappingInfo.toString().split(",")[0];
+                if (atIndexFirst == null) {
+                    throw  new RuntimeException("failed to extract mapping information");
+                }
+                String path = atIndexFirst.split(" ")[1];
+                if (path == null) {
+                    throw new RuntimeException("failed to extract path from mapping information");
+                }
+                int cutBy = Character.compare(path.charAt(path.length()-1), '}');
+                if (cutBy == 0) {
+                    path = path.substring(1, path.length()-2);
+                } else {
+                    path = path.substring(1, path.length()-1);
+                }
+                System.out.println(path);
                 if (handlerMethod.hasMethodAnnotation(RequiredScope.class)) {
                     SecurityScope scope = Objects.requireNonNull(handlerMethod.getMethodAnnotation(RequiredScope.class)).scope();
                     this.addEndpoint(SecurityUtilities.mapRequestMethodToHttpMethod(method), path, scope);
@@ -60,6 +71,7 @@ public class SecureController {
             }
         }
     }
+
 
 
     @ToString

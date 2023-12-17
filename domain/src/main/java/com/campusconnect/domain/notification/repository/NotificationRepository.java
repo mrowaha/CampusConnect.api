@@ -12,4 +12,6 @@ import java.util.UUID;
 public interface NotificationRepository extends ListCrudRepository<Notification, UUID> {
 
     Optional<List<Notification>> findAllByUserUserId(UUID id);
+
+    Integer countNotificationBySeenAndUserUserId(boolean seen, UUID userId);
 }

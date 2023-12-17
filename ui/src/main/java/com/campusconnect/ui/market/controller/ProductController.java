@@ -1,5 +1,6 @@
 package com.campusconnect.ui.market.controller;
 
+import com.campusconnect.domain.forumPost.entity.ForumPost;
 import com.campusconnect.domain.product.dto.ProductDto;
 import com.campusconnect.domain.product.dto.ProductSearchDto;
 import com.campusconnect.domain.product.entity.Product;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.Authenticator;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,6 +42,12 @@ public class ProductController {
     public ResponseEntity<List<Bid>> getProductBids(@PathVariable UUID productId) {
         List<Bid> productBids = productService.getProductBids(productId);
         return ResponseEntity.ok(productBids);
+    }
+
+    @GetMapping("/")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<Product> fetchProductById(@RequestParam("productId") UUID productId){
+        return ResponseEntity.ok(productService.fetchProductById(productId));
     }
 
     @GetMapping("/user/{userId}")

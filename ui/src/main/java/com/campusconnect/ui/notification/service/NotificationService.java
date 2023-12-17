@@ -85,6 +85,9 @@ public class NotificationService {
         return notificationRepository.findAllByUserUserId(userId).orElse(null);
     }
 
+    public Integer getUserUnreadNotificationCount(UUID userId){
+        return notificationRepository.countNotificationBySeenAndUserUserId(false, userId);
+    }
 
 
     public void deleteNotification(UUID notificationId){

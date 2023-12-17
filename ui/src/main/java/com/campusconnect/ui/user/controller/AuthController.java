@@ -62,18 +62,6 @@ public class AuthController extends SecureController {
         );
     }
 
-
-    @PostMapping(value = "/moderator/register", consumes = "application/json", produces = "application/json")
-    @RequiredScope(scope = SecurityScope.ADMIN)
-    public ResponseEntity<BearerToken> registerModerator(
-            @RequestHeader("x-api-key") String apikey,
-            @Valid @RequestBody UserCreationDto moderatorCreationInfo
-    ) throws UserAlreadyTakenException {
-        return new ResponseEntity<>(
-                moderatorService.register(moderatorCreationInfo),
-                HttpStatus.OK);
-    }
-
     @PostMapping(value = "/moderator/login", consumes = "application/json", produces = "application/json")
     @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<ModeratorLoginResponseDto> loginModerator(

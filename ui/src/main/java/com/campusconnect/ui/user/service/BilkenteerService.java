@@ -1,9 +1,11 @@
 package com.campusconnect.ui.user.service;
 
+import com.campusconnect.domain.admin.dto.UserSuspendRequestDto;
+import com.campusconnect.domain.admin.dto.UserSuspendResponseDto;
 import com.campusconnect.domain.ProductTag.entity.ProductTag;
 import com.campusconnect.domain.ProductTag.repository.ProductTagRepository;
 import com.campusconnect.domain.security.dto.BearerToken;
-import com.campusconnect.domain.user.dto.BilkenteerLoginResponse;
+import com.campusconnect.domain.user.dto.*;
 import com.campusconnect.domain.user.entity.User;
 import com.campusconnect.domain.user.repository.ModeratorRepository;
 import com.campusconnect.ui.productTag.exceptions.TagNotFoundException;
@@ -11,8 +13,6 @@ import com.campusconnect.ui.utils.JwtUtilities;
 import com.campusconnect.ui.user.exceptions.InvalidPasswordException;
 import com.campusconnect.ui.user.exceptions.UserAlreadyTakenException;
 import com.campusconnect.ui.user.exceptions.UserNotFoundException;
-import com.campusconnect.domain.user.dto.UserCreationDto;
-import com.campusconnect.domain.user.dto.UserLoginRequestDto;
 import com.campusconnect.domain.user.entity.Bilkenteer;
 import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.domain.user.repository.BilkenteerRepository;
@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -46,6 +47,47 @@ public class BilkenteerService implements UserService {
         return bilkenteerRepository.findByEmail(email).orElseThrow(() ->
                 new UsernameNotFoundException("User not found"));
     }
+
+    @Override
+    public List<UserInfoDto> listAll() {
+        List<Bilkenteer> bilkenteers = bilkenteerRepository.findAll();
+        return bilkenteers.stream()
+                .map(bilkenteer -> UserInfoDto.builder()
+                        .uuid(bilkenteer.getUserId())
+                        .email(bilkenteer.getEmail())
+                        .lastName(bilkenteer.getLastName())
+                        .firstName(bilkenteer.getFirstName())
+                        .role(bilkenteer.getRole())
+                        .isActive(!bilkenteer.getIsSuspended())
+                        .build()
+                )
+                .toList();
+    }
+
+    @Override
+    public UserSuspendResponseDto suspend(UserSuspendRequestDto suspendRequestDto) throws UserNotFoundException {
+        bilkenteerRepository.findById(suspendRequestDto.getUuid())
+                .orElseThrow(UserNotFoundException::new);
+        bilkenteerRepository.disable(suspendRequestDto.getUuid());
+        return UserSuspendResponseDto.builder()
+                .uuid(suspendRequestDto.getUuid())
+                .successStatus(true)
+                .message(String.format("Bilkenteer %s suspended", suspendRequestDto.getUuid().toString()))
+                .build();
+    }
+
+    @Override
+    public UserSuspendResponseDto unsuspend(UserSuspendRequestDto suspendRequestDto) throws UserNotFoundException {
+        bilkenteerRepository.findById(suspendRequestDto.getUuid())
+                .orElseThrow(UserNotFoundException::new);
+        bilkenteerRepository.enable(suspendRequestDto.getUuid());
+        return UserSuspendResponseDto.builder()
+                .uuid(suspendRequestDto.getUuid())
+                .successStatus(true)
+                .message(String.format("Bilkenteer %s activated", suspendRequestDto.getUuid().toString()))
+                .build();
+    }
+
     public BearerToken register(UserCreationDto creationDto) throws UserAlreadyTakenException {
         if(bilkenteerRepository.existsByEmail(creationDto.getEmail())) {
             throw new UserAlreadyTakenException();
@@ -98,6 +140,13 @@ public class BilkenteerService implements UserService {
                 .trustScore(bilkenteer.getTrustScore())
                 .token(bearerToken)
                 .build();
+    }
+
+    public void addContactInfo(UUID userid, BilkenteerContactInfoDto contactInfoDto) {
+        bilkenteerRepository.updateAddressBy(
+                userid,
+                contactInfoDto.getAddress()
+        );
     }
 
     public User findUser(UUID userId) {

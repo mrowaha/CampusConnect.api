@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,6 +17,16 @@ public interface ModeratorRepository extends ListCrudRepository<Moderator, UUID>
 
     Boolean existsByEmail(String email);
     Optional<Moderator> findByEmail(String email);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Moderator SET isActive = false WHERE userId = :uuid")
+    void disable(UUID uuid);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Moderator SET isActive = true WHERE userId = :uuid")
+    void enable(UUID uuid);
 
     @Modifying
     @Transactional

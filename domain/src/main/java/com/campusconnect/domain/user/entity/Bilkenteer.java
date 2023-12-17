@@ -1,13 +1,14 @@
 package com.campusconnect.domain.user.entity;
 
+import com.campusconnect.domain.comment.entity.Comment;
 import com.campusconnect.domain.ProductTag.entity.ProductTag;
 import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.forumPost.entity.ForumPost;
-import com.campusconnect.domain.messageThread.entity.MessageThread;
+import com.campusconnect.domain.user.converter.BilkenteerAddressConverter;
 import com.campusconnect.domain.user.enums.Role;
+import com.campusconnect.domain.user.pojo.BilkenteerAddress;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -34,9 +35,8 @@ public class Bilkenteer extends User {
     @Column(name = "phone_number", nullable = false)
     private List<String> phoneNumbers = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id", referencedColumnName = "id")
-    @Nullable
+    @Column(name = "address")
+    @Convert(converter =  BilkenteerAddressConverter.class)
     private BilkenteerAddress address;
 
     @OneToMany(mappedBy = "seller", fetch = FetchType.EAGER)
