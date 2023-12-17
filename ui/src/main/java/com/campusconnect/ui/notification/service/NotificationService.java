@@ -94,6 +94,14 @@ public class NotificationService {
      * @return List of notifications for the user.
      */
     public List<Notification> getUserNotificationList(UUID userId){
+
+        List<Notification> notifications = notificationRepository.findAllByUserUserId(userId).orElse(null);
+
+        for (Notification notification : notifications) {
+            notification.setSeen(true);
+            notificationRepository.save(notification);
+        }
+
         return notificationRepository.findAllByUserUserId(userId).orElse(null);
     }
 

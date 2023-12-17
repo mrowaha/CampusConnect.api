@@ -78,6 +78,7 @@ public abstract class User{
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
+    @OrderBy("createdAt")
     private Set<Notification> notifications = new HashSet();
 
 //    @Transient
