@@ -2,6 +2,7 @@ package com.campusconnect.domain.user.repository;
 
 import com.campusconnect.domain.user.entity.Bilkenteer;
 import com.campusconnect.domain.user.pojo.BilkenteerAddress;
+import com.campusconnect.domain.user.pojo.BilkenteerPhoneNumbers;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -24,8 +25,8 @@ public interface BilkenteerRepository extends ListCrudRepository<Bilkenteer, UUI
 
     @Modifying
     @Transactional
-    @Query("UPDATE Bilkenteer SET address = :address WHERE userId = :id")
-    void updateAddressBy(UUID id, BilkenteerAddress address);
+    @Query("UPDATE Bilkenteer SET address = :address, phoneNumbers = :phoneNumbers WHERE userId = :id")
+    void updateAddressBy(UUID id, BilkenteerAddress address, List<String> phoneNumbers);
 
     @Modifying
     @Transactional

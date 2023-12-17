@@ -7,6 +7,7 @@ import com.campusconnect.domain.ProductTag.repository.ProductTagRepository;
 import com.campusconnect.domain.security.dto.BearerToken;
 import com.campusconnect.domain.user.dto.*;
 import com.campusconnect.domain.user.entity.User;
+import com.campusconnect.domain.user.pojo.BilkenteerPhoneNumbers;
 import com.campusconnect.domain.user.repository.ModeratorRepository;
 import com.campusconnect.ui.productTag.exceptions.TagNotFoundException;
 import com.campusconnect.ui.utils.JwtUtilities;
@@ -145,8 +146,18 @@ public class BilkenteerService implements UserService {
     public void addContactInfo(UUID userid, BilkenteerContactInfoDto contactInfoDto) {
         bilkenteerRepository.updateAddressBy(
                 userid,
-                contactInfoDto.getAddress()
+                contactInfoDto.getAddress(),
+                contactInfoDto.getPhoneNumbers()
         );
+    }
+
+    public BilkenteerContactInfoDto getContactInfo(UUID userId) {
+        Bilkenteer bilkenteer = bilkenteerRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+        return BilkenteerContactInfoDto.builder()
+                .phoneNumbers(bilkenteer.getPhoneNumbers())
+                .address(bilkenteer.getAddress())
+                .build();
     }
 
     public User findUser(UUID userId) {
@@ -165,7 +176,7 @@ public class BilkenteerService implements UserService {
                 .orElseThrow(UserNotFoundException::new);
 
         ProductTag tag = productTagRepository.findByName(tagName)
-                .orElseThrow(() -> new TagNotFoundException());
+                .orElseThrow(TagNotFoundException::new);
 
         bilkenteer.getSubscribedTags().add(tag);
         bilkenteerRepository.save(bilkenteer);
@@ -178,7 +189,7 @@ public class BilkenteerService implements UserService {
                 .orElseThrow(UserNotFoundException::new);
 
         ProductTag tag = productTagRepository.findByName(tagName)
-                .orElseThrow(() -> new TagNotFoundException());
+                .orElseThrow(TagNotFoundException::new);
 
         bilkenteer.getSubscribedTags().remove(tag);
         bilkenteerRepository.save(bilkenteer);
