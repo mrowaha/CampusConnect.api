@@ -1,2 +1,4 @@
-package com.campusconnect.ui.image.exceptions;public class UnAuthorizedImageUpload {
+package com.campusconnect.ui.image.exceptions;
+
+public class UnAuthorizedImageUpload extends RuntimeException{
 }

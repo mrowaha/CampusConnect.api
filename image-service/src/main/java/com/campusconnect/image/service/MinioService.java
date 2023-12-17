@@ -15,4 +15,11 @@ public interface MinioService {
 
     // Download file from bucket
     InputStream getProfilePicture(String objectName) throws GenericMinIOFailureException, InvalidFileTypeException;
+
+
+    FileResponse putProductPicture(MultipartFile multipartFile, String objectName) throws GenericMinIOFailureException, InvalidFileTypeException;
+
+
+    // Download file from bucket
+    InputStream getProductPicture(String objectName) throws GenericMinIOFailureException, InvalidFileTypeException;
 }

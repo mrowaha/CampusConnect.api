@@ -1,5 +1,6 @@
 package com.campusconnect.domain.product.entity;
 
+import com.campusconnect.domain.common.converter.ArrayListToJsonConverter;
 import com.campusconnect.domain.messageThread.entity.MessageThread;
 import com.campusconnect.domain.product.enums.ProductType;
 import com.campusconnect.domain.product.enums.ProductStatus;
@@ -94,6 +95,10 @@ public class Product {
     @CollectionTable(name = "product_tags_table", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "tags")
     protected Set<String> tags = new HashSet<>();
+
+    @Column(name = "images", nullable = true)
+    @Convert(converter = ArrayListToJsonConverter.class )
+    private ArrayList<String> images = new ArrayList<>();
 
     //public void addImage()
     //public void removeImage()
