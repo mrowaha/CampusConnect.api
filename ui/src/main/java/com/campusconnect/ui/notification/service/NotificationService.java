@@ -2,6 +2,7 @@ package com.campusconnect.ui.notification.service;
 
 import com.campusconnect.domain.notification.dto.NotificationDto;
 import com.campusconnect.domain.notification.entity.Notification;
+import com.campusconnect.domain.notification.enums.NotificationType;
 import com.campusconnect.domain.notification.repository.NotificationRepository;
 import com.campusconnect.domain.user.entity.User;
 import com.campusconnect.email.EmailSenderService;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 
 @Service
@@ -47,38 +49,33 @@ public class NotificationService {
 
         if (user.getEnableEmailNotification()){
 
-            String subject = "CampusConnect: ";
+            String subject = "CampusConnect: " + getSubjectByType(notificationDto.getType());
 
-            // Different subjects according to notification type
-            switch (notificationDto.getType()) {
-                case PRODUCT:
-                    subject += "Notification about Product Posting";
-                    break;
-                case FORUMPOST:
-                    subject += "Update on your Forum Post";
-                    break;
-                case INBOX:
-                    subject += "You have received a new Message";
-                    break;
-                case REPORT:
-                    subject += "Update on your Report";
-                    break;
-                case TAG:
-                    subject += "Tag Notification";
-                    break;
-                case BID:
-                    subject += "Update on your Bid";
-                    break;
-                default:
-                    subject += "New Notification";
-                    break;
-            }
-
-            emailSenderService.sendNotificationEmail(user.getFirstName(), user.getEmail(), subject, notificationDto.getContent());
-
+            CompletableFuture.runAsync(() -> {
+                emailSenderService.sendNotificationEmail(user.getFirstName(), user.getEmail(), subject, notificationDto.getContent());
+            });
         }
 
         return notification;
+    }
+
+    private String getSubjectByType(NotificationType type) {
+        switch (type) {
+            case PRODUCT:
+                return "Notification about Product Posting";
+            case FORUMPOST:
+                return "Update on your Forum Post";
+            case INBOX:
+                return "You have received a new Message";
+            case REPORT:
+                return "Update on your Report";
+            case TAG:
+                return "Tag Notification";
+            case BID:
+                return "Update on your Bid";
+            default:
+                return "New Notification";
+        }
     }
 
     public List<Notification> getUserNotificationList(UUID userId){
