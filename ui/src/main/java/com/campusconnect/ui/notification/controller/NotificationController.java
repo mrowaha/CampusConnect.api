@@ -26,6 +26,12 @@ public class NotificationController extends SecureController {
         return ResponseEntity.ok(notificationService.getUserNotificationList(userId));
     }
 
+    @GetMapping("/count/")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<Integer> getUserUnreadNotificationCount(@RequestParam("userId") UUID userId){
+        return ResponseEntity.ok(notificationService.getUserUnreadNotificationCount(userId));
+    }
+
     @DeleteMapping("/")
     @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<Notification> deleteNotification(@RequestParam("notificationId") UUID notificationId){

@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.Authenticator;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +25,7 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping()
-    @RequiredScope(scope = SecurityScope.NONE)
+    @RequiredScope(scope = SecurityScope.BILKENTEER)
     public ResponseEntity<?> saveProduct(@Valid @RequestBody ProductDto productCreationInfo) {
         return ResponseEntity.ok(productService.saveProduct(productCreationInfo));
     }
