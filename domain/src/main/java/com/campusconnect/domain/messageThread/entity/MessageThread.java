@@ -26,12 +26,10 @@ public class MessageThread{
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "initiating_user_id", nullable = false)
-//    @JsonBackReference(value = "initiating_user_id")
     private User initiatingUser;
 
     @ManyToOne()
     @JoinColumn(name = "receiving_user_id", nullable = false)
-//    @JsonBackReference(value = "receiving_user_id")
     private User receivingUser;
 
     @OneToMany(mappedBy = "messageThread", cascade = CascadeType.ALL)
