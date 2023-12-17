@@ -51,22 +51,7 @@ public class ProductS3Service {
             throw new UnAuthorizedImageUpload();
         }
 
-        String base = productId.toString();
-        final MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new GenericMinIOFailureException();
-        }
-        final byte[] hash = digest.digest(base.getBytes(StandardCharsets.UTF_8));
-        final StringBuilder hexString = new StringBuilder();
-        for (byte b : hash) {
-            final String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1)
-                hexString.append('0');
-            hexString.append(hex);
-        }
-        String saltedName =  hexString.toString();
+        String saltedName =  productId.toString().replaceAll("-", "");
         List<FileResponse> fileResponses = new ArrayList<>();
         ArrayList<String> oldImages = new ArrayList<>(product.getImages());
 
@@ -81,9 +66,10 @@ public class ProductS3Service {
                 throw new GenericMinIOFailureException();
             }
             String random = OTPStrategy.generateRandomString(3);
-            String objectName = saltedName + random + fileType.substring(fileType.lastIndexOf("/")).replaceAll("/", ".");
+            String fileTypeSuffix = fileType.substring(fileType.lastIndexOf("/")).replaceAll("/", ".");
+            String objectName = saltedName + random + fileTypeSuffix;
             log.info("Object Name {}", objectName);
-            oldImages.add(random);
+            oldImages.add(random+fileTypeSuffix);
             FileResponse response = minioService.putProductPicture(fileList.get(i), objectName);
             fileResponses.add(response);
         }
@@ -101,23 +87,7 @@ public class ProductS3Service {
             throw new UnAuthorizedImageUpload();
         }
 
-        String base = productId.toString();
-        final MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new GenericMinIOFailureException();
-        }
-        final byte[] hash = digest.digest(base.getBytes(StandardCharsets.UTF_8));
-        final StringBuilder hexString = new StringBuilder();
-        for (byte b : hash) {
-            final String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1)
-                hexString.append('0');
-            hexString.append(hex);
-        }
-        String saltedName =  hexString.toString();
-
+        String saltedName =  productId.toString().replaceAll("-", "");
         log.info("Salted Name for email {} and product {} is {}", email, productId, saltedName);
         String fileType = null;
         try {
@@ -126,9 +96,10 @@ public class ProductS3Service {
             throw new GenericMinIOFailureException();
         }
         String random = OTPStrategy.generateRandomString(3);
-        String objectName = saltedName + random + fileType.substring(fileType.lastIndexOf("/")).replaceAll("/", ".");
+        String fileTypeSuffix = fileType.substring(fileType.lastIndexOf("/")).replaceAll("/", ".");
+        String objectName = saltedName + random + fileTypeSuffix;
         log.info("Object Name {}", objectName);
-        product.getImages().add(random);
+        product.getImages().add(random+fileTypeSuffix);
 
         FileResponse response = minioService.putProductPicture(imageFile, objectName);
         productRepository.save(product);
@@ -141,23 +112,7 @@ public class ProductS3Service {
         Product product = productRepository.findById(productId)
                 .orElseThrow(ProductNotFoundException::new);
 
-        String base = product.toString();
-        final MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new GenericMinIOFailureException();
-        }
-        final byte[] hash = digest.digest(base.getBytes(StandardCharsets.UTF_8));
-        final StringBuilder hexString = new StringBuilder();
-        for (byte b : hash) {
-            final String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1)
-                hexString.append('0');
-            hexString.append(hex);
-        }
-        String saltedName =  hexString.toString();
-
+        String saltedName =  productId.toString().replaceAll("-", "");
         File zipFile = File.createTempFile("files", ".zip");
         try (FileOutputStream fos = new FileOutputStream(zipFile);
              ZipOutputStream zos = new ZipOutputStream(fos)) {
@@ -165,8 +120,9 @@ public class ProductS3Service {
             for (String fileName : fileNames) {
                 InputStream in = null;
                 try {
-                    String objectName = saltedName + fileName + ".jpg";
-                    in = minioService.getProfilePicture(objectName);
+                    String objectName = saltedName + fileName;
+                    log.info("fetch object {}", objectName);
+                    in = minioService.getProductPicture(objectName);
                     ZipEntry zipEntry = new ZipEntry(objectName);
                     zos.putNextEntry(zipEntry);
                     IOUtils.copy(in, zos);
