@@ -63,9 +63,13 @@ public class ProductService {
         Set<String> tags = new HashSet<>(productCreationInfo.getTagNames());
 
         List<ProductTag> acceptedTags = productTagRepository.findAll();
-        if (!tags.stream().allMatch(tag -> acceptedTags.stream().anyMatch(acceptedTag -> acceptedTag.getName().equals(tag)))) {
-            return new ResponseEntity<>("Invalid tags. Some tags are not accepted.", HttpStatus.BAD_REQUEST);
-        }
+        Set<String> acceptedTagNames = acceptedTags.stream()
+                .map(ProductTag::getName)
+                .collect(Collectors.toSet());
+
+        Set<String> validTags = tags.stream()
+                .filter(acceptedTagNames::contains)
+                .collect(Collectors.toSet());
 
         Product product = Product.builder()
                 .seller(bilkenteer)
@@ -78,7 +82,8 @@ public class ProductService {
                 .status(ProductStatus.AVAILABLE)
                 .wishListedBy(new HashSet<UUID>())
                 .bids(new ArrayList<Bid>())
-                .tags(acceptedTags.stream().map(ProductTag::getName).collect(Collectors.toSet())).build();
+                .tags(validTags)
+                .build();
 
         productRepository.save(product);
         bilkenteer.getProducts().add(product);
