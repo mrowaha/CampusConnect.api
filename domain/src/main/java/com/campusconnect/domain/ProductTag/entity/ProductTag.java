@@ -23,13 +23,16 @@ public class ProductTag {
     @Column(name = "tag_name", nullable = false)
     private String name;
 
+    // The status of the product tag (e.g., REQUESTED, APPROVED, DISABLED)
     @Enumerated(EnumType.STRING)
     @Column(name = "tag_status", nullable = false)
     private ProductTagStatus tagStatus;
 
+    // The UUID of the Bilkenteer who requested the tag
     @Column(name = "requested_by_id", nullable = false)
     private UUID requestedByID;
 
+    // The UUID of the Moderator who accepted the tag (can be null if not accepted yet)
     @Column(name = "accepted_by_id")
     private UUID acceptedByID;
 

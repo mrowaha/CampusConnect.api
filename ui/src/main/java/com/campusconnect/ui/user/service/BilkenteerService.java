@@ -37,18 +37,21 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BilkenteerService implements UserService {
 
+    // Repositories and utilities for database and authentication operations
     private final BilkenteerRepository bilkenteerRepository;
     private final PasswordEncoder passwordEncoder;
     private final ModeratorRepository moderatorRepository;
     private final ProductTagRepository productTagRepository;
     private final JwtUtilities jwtUtilities;
 
+    // Implementation of UserService method to load a user by username (email)
     @Override
     public User loadUserByUsername(String email) throws UsernameNotFoundException {
         return bilkenteerRepository.findByEmail(email).orElseThrow(() ->
                 new UsernameNotFoundException("User not found"));
     }
 
+    // Implementation of UserService method to list all Bilkenteer users
     @Override
     public List<UserInfoDto> listAll() {
         List<Bilkenteer> bilkenteers = bilkenteerRepository.findAll();
@@ -65,6 +68,7 @@ public class BilkenteerService implements UserService {
                 .toList();
     }
 
+    // Implementation of UserService method to suspend a Bilkenteer user
     @Override
     public UserSuspendResponseDto suspend(UserSuspendRequestDto suspendRequestDto) throws UserNotFoundException {
         bilkenteerRepository.findById(suspendRequestDto.getUuid())
@@ -77,6 +81,7 @@ public class BilkenteerService implements UserService {
                 .build();
     }
 
+    // Implementation of UserService method to unsuspend a Bilkenteer user
     @Override
     public UserSuspendResponseDto unsuspend(UserSuspendRequestDto suspendRequestDto) throws UserNotFoundException {
         bilkenteerRepository.findById(suspendRequestDto.getUuid())
@@ -89,6 +94,13 @@ public class BilkenteerService implements UserService {
                 .build();
     }
 
+    /**
+     * Registers a new Bilkenteer user.
+     *
+     * @param creationDto Information about the user to be created.
+     * @return BearerToken containing the authentication token for the registered user.
+     * @throws UserAlreadyTakenException If the user with the same email already exists.
+     */
     public BearerToken register(UserCreationDto creationDto) throws UserAlreadyTakenException {
         if(bilkenteerRepository.existsByEmail(creationDto.getEmail())) {
             throw new UserAlreadyTakenException();
@@ -114,6 +126,15 @@ public class BilkenteerService implements UserService {
         }
     }
 
+    /**
+     * Authenticates a Bilkenteer user based on login credentials.
+     *
+     * @param loginDto Information about the user's login credentials.
+     * @return BilkenteerLoginResponse containing user information and authentication token.
+     * @throws UserNotFoundException    If the user with the specified email is not found.
+     * @throws InvalidPasswordException If the provided password is invalid.
+     * @throws UserSuspendedException   If the user is suspended.
+     */
     public BilkenteerLoginResponse authenticate(UserLoginRequestDto loginDto)
             throws UserNotFoundException,InvalidPasswordException, UserSuspendedException
     {
@@ -142,7 +163,12 @@ public class BilkenteerService implements UserService {
                 .token(bearerToken)
                 .build();
     }
-
+    /**
+     * Adds contact information to a Bilkenteer user profile.
+     *
+     * @param userid          ID of the Bilkenteer user.
+     * @param contactInfoDto  Information about the contact details to be added.
+     */
     public void addContactInfo(UUID userid, BilkenteerContactInfoDto contactInfoDto) {
         bilkenteerRepository.updateAddressBy(
                 userid,
@@ -151,6 +177,12 @@ public class BilkenteerService implements UserService {
         );
     }
 
+    /**
+     * Retrieves contact information of a Bilkenteer user.
+     *
+     * @param userId ID of the Bilkenteer user.
+     * @return BilkenteerContactInfoDto containing contact information.
+     */
     public BilkenteerContactInfoDto getContactInfo(UUID userId) {
         Bilkenteer bilkenteer = bilkenteerRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
@@ -160,6 +192,12 @@ public class BilkenteerService implements UserService {
                 .build();
     }
 
+    /**
+     * Finds a user by ID, searching in both Bilkenteer and Moderator repositories.
+     *
+     * @param userId ID of the user to find.
+     * @return Found user or null if not found.
+     */
     public User findUser(UUID userId) {
 
         User user = moderatorRepository.findById(userId).orElse(null);
@@ -171,6 +209,13 @@ public class BilkenteerService implements UserService {
         return user;
     }
 
+    /**
+     * Subscribes a Bilkenteer user to a product tag.
+     *
+     * @param bilkenteerId ID of the Bilkenteer user.
+     * @param tagName       Name of the product tag to subscribe to.
+     * @return Updated Bilkenteer user with the subscribed tag.
+     */
     public Bilkenteer subscribeToTag(UUID bilkenteerId, String tagName) {
         Bilkenteer bilkenteer = bilkenteerRepository.findById(bilkenteerId)
                 .orElseThrow(UserNotFoundException::new);
@@ -184,6 +229,13 @@ public class BilkenteerService implements UserService {
         return bilkenteer;
     }
 
+    /**
+     * Unsubscribes a Bilkenteer user from a product tag.
+     *
+     * @param bilkenteerId ID of the Bilkenteer user.
+     * @param tagName       Name of the product tag to unsubscribe from.
+     * @return Updated Bilkenteer user without the unsubscribed tag.
+     */
     public Bilkenteer unsubscribeFromTag(UUID bilkenteerId, String tagName) {
         Bilkenteer bilkenteer = bilkenteerRepository.findById(bilkenteerId)
                 .orElseThrow(UserNotFoundException::new);

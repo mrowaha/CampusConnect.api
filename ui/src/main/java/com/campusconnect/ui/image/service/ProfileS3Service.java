@@ -30,19 +30,42 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProfileS3Service {
 
+    // Repositories and services for database and S3 operations
     private final BilkenteerRepository bilkenteerRepository;
     private final ModeratorRepository moderatorRepository;
     private final MinioService minioService;
     private final ImageTypeUtils imageTypeUtils;
 
+    /**
+     * Functional interface for generating a salted object name.
+     */
     public interface  SaltedObjectName {
         String saltedObjectName(final String email, final Role role) throws GenericMinIOFailureException;
     }
+
+    /**
+     * Salts the object name using the provided functional interface.
+     *
+     * @param saltedObjectName Functional interface for generating a salted object name.
+     * @param email            Email of the user.
+     * @param role             Role of the user.
+     * @return The salted object name.
+     * @throws GenericMinIOFailureException If there is a failure in the salted object name generation.
+     */
     public static String saltObjectName(SaltedObjectName saltedObjectName, String email, Role role) throws GenericMinIOFailureException {
         return saltedObjectName.saltedObjectName(email, role);
     }
 
-
+    /**
+     * Uploads a profile picture to S3 and updates the user's profile picture in the database.
+     *
+     * @param imageFile The profile picture file.
+     * @param email     Email of the user.
+     * @param role      Role of the user.
+     * @return FileResponse representing the uploaded profile picture.
+     * @throws InvalidFileTypeException    If the file type is invalid.
+     * @throws GenericMinIOFailureException If there is a failure in the S3 operations.
+     */
     public FileResponse upload(MultipartFile imageFile, String email, Role role)
         throws InvalidFileTypeException, GenericMinIOFailureException
     {
@@ -108,6 +131,16 @@ public class ProfileS3Service {
         }
     }
 
+    /**
+     * Retrieves and serves a profile picture from S3 to the HttpServletResponse.
+     *
+     * @param response HttpServletResponse to write the profile picture content.
+     * @param userId   ID of the user.
+     * @param role     Role of the user.
+     * @throws GenericMinIOFailureException If there is a failure in the S3 operations.
+     * @throws UserNotFoundException        If the user is not found in the database.
+     * @throws IOException                  If there is an I/O exception.
+     */
     public void get(HttpServletResponse response, UUID userId, Role role)
         throws GenericMinIOFailureException, UserNotFoundException, IOException
     {

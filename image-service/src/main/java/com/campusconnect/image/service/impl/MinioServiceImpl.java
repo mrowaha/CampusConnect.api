@@ -19,6 +19,9 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Implementation of the MinioService interface for managing objects in MinIO storage.
+ */
 @Service
 public class MinioServiceImpl implements MinioService {
 
@@ -27,6 +30,13 @@ public class MinioServiceImpl implements MinioService {
 
     private final MinioConfigProperties properties;
 
+    /**
+     * Constructor for MinioServiceImpl.
+     *
+     * @param imageTypeUtils Utility for determining the image type.
+     * @param minioUtil      Utility for interacting with MinIO.
+     * @param properties     Configuration properties for MinIO.
+     */
     @Autowired
     public MinioServiceImpl(
             ImageTypeUtils imageTypeUtils,
@@ -37,6 +47,23 @@ public class MinioServiceImpl implements MinioService {
         this.properties = properties;
     }
 
+    /**
+     * Uploads an object to the specified MinIO bucket with a generated object name.
+     *
+     * @param multipartFile The file to upload.
+     * @param bucketName    The MinIO bucket name.
+     * @return A FileResponse containing information about the uploaded file.
+     * @throws IOException               If an I/O error occurs.
+     * @throws ServerException           If an error occurs on the server.
+     * @throws InsufficientDataException If there is insufficient data.
+     * @throws ErrorResponseException    If an error response is received.
+     * @throws NoSuchAlgorithmException  If a required cryptographic algorithm is not available.
+     * @throws InvalidKeyException       If the key is invalid.
+     * @throws InvalidResponseException   If the response is invalid.
+     * @throws XmlParserException        If an XML parsing error occurs.
+     * @throws InternalException         If an internal error occurs.
+     * @throws InvalidFileTypeException  If the file type is not valid.
+     */
     private FileResponse putObject(MultipartFile multipartFile, String bucketName) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException, InvalidFileTypeException {
         // validate incoming image type
 
@@ -57,6 +84,24 @@ public class MinioServiceImpl implements MinioService {
                 .build();
     }
 
+    /**
+     * Uploads an object to the specified MinIO bucket with a custom object name.
+     *
+     * @param multipartFile The file to upload.
+     * @param bucketName    The MinIO bucket name.
+     * @param objectName    The custom object name.
+     * @return A FileResponse containing information about the uploaded file.
+     * @throws IOException               If an I/O error occurs.
+     * @throws ServerException           If an error occurs on the server.
+     * @throws InsufficientDataException If there is insufficient data.
+     * @throws ErrorResponseException    If an error response is received.
+     * @throws NoSuchAlgorithmException  If a required cryptographic algorithm is not available.
+     * @throws InvalidKeyException       If the key is invalid.
+     * @throws InvalidResponseException   If the response is invalid.
+     * @throws XmlParserException        If an XML parsing error occurs.
+     * @throws InternalException         If an internal error occurs.
+     * @throws InvalidFileTypeException  If the file type is not valid.
+     */
     private FileResponse putObject(MultipartFile multipartFile, String bucketName, String objectName) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException, InvalidFileTypeException {
         String fileType = imageTypeUtils.getImageType(multipartFile);
         byte[] fileData = multipartFile.getBytes();
@@ -71,6 +116,15 @@ public class MinioServiceImpl implements MinioService {
                 .build();
     }
 
+    /**
+     * Uploads a profile picture to the MinIO bucket with a specified object name.
+     *
+     * @param multipartFile The profile picture file to upload.
+     * @param objectName    The object name for the profile picture.
+     * @return A FileResponse containing information about the uploaded profile picture.
+     * @throws InvalidFileTypeException   If the file type is not valid.
+     * @throws GenericMinIOFailureException If a generic MinIO failure occurs.
+     */
     @Override
     public FileResponse putProfilePicture(MultipartFile multipartFile, String objectName) throws InvalidFileTypeException, GenericMinIOFailureException {
         String profilePictureBucket = properties.getProfileBucketName();
@@ -89,6 +143,14 @@ public class MinioServiceImpl implements MinioService {
         }
     }
 
+    /**
+     * Retrieves a profile picture from the MinIO bucket with the specified object name.
+     *
+     * @param objectName The object name of the profile picture.
+     * @return An InputStream containing the profile picture data.
+     * @throws GenericMinIOFailureException If a generic MinIO failure occurs.
+     * @throws InvalidFileTypeException     If the file type is not valid.
+     */
     @Override
     public InputStream getProfilePicture(String objectName) throws GenericMinIOFailureException, InvalidFileTypeException {
         String profilePictureBucket = properties.getProfileBucketName();
@@ -103,6 +165,22 @@ public class MinioServiceImpl implements MinioService {
         }
     }
 
+    /**
+     * Downloads an object from the specified MinIO bucket.
+     *
+     * @param bucketName The MinIO bucket name.
+     * @param objectName The object name of the file to download.
+     * @return An InputStream containing the file data.
+     * @throws ServerException           If an error occurs on the server.
+     * @throws InsufficientDataException If there is insufficient data.
+     * @throws ErrorResponseException    If an error response is received.
+     * @throws IOException               If an I/O error occurs.
+     * @throws NoSuchAlgorithmException  If a required cryptographic algorithm is not available.
+     * @throws InvalidKeyException       If the key is invalid.
+     * @throws InvalidResponseException   If the response is invalid.
+     * @throws XmlParserException        If an XML parsing error occurs.
+     * @throws InternalException         If an internal error occurs.
+     */
     public InputStream downloadObject(String bucketName, String objectName) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         return minioUtil.getObject(bucketName, objectName);
     }

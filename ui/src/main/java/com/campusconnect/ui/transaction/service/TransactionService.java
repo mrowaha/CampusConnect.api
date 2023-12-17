@@ -29,13 +29,21 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class TransactionService {
+    // Repositories for database operations
     private final ProductRepository productRepository;
     private final BilkenteerRepository bilkenteerRepository;
     private final NotificationRepository notificationRepository;
-
     private final BidRepository bidRepository;
     private final TransactionRepository transactionRepository;
 
+    /**
+     * Cancels a bid made by a buyer on a product.
+     *
+     * @param buyerId  ID of the buyer.
+     * @param productId ID of the product.
+     * @throws UserNotFoundException     If the buyer is not found.
+     * @throws ProductNotFoundException  If the product is not found.
+     */
     public void cancelBid(UUID buyerId, UUID productId) {
         Bilkenteer bilkenteer = bilkenteerRepository.findById(buyerId).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
@@ -52,7 +60,17 @@ public class TransactionService {
             bidRepository.delete(bidToRemove);
         }
     }
-
+    /**
+     * Places a bid on a product by a buyer and notifies the seller.
+     *
+     * @param buyerId    ID of the buyer.
+     * @param sellerId   ID of the seller.
+     * @param productId  ID of the product.
+     * @param bidPrice   Price offered in the bid.
+     * @param returnDate Return date for the bid (for rental products).
+     * @throws UserNotFoundException     If the buyer or seller is not found.
+     * @throws ProductNotFoundException  If the product is not found.
+     */
     public void makeBid(UUID buyerId, UUID sellerId, UUID productId, double bidPrice, LocalDate returnDate) {
         Bilkenteer bilkenteer = bilkenteerRepository.findById(buyerId).orElseThrow(UserNotFoundException::new);
         Product product = productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
@@ -73,7 +91,12 @@ public class TransactionService {
         product.getBids().add(bid);
         notifyUser(owner, "New bid has been made on your product.");
     }
-
+    /**
+     * Notifies a user with a message.
+     *
+     * @param owner   User to be notified.
+     * @param message Notification message.
+     */
     private void notifyUser(Bilkenteer owner, String message) {
         Notification notification = new Notification();
         notification.setUser(owner);
@@ -85,7 +108,16 @@ public class TransactionService {
         notificationRepository.save(notification);
     }
 
-
+    /**
+     * Sells a product, updating its status to SOLD, clearing bids, and notifying bidders.
+     *
+     * @param buyerId   ID of the buyer.
+     * @param sellerId  ID of the seller.
+     * @param productId ID of the product.
+     * @throws UserNotFoundException        If the buyer or seller is not found.
+     * @throws ProductNotFoundException     If the product is not found.
+     * @throws ProductNotAvailableException If the product is not available for sale.
+     */
     public void sellProduct(UUID buyerId, UUID sellerId, UUID productId) {
         Bilkenteer buyer = bilkenteerRepository.findById(buyerId).orElseThrow(UserNotFoundException::new);
         Bilkenteer seller = bilkenteerRepository.findById(sellerId).orElseThrow(UserNotFoundException::new);
@@ -103,13 +135,26 @@ public class TransactionService {
             throw new ProductNotAvailableException("The product is not available for sale.");
         }
     }
-
+    /**
+     * Notifies bidders about the item they bid on is sold.
+     *
+     * @param bids    List of bids to notify.
+     * @param message Notification message.
+     */
     private void notifyBidders(List<Bid> bids, String message) {
         for (Bid bid : bids) {
             notifyUser(bid.getBilkenteer(),message);
         }
     }
-
+    /**
+     * Rents a product, updating its status, rental start and end dates.
+     *
+     * @param buyerId    ID of the buyer.
+     * @param sellerId   ID of the seller.
+     * @param productId  ID of the product.
+     * @param returnDate Return date for the rental.
+     * @throws ProductNotFoundException If the product is not found.
+     */
     public void rentProduct(UUID buyerId, UUID sellerId, UUID productId, LocalDate returnDate) {
         Product product = productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
 
