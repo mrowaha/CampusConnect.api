@@ -5,6 +5,7 @@ import com.campusconnect.domain.security.dto.*;
 import com.campusconnect.domain.security.token.UserAuthenticationToken;
 import com.campusconnect.domain.user.entity.User;
 import com.campusconnect.domain.user.enums.Role;
+import com.campusconnect.ui.common.controller.SecureController;
 import com.campusconnect.ui.user.service.BilkenteerService;
 import com.campusconnect.ui.user.service.ModeratorService;
 import com.campusconnect.ui.utils.JwtUtilities;
@@ -43,19 +44,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * moderator routes are routes that can be validated
      * on only JWT generated for moderator role
      */
-    private final List<String> moderatorRoutes;
+    private final List<SecureController.Endpoint> moderatorRoutes;
 
     /**
      * bilkenteer routes are routes that can be validated
      * on only JWT generated for bilkenteer role
      */
-    private final List<String> bilkenteerRoutes;
+    private final List<SecureController.Endpoint> bilkenteerRoutes;
 
     /**
      * shared routes are routes that can be validated
      * on either of the web token roles
      */
-    private final List<String> sharedRoutes;
+    private final List<SecureController.Endpoint> sharedRoutes;
 
     @Autowired
     public JwtAuthenticationFilter(
@@ -71,16 +72,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.sharedRoutes = new ArrayList<>();
     }
 
-    public void insertModeratorRoutes(List<String> routes) {
+    public void insertModeratorRoutes(List<SecureController.Endpoint> routes) {
         moderatorRoutes.addAll(routes);
     }
 
-    public void insertBilkenteerRoutes(List<String> routes) {
+    public void insertBilkenteerRoutes(List<SecureController.Endpoint> routes) {
 
         bilkenteerRoutes.addAll(routes);
     }
 
-    public void insertSharedRoutes(List<String> routes) {
+    public void insertSharedRoutes(List<SecureController.Endpoint> routes) {
 
         sharedRoutes.addAll(routes);
     }
@@ -106,11 +107,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         AntPathMatcher pathMatcher = new AntPathMatcher();
         boolean isSharedRoute = sharedRoutes.stream().anyMatch(
-                route -> pathMatcher.match(route, request.getServletPath())
+                route -> pathMatcher.match(route.getUrl(), request.getServletPath()) &&
+                         route.getMethod().toString().equals(request.getMethod())
         );
 
         boolean isModeratorRoute = moderatorRoutes.stream().anyMatch(
-                route -> pathMatcher.match(route, request.getServletPath())
+                route -> pathMatcher.match(route.getUrl(), request.getServletPath()) &&
+                        route.getMethod().toString().equals(request.getMethod())
         );
         // any request not a moderator route must be validated as BILKENTEER
         String token = jwtUtilities.getToken(request);

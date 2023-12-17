@@ -5,6 +5,7 @@ import com.campusconnect.domain.security.SecurityScope;
 import com.campusconnect.ui.utils.SecurityUtilities;
 import jakarta.annotation.PostConstruct;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class SecureController {
     /**
      * This Controller provides utility for the JWT Authentication Filter
@@ -61,10 +63,11 @@ public class SecureController {
                 } else {
                     path = path.substring(1, path.length()-1);
                 }
-                System.out.println(path);
                 if (handlerMethod.hasMethodAnnotation(RequiredScope.class)) {
                     SecurityScope scope = Objects.requireNonNull(handlerMethod.getMethodAnnotation(RequiredScope.class)).scope();
-                    this.addEndpoint(SecurityUtilities.mapRequestMethodToHttpMethod(method), path, scope);
+                    HttpMethod mappedMethod = SecurityUtilities.mapRequestMethodToHttpMethod(method);
+                    log.info("{}",String.format("path %s, method %s, scope %s", path, mappedMethod.toString(), scope));
+                    this.addEndpoint(mappedMethod, path, scope);
                 } else {
                     throw new RuntimeException("all secure controller types must annotate methods with RequiredScope");
                 }

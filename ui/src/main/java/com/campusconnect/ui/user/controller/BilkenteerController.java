@@ -98,23 +98,23 @@ public class BilkenteerController extends SecureController {
         return ResponseEntity.ok(String.format("value: %s", hello));
     }
 
-    @PostMapping("/subscribeToTag")
+    @PostMapping("/subscribe-tag")
     @RequiredScope(scope = SecurityScope.BILKENTEER)
     public ResponseEntity<ProtectedDto> subscribeToTag(
                 Authentication authentication,
-                @RequestParam String tagName
-    ) throws UserUtilities.AuthToUserException {
+                @RequestParam("tagName") String tagName
+    ) throws UserUtilities.AuthToUserException, UserNotFoundException, TagNotFoundException {
             User user = userUtilities.getUserFromAuth(authentication);
             bilkenteerService.subscribeToTag(user.getUserId(), tagName);
             return new ResponseEntity<>(new ProtectedDto("Subscribed"), HttpStatus.OK);
     }
 
-    @PostMapping("/unsubscribeFromTag")
+    @PostMapping("/unsubscribe-tag")
     @RequiredScope(scope = SecurityScope.BILKENTEER)
     public ResponseEntity<ProtectedDto> unsubscribeFromTag(
             Authentication authentication,
-            @RequestParam String tagName
-    ) throws UserUtilities.AuthToUserException {
+            @RequestParam("tagName") String tagName
+    ) throws UserUtilities.AuthToUserException, UserNotFoundException, TagNotFoundException {
         User user = userUtilities.getUserFromAuth(authentication);
         bilkenteerService.unsubscribeFromTag(user.getUserId(), tagName);
         return new ResponseEntity<>(new ProtectedDto("Unsubscribed"), HttpStatus.OK);

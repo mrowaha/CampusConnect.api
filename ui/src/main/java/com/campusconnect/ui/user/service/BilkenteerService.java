@@ -214,9 +214,10 @@ public class BilkenteerService implements UserService {
      *
      * @param bilkenteerId ID of the Bilkenteer user.
      * @param tagName       Name of the product tag to subscribe to.
-     * @return Updated Bilkenteer user with the subscribed tag.
      */
-    public Bilkenteer subscribeToTag(UUID bilkenteerId, String tagName) {
+    public void subscribeToTag(UUID bilkenteerId, String tagName)
+     throws UserNotFoundException, TagNotFoundException
+    {
         Bilkenteer bilkenteer = bilkenteerRepository.findById(bilkenteerId)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -225,8 +226,6 @@ public class BilkenteerService implements UserService {
 
         bilkenteer.getSubscribedTags().add(tag);
         bilkenteerRepository.save(bilkenteer);
-
-        return bilkenteer;
     }
 
     /**
@@ -234,9 +233,10 @@ public class BilkenteerService implements UserService {
      *
      * @param bilkenteerId ID of the Bilkenteer user.
      * @param tagName       Name of the product tag to unsubscribe from.
-     * @return Updated Bilkenteer user without the unsubscribed tag.
      */
-    public Bilkenteer unsubscribeFromTag(UUID bilkenteerId, String tagName) {
+    public void unsubscribeFromTag(UUID bilkenteerId, String tagName)
+            throws UserNotFoundException, TagNotFoundException
+    {
         Bilkenteer bilkenteer = bilkenteerRepository.findById(bilkenteerId)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -245,8 +245,6 @@ public class BilkenteerService implements UserService {
 
         bilkenteer.getSubscribedTags().remove(tag);
         bilkenteerRepository.save(bilkenteer);
-
-        return bilkenteer;
     }
 
 }

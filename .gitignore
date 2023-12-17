@@ -35,6 +35,9 @@ build/
 ### MINIO STORAGE ###
 s3
 
+### REDIS VOLUME ###
+cache
+
 ##Local application properties##
 
 application-local.properties

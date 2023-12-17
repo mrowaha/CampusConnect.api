@@ -156,6 +156,7 @@ public class ModeratorService implements UserService {
                     .isActive(true)
                     .email(moderator.getEmail())
                     .uuid(savedModerator.getUserId())
+                    .role(moderator.getRole())
                     .build()
                     ;
         }
