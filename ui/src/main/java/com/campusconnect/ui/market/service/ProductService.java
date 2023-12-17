@@ -44,14 +44,22 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductService {
 
+    // Repositories for database operations
     private final ProductRepository productRepository;
     private final ProductTagRepository productTagRepository;
     private final BilkenteerRepository bilkenteerRepository;
     private final NotificationRepository notificationRepository;
 
+    // EntityManager for JPA operations
     @Autowired
     private EntityManager entityManager;
 
+    /**
+     * Saves a new product to the database and notifies users subscribed to relevant tags.
+     *
+     * @param productCreationInfo Information about the product to be created.
+     * @return ResponseEntity indicating success or failure along with the product ID.
+     */
     public ResponseEntity<?> saveProduct(ProductDto productCreationInfo){
         Bilkenteer bilkenteer = bilkenteerRepository.findById(UUID.fromString(productCreationInfo.getSellerId()))
                 .orElseThrow(UserNotFoundException::new);
@@ -82,7 +90,11 @@ public class ProductService {
 
         return new ResponseEntity<>( "Product Id:" + product.getProductId(), HttpStatus.OK);
     }
-
+    /**
+     * Fetches a list of available products from the database.
+     *
+     * @return List of available products.
+     */
     public List<Product> fetchProductList(){
         List<Product> allProducts = productRepository.findAll();
 
@@ -92,7 +104,12 @@ public class ProductService {
 
         return availableProducts;
     }
-
+    /**
+     * Fetches a product by its ID, increments view count, and updates the database.
+     *
+     * @param productId ID of the product to fetch.
+     * @return Product with the specified ID.
+     */
     public Product fetchProductById(UUID productId){
 
         Product product = productRepository.findById(productId).orElse(null);
@@ -105,7 +122,13 @@ public class ProductService {
 
         return product;
     }
-
+    /**
+     * Updates an existing product based on the provided information.
+     *
+     * @param productCreationInfo Information about the product to be updated.
+     * @param productId           ID of the product to update.
+     * @return Updated product.
+     */
     public Product updateProduct(ProductDto productCreationInfo, UUID productId){
         Product productDB = productRepository.findById(productId).get();
 
@@ -127,7 +150,13 @@ public class ProductService {
 
         return productRepository.save(productDB);
     }
-
+    /**
+     * Assigns a tag to a product if the tag is approved.
+     *
+     * @param tagName   Name of the tag to be assigned.
+     * @param productId ID of the product.
+     * @return Updated product.
+     */
     public Product assignTag(String tagName, UUID productId){
         Product product = productRepository.findById(productId).get();
         ProductTag tag = productTagRepository.findByName(tagName).get();
@@ -141,21 +170,41 @@ public class ProductService {
         }
         return product;
     }
-
+    /**
+     * Deletes a product by its ID.
+     *
+     * @param productId ID of the product to delete.
+     */
     public void deleteProductById(UUID productId){
         productRepository.deleteById(productId);
     }
-
+    /**
+     * Fetches products associated with a user by their ID.
+     *
+     * @param userId ID of the user.
+     * @return List of products associated with the user.
+     * @throws UserNotFoundException If the user is not found.
+     */
     public List<Product> fetchProductsByUserId(UUID userId) throws UserNotFoundException {
         return productRepository.findAllBySellerUserId(userId).orElseThrow(UserNotFoundException::new);
     }
-
+    /**
+     * Retrieves bids associated with a product by its ID.
+     *
+     * @param productId ID of the product.
+     * @return List of bids for the product.
+     */
     public List<Bid> getProductBids(UUID productId) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException());
 
         return product.getBids();
     }
-
+    /**
+     * Searches for products based on the specified criteria.
+     *
+     * @param productSearchDto Search criteria.
+     * @return List of products matching the criteria.
+     */
     public List<Product> searchProduct(ProductSearchDto productSearchDto) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Product> cq = cb.createQuery(Product.class);
@@ -213,7 +262,12 @@ public class ProductService {
         TypedQuery<Product> query = entityManager.createQuery(cq);
         return query.getResultList();
     }
-
+    /**
+     * Notifies users subscribed to certain tags about a new product.
+     *
+     * @param tags    Set of tags associated with the product.
+     * @param product Product for which notifications are generated.
+     */
     private void notifyUsersForTags(Set<String> tags, Product product) {
         List<Bilkenteer> subscribedUsers = bilkenteerRepository.findBySubscribedTags_NameIn(tags);
 

@@ -32,21 +32,22 @@ import java.util.Map;
 @EnableConfigurationProperties({RoledJwtProperties.class, AdminProperties.class})
 public class SpringSecurityConfig {
 
+    // Lists to store URL patterns for different roles
     private List<String> WHITE_LIST_URLS;
-
     private List<String> MODERATOR_URLS;
-
     private List<String> BILKENTEER_URLS;
-
     private List<String> SHARED_URLS;
-
     private List<String> ADMIN_URLS;
 
+    // List to store controllers with security configurations
     private final List<SecureController> secureControllerList;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter ;
 
+    // Custom authentication filters
+    private final JwtAuthenticationFilter jwtAuthenticationFilter ;
     private final AdminAuthenticationFilter adminAuthenticationFilter;
 
+
+    // Constructor to initialize filters and controller list
     @Autowired
     public SpringSecurityConfig(
             JwtAuthenticationFilter filter,
@@ -78,6 +79,7 @@ public class SpringSecurityConfig {
         }
     }
 
+    // SecurityFilterChain configuration
     @Bean
     public SecurityFilterChain filterChain (HttpSecurity http) throws Exception
     {
@@ -113,6 +115,7 @@ public class SpringSecurityConfig {
         return  http.build();
     }
 
+    // AuthenticationManager bean configuration
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception
     {

@@ -23,25 +23,30 @@ import java.util.UUID;
 @Table(name = "cc_comment")
 public class Comment{
 
+    // Unique identifier for the comment
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
     protected UUID id;
 
+    // Forum post to which the comment belongs
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "forum_post_id")
     @JsonBackReference(value = "comments")
     @NonNull
     private ForumPost forumPost;
 
+    // Timestamp when the comment was created
     @Column(name = "timeStamp", nullable = false)
     @NonNull
     private LocalDateTime timeStamp;
 
+    // Content or text of the comment
     @Column(name = "content", nullable = false)
     @NonNull
     private String content;
 
+    // Bilkenteer who posted the comment
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "commenter_Id")
     @JsonBackReference(value = "commenter")

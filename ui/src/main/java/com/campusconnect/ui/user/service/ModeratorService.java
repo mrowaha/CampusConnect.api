@@ -31,10 +31,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ModeratorService implements UserService {
 
+    // Repositories for database operations
     private final ModeratorRepository moderatorRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtilities jwtUtilities;
 
+    /**
+     * Loads a moderator by email.
+     *
+     * @param email Email of the moderator.
+     * @return The loaded moderator.
+     * @throws UserNotFoundException If the moderator with the specified email is not found.
+     */
     @Override
     public User loadUserByUsername(String email) throws UserNotFoundException {
         return moderatorRepository.findByEmail(email).orElseThrow(() ->
@@ -42,6 +50,11 @@ public class ModeratorService implements UserService {
         );
     }
 
+    /**
+     * Lists all moderators.
+     *
+     * @return List of moderator information DTOs.
+     */
     @Override
     public List<UserInfoDto> listAll() {
         List<Moderator> moderators = moderatorRepository.findAll();
@@ -57,6 +70,13 @@ public class ModeratorService implements UserService {
                 .toList();
     }
 
+    /**
+     * Suspends a moderator.
+     *
+     * @param suspendRequestDto Request to suspend a moderator.
+     * @return Response DTO with suspension details.
+     * @throws UserNotFoundException If the moderator to be suspended is not found.
+     */
     @Override
     public UserSuspendResponseDto suspend(UserSuspendRequestDto suspendRequestDto)
         throws UserNotFoundException
@@ -79,6 +99,13 @@ public class ModeratorService implements UserService {
                 .build();
     }
 
+    /**
+     * Unsuspends a moderator.
+     *
+     * @param suspendRequestDto Request to unsuspend a moderator.
+     * @return Response DTO with unsuspension details.
+     * @throws UserNotFoundException If the moderator to be unsuspended is not found.
+     */
     @Override
     public UserSuspendResponseDto unsuspend(UserSuspendRequestDto suspendRequestDto) throws UserNotFoundException {
         Moderator moderator = moderatorRepository.findById(suspendRequestDto.getUuid())
@@ -100,6 +127,13 @@ public class ModeratorService implements UserService {
     }
 
 
+    /**
+     * Registers a new moderator.
+     *
+     * @param creationDto Data for creating a new moderator.
+     * @return Information DTO of the registered moderator.
+     * @throws UserAlreadyTakenException If the email is already taken by another user.
+     */
     public UserInfoDto register(UserCreationDto creationDto) throws UserAlreadyTakenException {
         if(moderatorRepository.existsByEmail(creationDto.getEmail())) {
             throw new UserAlreadyTakenException();
@@ -127,6 +161,15 @@ public class ModeratorService implements UserService {
         }
     }
 
+    /**
+     * Authenticates a moderator.
+     *
+     * @param loginDto Login request data.
+     * @return Response DTO with moderator information and authentication token.
+     * @throws UserNotFoundException    If the moderator with the specified email is not found.
+     * @throws InvalidPasswordException  If the provided password is invalid.
+     * @throws UserSuspendedException    If the moderator is suspended.
+     */
     public ModeratorLoginResponseDto authenticate(UserLoginRequestDto loginDto)
             throws UserNotFoundException, InvalidPasswordException
     {

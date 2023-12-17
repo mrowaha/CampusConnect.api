@@ -26,10 +26,19 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 public class NotificationService {
 
+    // Repositories and services for database and email operations
     private final NotificationRepository notificationRepository;
     private final BilkenteerService bilkenteerService;
     private final EmailSenderService emailSenderService;
 
+    /**
+     * Saves a new notification for a user and sends an email notification if enabled.
+     *
+     * @param userId           ID of the user.
+     * @param notificationDto  Information about the notification to be saved.
+     * @return The saved notification.
+     * @throws UserNotFoundException If the user with the specified ID is not found.
+     */
     public Notification saveNotification(UUID userId, NotificationDto notificationDto) throws UserNotFoundException {
 
         Notification notification = new Notification();
@@ -78,20 +87,41 @@ public class NotificationService {
         }
     }
 
+    /**
+     * Retrieves the list of notifications for a user.
+     *
+     * @param userId ID of the user.
+     * @return List of notifications for the user.
+     */
     public List<Notification> getUserNotificationList(UUID userId){
         return notificationRepository.findAllByUserUserId(userId).orElse(null);
     }
 
+    /**
+     * Retrieves the count of unread notifications for a user.
+     *
+     * @param userId ID of the user.
+     * @return The count of unread notifications.
+     */
     public Integer getUserUnreadNotificationCount(UUID userId){
         return notificationRepository.countNotificationBySeenAndUserUserId(false, userId);
     }
 
-
+    /**
+     * Deletes a notification by its ID.
+     *
+     * @param notificationId ID of the notification to be deleted.
+     */
     public void deleteNotification(UUID notificationId){
         notificationRepository.deleteById(notificationId);
     }
 
-
+    /**
+     * Marks a list of notifications as seen.
+     *
+     * @param notificationIds List of notification IDs to be marked as seen.
+     * @throws NotificationNotFoundException If any notification in the list is not found.
+     */
     @Transactional
     public void markNotificationsAsSeen(List<UUID> notificationIds) throws NotificationNotFoundException{
         for (UUID notificationId : notificationIds) {

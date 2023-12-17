@@ -10,6 +10,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @NoArgsConstructor
 public class PasswordConfig {
 
+    /**
+     * Configures a BCryptPasswordEncoder bean.
+     *
+     * @return BCryptPasswordEncoder bean
+     */
     @Bean
     public PasswordEncoder passwordEncoder()
     { return new BCryptPasswordEncoder(); }

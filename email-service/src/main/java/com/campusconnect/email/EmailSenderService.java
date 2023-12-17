@@ -9,6 +9,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import java.util.logging.Logger;
 
+/**
+ * Service class responsible for sending emails using JavaMailSender.
+ */
 @Component
 @Slf4j
 public class EmailSenderService {
@@ -16,6 +19,12 @@ public class EmailSenderService {
     @Autowired
     private JavaMailSender mailSender;
 
+    /**
+     * Sends a One-Time Password (OTP) email to the specified recipient.
+     *
+     * @param recipientEmail The email address of the recipient.
+     * @param otp             The One-Time Password to include in the email.
+     */
     public void sendOTPEmail(String recipientEmail, String otp)  {
 
         try{
@@ -62,6 +71,14 @@ public class EmailSenderService {
 
     }
 
+    /**
+     * Sends a notification email to the specified recipient.
+     *
+     * @param userName        The name of the user receiving the notification.
+     * @param recipientEmail  The email address of the recipient.
+     * @param subject         The subject of the notification email.
+     * @param content         The content/body of the notification email.
+     */
     public void sendNotificationEmail(String userName, String recipientEmail, String subject, String content) {
 
         try{

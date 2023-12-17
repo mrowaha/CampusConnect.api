@@ -28,19 +28,30 @@ import java.util.logging.Logger;
 @Service
 @RequiredArgsConstructor
 public class MessageThreadService {
-
+    // Repositories and services for database operations
     private final MessageRepository messageRepository;
     private final MessageThreadRepository messageThreadRepository;
     private final BilkenteerService bilkenteerService;
     private final NotificationService notificationService;
 
+    // Logger for logging messages
     private static final Logger log = Logger.getLogger(MessageThreadService.class.getName());
 
+    /**
+     * Retrieves all message threads for a user.
+     *
+     * @param userId ID of the user.
+     * @return Optional list of message threads.
+     */
     public Optional<List<MessageThread>> getAllMessageThreads(UUID userId) {
         return messageThreadRepository.findAllByUserId(userId);
     }
 
-
+    /**
+     * Sends a message and creates a notification for the receiving user.
+     *
+     * @param messageDto Information about the message to be sent.
+     */
     @Transactional
     public void sendMessage(MessageDto messageDto) {
 
@@ -71,6 +82,12 @@ public class MessageThreadService {
         log.info("User Notified about Message Successfully");
     }
 
+    /**
+     * Marks messages as seen for a user.
+     *
+     * @param userId      ID of the user.
+     * @param messageDtos List of messages to be marked as seen.
+     */
     @Transactional
     public void markMessagesAsSeen(UUID userId, List<MessageDto> messageDtos) {
         for (MessageDto messageDto : messageDtos) {
@@ -86,6 +103,14 @@ public class MessageThreadService {
         }
     }
 
+    /**
+     * Adds a new message thread between two users.
+     *
+     * @param senderId   ID of the sender.
+     * @param receiverId ID of the receiver.
+     * @return The created message thread.
+     * @throws UserNotFoundException If either the sender or receiver is not found.
+     */
     private MessageThread addMessageThread(UUID senderId, UUID receiverId) throws UserNotFoundException {
 
         MessageThread messageThread = new MessageThread();
