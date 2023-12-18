@@ -1,14 +1,12 @@
 package com.campusconnect.domain.product.entity;
 
+import com.campusconnect.domain.common.converter.ArrayListToJsonConverter;
 import com.campusconnect.domain.messageThread.entity.MessageThread;
 import com.campusconnect.domain.product.enums.ProductType;
 import com.campusconnect.domain.product.enums.ProductStatus;
 import com.campusconnect.domain.transaction.entity.Bid;
 import com.campusconnect.domain.user.entity.Bilkenteer;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -94,6 +92,10 @@ public class Product {
     @CollectionTable(name = "product_tags_table", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "tags")
     protected Set<String> tags = new HashSet<>();
+
+    @Column(name = "images", nullable = true)
+    @Convert(converter = ArrayListToJsonConverter.class )
+    private ArrayList<String> images = new ArrayList<>();
 
     //public void addImage()
     //public void removeImage()

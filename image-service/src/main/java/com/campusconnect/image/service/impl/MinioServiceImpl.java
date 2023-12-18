@@ -165,6 +165,38 @@ public class MinioServiceImpl implements MinioService {
         }
     }
 
+    @Override
+    public FileResponse putProductPicture(MultipartFile multipartFile, String objectName) throws GenericMinIOFailureException, InvalidFileTypeException {
+        String productPictureBucket = properties.getProductBucketName();
+        try {
+            return this.putObject(
+                    multipartFile,
+                    productPictureBucket,
+                    objectName
+            );
+        } catch (Exception e) {
+            if (e instanceof  InvalidFileTypeException) {
+                throw (InvalidFileTypeException)  e;
+            } else {
+                throw new GenericMinIOFailureException();
+            }
+        }
+    }
+
+    @Override
+    public InputStream getProductPicture(String objectName) throws GenericMinIOFailureException, InvalidFileTypeException {
+        String productPictureBucket = properties.getProductBucketName();
+        try {
+            InputStream is = this.downloadObject(productPictureBucket, objectName);
+            if (is == null) {
+                throw new GenericMinIOFailureException();
+            }
+            return is;
+        } catch (Exception e) {
+            throw new GenericMinIOFailureException();
+        }
+    }
+
     /**
      * Downloads an object from the specified MinIO bucket.
      *

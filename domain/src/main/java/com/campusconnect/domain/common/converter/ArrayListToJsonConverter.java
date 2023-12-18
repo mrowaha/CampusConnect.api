@@ -1,7 +1,5 @@
-package com.campusconnect.domain.user.converter;
+package com.campusconnect.domain.common.converter;
 
-import com.campusconnect.domain.user.pojo.BilkenteerAddress;
-import com.campusconnect.domain.user.pojo.BilkenteerPhoneNumbers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
@@ -9,7 +7,7 @@ import jakarta.persistence.AttributeConverter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BilkenteerPhoneNumbersConverter implements AttributeConverter<List<String>, String> {
+public class ArrayListToJsonConverter implements AttributeConverter<List<String>, String> {
     @Override
     public String convertToDatabaseColumn(List<String> attribute) {
         try {

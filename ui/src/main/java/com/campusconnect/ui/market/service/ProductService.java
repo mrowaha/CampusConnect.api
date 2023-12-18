@@ -9,6 +9,7 @@ import com.campusconnect.domain.notification.entity.Notification;
 import com.campusconnect.domain.notification.enums.NotificationType;
 import com.campusconnect.domain.notification.repository.NotificationRepository;
 import com.campusconnect.domain.product.dto.ProductDto;
+import com.campusconnect.domain.product.dto.ProductImageCountDto;
 import com.campusconnect.domain.product.dto.ProductSearchDto;
 import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.product.enums.ProductStatus;
@@ -264,6 +265,18 @@ public class ProductService {
         TypedQuery<Product> query = entityManager.createQuery(cq);
         return query.getResultList();
     }
+
+    public ProductImageCountDto getImagesInfo(UUID productId)
+        throws ProductNotFoundException {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(ProductNotFoundException::new);
+
+        return ProductImageCountDto.builder()
+                .fileNamePrefixes(product.getImages())
+                .totalCount(product.getImages().size())
+                .build();
+    }
+
     /**
      * Notifies users subscribed to certain tags about a new product.
      *
@@ -285,7 +298,6 @@ public class ProductService {
             notificationRepository.save(notification);
         }
     }
-
 
 }
 

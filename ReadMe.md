@@ -65,6 +65,8 @@ services:
       - {minio_console_port}:9001
     command: server /data --console-address ":9001"
 ```
+__NOTE__: If you wish to reuse existing minio, you only need to create a `./s3` folder in project dir
+
 __NOTE__: Your variables in both the docker-compose and application-local properties
 must be similar.
 
@@ -100,7 +102,34 @@ mvn install
 
 __NOTE__: When running the application from an integrated development environment (IDE), these commands are typically executed automatically for you. 
 
-## 6. Run UiApplication in UI Module
+## 6. Redis OTP Cache
+Redis Docker Image will be started automatically with `docker-compose.yml`. However,
+ if you want to use the existing properties, create a folder `./cache` in the root dir.
+
+## 7. Domain Tag Initialization
+Run the backend with this first query
+```
+curl --location 'http://localhost:8080/product-tags/batch' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyb3dhaGEyQGJpbGtlbnQuZWR1LnRyIiwicm9sZSI6IkJJTEtFTlRFRVIiLCJpYXQiOjE3MDI4MzY0MDEsImV4cCI6MTcwMjg3MjQwMX0.Y5EoWCRvBbd7SHdAR1DFNiN8lYbdP5psgMLcRY0i0QQ' \
+--header 'Content-Type: application/json' \
+--data '{
+    "tagNames": [
+        "Textbooks",
+        "Electronics",
+        "Kitchenware",
+        "Instruments",
+        "Bicycles",
+        "Games",
+        "Furniture",
+        "Rentable",
+        "Borrowable",
+        "Donations",
+        "Purchase"
+    ]
+}'
+```
+
+## 8. Run UiApplication in UI Module
 
 Navigate to the `ui` module and click Run next to the Current Module option on the toolbar.
 

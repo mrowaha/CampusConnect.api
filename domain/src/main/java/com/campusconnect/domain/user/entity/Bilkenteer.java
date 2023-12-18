@@ -1,11 +1,10 @@
 package com.campusconnect.domain.user.entity;
 
-import com.campusconnect.domain.comment.entity.Comment;
 import com.campusconnect.domain.ProductTag.entity.ProductTag;
+import com.campusconnect.domain.common.converter.ArrayListToJsonConverter;
 import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.forumPost.entity.ForumPost;
 import com.campusconnect.domain.user.converter.BilkenteerAddressConverter;
-import com.campusconnect.domain.user.converter.BilkenteerPhoneNumbersConverter;
 import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.domain.user.pojo.BilkenteerAddress;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -35,7 +34,7 @@ public class Bilkenteer extends User {
 
     // List of phone numbers associated with the Bilkenteer, stored as ArrayList
     @Column(name = "phone_number", nullable = true)
-    @Convert(converter = BilkenteerPhoneNumbersConverter.class )
+    @Convert(converter = ArrayListToJsonConverter.class )
     private ArrayList<String> phoneNumbers = new ArrayList<>();
 
     // Address information of the Bilkenteer, stored using a custom converter

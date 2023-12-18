@@ -2,6 +2,7 @@ package com.campusconnect.ui.market.controller;
 
 import com.campusconnect.domain.forumPost.entity.ForumPost;
 import com.campusconnect.domain.product.dto.ProductDto;
+import com.campusconnect.domain.product.dto.ProductImageCountDto;
 import com.campusconnect.domain.product.dto.ProductSearchDto;
 import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.security.RequiredScope;
@@ -11,6 +12,7 @@ import com.campusconnect.ui.market.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -79,6 +81,16 @@ public class ProductController {
     @RequiredScope(scope = SecurityScope.NONE)
     public ResponseEntity<List<Product>> searchProduct(@RequestBody ProductSearchDto productSearchDto) {
         return ResponseEntity.ok(productService.searchProduct(productSearchDto));
+    }
+
+    @GetMapping("/{productId}/images")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public ResponseEntity<ProductImageCountDto> getImagesInfo(
+            @PathVariable("productId") UUID productId
+    ) {
+        return ResponseEntity.ok(
+                productService.getImagesInfo(productId)
+        );
     }
 
 

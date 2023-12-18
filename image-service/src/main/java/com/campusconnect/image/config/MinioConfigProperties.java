@@ -18,6 +18,8 @@ public class MinioConfigProperties {
 
     private String profileBucketName;
 
+    private String productBucketName;
+
     private long partSize;
 
     private boolean enableLog;
