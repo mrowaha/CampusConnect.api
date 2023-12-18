@@ -11,6 +11,7 @@ import com.campusconnect.image.exceptions.GenericMinIOFailureException;
 import com.campusconnect.image.exceptions.InvalidFileTypeException;
 import com.campusconnect.ui.common.controller.SecureController;
 import com.campusconnect.ui.image.exceptions.UnAuthorizedImageUpload;
+import com.campusconnect.ui.image.service.ForumsS3Service;
 import com.campusconnect.ui.image.service.ProductS3Service;
 import com.campusconnect.ui.market.exceptions.ProductNotFoundException;
 import com.campusconnect.ui.utils.JwtUtilities;
@@ -51,6 +52,8 @@ public class S3Controller extends SecureController {
     private final UserUtilities userUtilities;
 
     private final ProductS3Service productS3Service;
+
+    private final ForumsS3Service forumsS3Service;
 
     @PostMapping(value = "/profile-picture")
     @RequiredScope(scope = SecurityScope.SHARED)
@@ -153,4 +156,44 @@ public class S3Controller extends SecureController {
         this.productS3Service.incrementalGet(response, id, index);
     }
 
+    @PostMapping(value = "/forum-picture")
+    @RequiredScope(scope = SecurityScope.BILKENTEER)
+    public ResponseEntity<List<FileResponse>> uploadBatchForumPicture(
+            Authentication authentication,
+            @RequestParam Map<String, String> allParams, HttpServletRequest request
+    )
+            throws UserUtilities.AuthToUserException, GenericMinIOFailureException
+            , InvalidFileTypeException, ProductNotFoundException, UnAuthorizedImageUpload
+    {
+        if (!allParams.containsKey("forumId")) throw new GenericMinIOFailureException();
+        ProductIdDto productIdDto = null;
+        try {
+            productIdDto = new ObjectMapper().readValue(allParams.get("forumId"), ProductIdDto.class);
+        } catch (JsonProcessingException e) {
+            throw new GenericMinIOFailureException();
+        }
+
+        User user = userUtilities.getUserFromAuth(authentication);
+        Map<String, MultipartFile> fileMap = new HashMap<String, MultipartFile>();
+        if (request instanceof MultipartHttpServletRequest multiRequest) {
+            fileMap = multiRequest.getFileMap();
+        }
+        return ResponseEntity.ok(
+                forumsS3Service.uploadBatch(
+                        fileMap,
+                        user.getEmail(),
+                        productIdDto.getId()
+                )
+        );
+    }
+
+    @GetMapping(value = "/product-pictures/{id}")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public void getForumPictures(
+            HttpServletResponse response,
+            @PathVariable("id") UUID id
+    ) throws IOException {
+        this.forumsS3Service.get
+                (response, id);
+    }
 }

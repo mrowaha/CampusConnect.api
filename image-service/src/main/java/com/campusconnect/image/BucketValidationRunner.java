@@ -32,6 +32,13 @@ public class BucketValidationRunner implements ApplicationRunner {
             minioUtil.makeBucket(properties.getProductBucketName());
             log.info("successfully created MinIO Buckets");
         }
+        if (!minioUtil.bucketExists(properties.getForumsBucketName())) {
+            log.warn(properties.getForumsBucketName() + " does not exist");
+            log.info("creating MinIO Buckets");
+            minioUtil.makeBucket(properties.getForumsBucketName());
+            log.info("successfully created MinIO Buckets");
+        }
+
         log.info("validated MinIO Buckets");
 
     }

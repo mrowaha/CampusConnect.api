@@ -1,6 +1,7 @@
 package com.campusconnect.domain.transaction.entity;
 import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.user.entity.Bilkenteer;
+import com.campusconnect.domain.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -24,11 +25,9 @@ public class Bid {
     @GeneratedValue
     private UUID bidId;
 
-    // The Bilkenteer who placed the bid
-    @ManyToOne
-    @JoinColumn(name = "bilkenteer")
-    @JsonBackReference
-    private Bilkenteer bilkenteer;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "bider_id", nullable = false)
+    private Bilkenteer createdBy;
 
     // The product for which the bid is placed
     @ManyToOne

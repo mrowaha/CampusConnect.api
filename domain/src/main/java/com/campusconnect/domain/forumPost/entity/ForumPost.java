@@ -1,6 +1,7 @@
 package com.campusconnect.domain.forumPost.entity;
 
 import com.campusconnect.domain.comment.entity.Comment;
+import com.campusconnect.domain.common.converter.ArrayListToJsonConverter;
 import com.campusconnect.domain.forumPost.enums.ForumPostStatus;
 import com.campusconnect.domain.forumPost.enums.ForumPostType;
 import com.campusconnect.domain.user.entity.Bilkenteer;
@@ -11,6 +12,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -68,4 +70,9 @@ public class ForumPost {
     // Set of comments associated with the forum post
     @OneToMany(mappedBy = "forumPost", cascade = CascadeType.ALL)
     private Set<Comment> comments = new HashSet();
+
+    @Column(name = "images", nullable = true)
+    @Convert(converter = ArrayListToJsonConverter.class )
+    private ArrayList<String> images = new ArrayList<>();
+
 }

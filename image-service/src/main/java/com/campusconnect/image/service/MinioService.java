@@ -22,4 +22,10 @@ public interface MinioService {
 
     // Download file from bucket
     InputStream getProductPicture(String objectName) throws GenericMinIOFailureException, InvalidFileTypeException;
+
+    FileResponse putForumPicture(MultipartFile multipartFile, String objectName) throws GenericMinIOFailureException, InvalidFileTypeException;
+
+
+    // Download file from bucket
+    InputStream getForumPicture(String objectName) throws GenericMinIOFailureException, InvalidFileTypeException;
 }

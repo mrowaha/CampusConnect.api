@@ -19,10 +19,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.sql.BatchUpdateException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -50,7 +52,7 @@ public class TransactionService {
 
         Bid bidToRemove = null;
         for (Bid bid : product.getBids()) {
-            if (bid.getBilkenteer().equals(bilkenteer)) {
+            if (bid.getCreatedBy().equals(bilkenteer)) {
                 bidToRemove = bid;
                 break;
             }
@@ -60,35 +62,40 @@ public class TransactionService {
             bidRepository.delete(bidToRemove);
         }
     }
+
+    @Transactional
+    public Set<Bid> getAllBids(Bilkenteer bilkenteer) {
+        Set<Bid> bids = bilkenteer.getBids();
+        System.out.println(bids);
+        return bids;
+    }
+
+
     /**
      * Places a bid on a product by a buyer and notifies the seller.
      *
-     * @param buyerId    ID of the buyer.
-     * @param sellerId   ID of the seller.
      * @param productId  ID of the product.
      * @param bidPrice   Price offered in the bid.
      * @param returnDate Return date for the bid (for rental products).
      * @throws UserNotFoundException     If the buyer or seller is not found.
      * @throws ProductNotFoundException  If the product is not found.
      */
-    public void makeBid(UUID buyerId, UUID sellerId, UUID productId, double bidPrice, LocalDate returnDate) {
-        Bilkenteer bilkenteer = bilkenteerRepository.findById(buyerId).orElseThrow(UserNotFoundException::new);
+    public void makeBid(Bilkenteer creator, UUID productId, double bidPrice, LocalDate returnDate) {
         Product product = productRepository.findById(productId).orElseThrow(ProductNotFoundException::new);
-        Bilkenteer owner = bilkenteerRepository.findById(sellerId).orElseThrow(UserNotFoundException::new);
+        Bilkenteer owner = product.getSeller();
 
         boolean isRentingProduct = product.getType() == ProductType.RENT;
 
         Period period = isRentingProduct ? Period.between(returnDate, LocalDate.now()) : null;
 
         Bid bid = Bid.builder()
-                .bilkenteer(bilkenteer)
+                .createdBy(creator)
                 .product(product)
                 .requestedPrice(bidPrice)
                 .period(period)
                 .build();
 
         bidRepository.save(bid);
-        product.getBids().add(bid);
         notifyUser(owner, "New bid has been made on your product.");
     }
     /**
@@ -143,7 +150,7 @@ public class TransactionService {
      */
     private void notifyBidders(List<Bid> bids, String message) {
         for (Bid bid : bids) {
-            notifyUser(bid.getBilkenteer(),message);
+            notifyUser(bid.getCreatedBy(),message);
         }
     }
     /**

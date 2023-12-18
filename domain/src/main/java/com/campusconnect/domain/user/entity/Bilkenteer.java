@@ -2,8 +2,10 @@ package com.campusconnect.domain.user.entity;
 
 import com.campusconnect.domain.ProductTag.entity.ProductTag;
 import com.campusconnect.domain.common.converter.ArrayListToJsonConverter;
+import com.campusconnect.domain.messageThread.entity.MessageThread;
 import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.forumPost.entity.ForumPost;
+import com.campusconnect.domain.transaction.entity.Bid;
 import com.campusconnect.domain.user.converter.BilkenteerAddressConverter;
 import com.campusconnect.domain.user.enums.Role;
 import com.campusconnect.domain.user.pojo.BilkenteerAddress;
@@ -56,6 +58,11 @@ public class Bilkenteer extends User {
     // Set of product tags that the Bilkenteer is subscribed to
     @OneToMany(fetch = FetchType.LAZY)
     private Set<ProductTag> subscribedTags = new HashSet<>();
+
+    @OneToMany(mappedBy = "createdBy")
+    @JsonManagedReference(value = "bider_id")
+    @JsonIgnore
+    private Set<Bid> bids = new HashSet<>();
 
     // Overrides the method in User class to provide Bilkenteer-specific authorities
     @Override
