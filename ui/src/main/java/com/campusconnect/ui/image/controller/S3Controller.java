@@ -143,4 +143,14 @@ public class S3Controller extends SecureController {
                 (response, id);
     }
 
+    @GetMapping(value = "/product-pictures/{id}/{index}")
+    @RequiredScope(scope = SecurityScope.NONE)
+    public void getProductPictures(
+            HttpServletResponse response,
+            @PathVariable("id") UUID id,
+            @PathVariable("index") Integer index
+    ) throws IOException {
+        this.productS3Service.incrementalGet(response, id, index);
+    }
+
 }
