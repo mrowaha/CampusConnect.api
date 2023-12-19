@@ -215,6 +215,10 @@ public class ProductService {
         Root<Product> product = cq.from(Product.class);
         List<Predicate> predicates = new ArrayList<>();
 
+        // Filter only AVAILABLE products
+        Predicate statusPredicate = cb.equal(product.get("status"), ProductStatus.AVAILABLE);
+        predicates.add(statusPredicate);
+
         //Keyword can Match title or Description
         if (productSearchDto.getKeywords() != null) {
             String likePattern = "%" + productSearchDto.getKeywords().toLowerCase() + "%";

@@ -47,9 +47,8 @@ public class Comment{
     private String content;
 
     // Bilkenteer who posted the comment
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "commenter_Id")
-    @JsonBackReference(value = "commenter")
     private Bilkenteer commenter;
 
 //    @Transient

@@ -1,6 +1,7 @@
 package com.campusconnect.domain.user.entity;
 
 import com.campusconnect.domain.ProductTag.entity.ProductTag;
+import com.campusconnect.domain.comment.entity.Comment;
 import com.campusconnect.domain.common.converter.ArrayListToJsonConverter;
 import com.campusconnect.domain.product.entity.Product;
 import com.campusconnect.domain.forumPost.entity.ForumPost;
@@ -49,9 +50,15 @@ public class Bilkenteer extends User {
     private List<Product> products = new ArrayList<>();
 
     // Set of forum posts created by the Bilkenteer
-    @OneToMany(mappedBy = "postingUser", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "postingUser", fetch = FetchType.LAZY)
+    @JsonManagedReference(value = "posting_user_id")
     @JsonIgnore
     private Set<ForumPost> forumPosts = new HashSet<>();
+
+    @OneToMany(mappedBy = "commenter", fetch = FetchType.LAZY)
+    @JsonManagedReference(value = "commenter_id")
+    @JsonIgnore
+    private Set<Comment> comments = new HashSet<>();
 
     // Set of product tags that the Bilkenteer is subscribed to
     @OneToMany(fetch = FetchType.LAZY)

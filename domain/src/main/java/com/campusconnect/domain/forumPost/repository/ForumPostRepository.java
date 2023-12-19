@@ -23,6 +23,4 @@ public interface ForumPostRepository extends JpaRepository<ForumPost, UUID> {
             "OR LOWER(fp.description) LIKE LOWER(CONCAT('%', :keywords, '%'))) " +
             "AND fp.postType = :postType AND fp.postStatus = :postStatus")
     Optional<List<ForumPost>> findAllByKeywordsAndTypeAndStatus(String keywords, ForumPostType postType, ForumPostStatus postStatus);
-
-
 }

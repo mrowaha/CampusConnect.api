@@ -31,10 +31,8 @@ public class ForumPost {
     protected UUID forumPostId;
 
     // User who created the forum post
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "posting_user_id")
-    @JsonBackReference(value = "forumPosts")
-    @NonNull
     protected Bilkenteer postingUser;
 
     // Timestamp when the forum post was created
